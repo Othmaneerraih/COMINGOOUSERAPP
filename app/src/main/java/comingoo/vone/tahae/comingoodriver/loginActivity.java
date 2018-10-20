@@ -47,7 +47,7 @@ public class loginActivity extends AppCompatActivity {
 
     private void login(final String number,final String password){
 
-        String n = "+212"+number;
+        String n = number;//"+212"+number;
         FirebaseDatabase.getInstance().getReference("DRIVERUSERS").orderByChild("phoneNumber").equalTo(n).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -57,7 +57,8 @@ public class loginActivity extends AppCompatActivity {
                             if(data.child("isVerified").getValue(String.class).equals("0")){
                                 //Account is Banned
                             }else {
-                                loggedIn("+212"+ number, data.getKey());
+//                                loggedIn("+212"+ number, data.getKey());
+                                loggedIn( number, data.getKey());
                             }
                         }else{
                             //Wrong Password
