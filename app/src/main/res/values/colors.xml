@@ -12,4 +12,5 @@
     <color name="gradiantStart">#427ec0</color>
     <color name="gradiantEnd">#235fac</color>
     <color name="transp">#00000000</color>
+    <color name="gradiantEnd2">#0C57B1</color>
 </resources>
