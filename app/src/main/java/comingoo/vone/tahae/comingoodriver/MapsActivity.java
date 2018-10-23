@@ -436,7 +436,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         @Override
         protected String doInBackground(String... params) {
 
-
             final SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
             final String userId = prefs.getString("userId", null);
 
@@ -467,27 +466,74 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 final Button charge = (Button) dialog.findViewById(R.id.button2);
                                 final EditText moneyAmount = (EditText) dialog.findViewById(R.id.editText);
 
-                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                        if(dataSnapshot.exists()){
-                                            if(dataSnapshot.getValue(String.class).equals("0")) {
-                                                price.setText(dataSnapshott.child("price").getValue(String.class) + " MAD");
-                                            }else{
-                                                price.setText("0 MAD");
-                                                charge.setVisibility(View.GONE);
-                                                moneyAmount.setVisibility(View.GONE);
+
+
+                                // Generating prices for driver
+                                FirebaseDatabase.getInstance().getReference("DRIVERFINISHEDCOURSES").
+                                        addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                driverWaitTime = Integer.parseInt(dataSnapshot.child("waitTime").getValue(String.class));
                                             }
-                                        }else{
-                                            price.setText(dataSnapshott.child("price").getValue(String.class) + " MAD");
-                                        }
-                                    }
 
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                                    }
-                                });
+                                            }
+                                        });
+
+
+                                FirebaseDatabase.getInstance().getReference("PRICES").
+                                        addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+
+                                                double distanceInKm = distanceInKilometer(drawRouteStart.latitude, drawRouteStart.longitude,
+                                                        drawRouteArrival.latitude, drawRouteArrival.longitude);
+
+                                                Log.e("kilometer", "onDataChange: " + distanceInKm);
+
+
+                                                double price1 = Double.parseDouble(dataSnapshot.child("base").getValue(String.class) +
+                                                        (Double.parseDouble(dataSnapshot.child("km").getValue(String.class)) * distanceInKm) +
+                                                        Double.parseDouble(dataSnapshot.child("att").getValue(String.class)) * driverWaitTime);
+
+                                                Log.e("kilometer price", "onDataChange: " + price1);
+                                                price.setText(price1 + " MAD");
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                            }
+                                        });
+
+
+
+
+
+//                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").addListenerForSingleValueEvent(new ValueEventListener() {
+//                                    @Override
+//                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                        if(dataSnapshot.exists()){
+//                                            if(dataSnapshot.getValue(String.class).equals("0")) {
+//                                                price.setText(dataSnapshott.child("price").getValue(String.class) + " MAD");
+//                                            }else{
+//                                                price.setText("0 MAD");
+//                                                charge.setVisibility(View.GONE);
+//                                                moneyAmount.setVisibility(View.GONE);
+//                                            }
+//                                        }else{
+//                                            price.setText(dataSnapshott.child("price").getValue(String.class) + " MAD");
+//                                        }
+//                                    }
+//
+//                                    @Override
+//                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                                    }
+//                                });
 
 
 
@@ -675,9 +721,33 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
+    // Calculating KM from 2 LatLong
+    private double distanceInKilometer(double lat1, double lon1, double lat2, double lon2) {
+        double theta = lon1 - lon2;
+        double dist = Math.sin(deg2rad(lat1))
+                * Math.sin(deg2rad(lat2))
+                + Math.cos(deg2rad(lat1))
+                * Math.cos(deg2rad(lat2))
+                * Math.cos(deg2rad(theta));
+        dist = Math.acos(dist);
+        dist = rad2deg(dist);
+        dist = dist * 60 * 1.1515;
+        return (dist);
+    }
+
+    private double deg2rad(double deg) {
+        return (deg * Math.PI / 180.0);
+    }
+
+    private double rad2deg(double rad) {
+        return (rad * 180.0 / Math.PI);
+    }
 
 
 
+
+
+    int driverWaitTime = 0;
     double Rating;
     private String driverName;
     private String driverImage;
