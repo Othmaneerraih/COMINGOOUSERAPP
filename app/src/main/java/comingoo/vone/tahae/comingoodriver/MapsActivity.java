@@ -1078,35 +1078,38 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                             clientId = data.child("client").getValue(String.class);
 
-                            drawRouteStart = new LatLng(Double.parseDouble(data.child("startLat").getValue(String.class)), Double.parseDouble(data.child("startLong").getValue(String.class)));
+                            String lat = data.child("startLat").getValue(String.class);
+                            String lng = data.child("startLong").getValue(String.class);
 
-                            if(driverData.child("endLat").getValue(String.class).equals("")){
-                                drawRouteArrival = null;
-                            }else{
-                                drawRouteArrival = new LatLng(Double.parseDouble(data.child("endLat").getValue(String.class)), Double.parseDouble(data.child("endLong").getValue(String.class)));
+                            if(lat != null && lng != null){
+                                drawRouteStart = new LatLng(Double.parseDouble(lat),Double.parseDouble(lng));
                             }
 
-                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                    clientImageUri = dataSnapshot.child("image").getValue(String.class);
-                                    clientName = dataSnapshot.child("fullName").getValue(String.class);
-                                    clientPhoneNumber = dataSnapshot.child("phoneNumber").getValue(String.class);
-                                    lastCourse = dataSnapshot.child("LASTCOURSE").getValue(String.class);
-                                    courseHandle();
+                            if(driverData.child("endLat").getValue(String.class)!=null){
+                                if(driverData.child("endLat").getValue(String.class).equals("")){
+                                    drawRouteArrival = null;
+                                }else{
+                                    drawRouteArrival = new LatLng(Double.parseDouble(data.child("endLat").getValue(String.class)), Double.parseDouble(data.child("endLong").getValue(String.class)));
                                 }
+                            }
 
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError databaseError) {
+                            if (clientId != null){
+                                FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        clientImageUri = dataSnapshot.child("image").getValue(String.class);
+                                        clientName = dataSnapshot.child("fullName").getValue(String.class);
+                                        clientPhoneNumber = dataSnapshot.child("phoneNumber").getValue(String.class);
+                                        lastCourse = dataSnapshot.child("LASTCOURSE").getValue(String.class);
+                                        courseHandle();
+                                    }
 
-                                }
-                            });
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
 
-
-
-
-
-
+                                    }
+                                });
+                            }
                         }
                     }else{
                         //stopCourseService();
