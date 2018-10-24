@@ -902,8 +902,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         TextView ratingR = (TextView) findViewById(R.id.ratings);
 
         if (driverImage != null) {
-            if (driverImage.length() > 0)
+            if (driverImage.length() > 0) {
                 Picasso.get().load(driverImage).fit().centerCrop().into(driverI);
+            }else{
+                driverI.setImageResource(R.drawable.driver_profil_picture);
+            }
+        }else{
+            driverI.setImageResource(R.drawable.driver_profil_picture);
         }
         fullName.setText(driverName);
         ratingR.setText(Rating + "");

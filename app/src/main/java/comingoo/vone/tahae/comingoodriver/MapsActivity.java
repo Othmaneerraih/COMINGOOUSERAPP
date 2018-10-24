@@ -1,6 +1,7 @@
 package comingoo.vone.tahae.comingoodriver;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
@@ -91,6 +92,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private ImageButton wazeButton;
     private ImageButton contactButton;
+    private Button cancel_ride_btn;
 
     private ConstraintLayout clientInfoLayout;
     private ConstraintLayout destinationLayout;
@@ -224,6 +226,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         wazeButton = (ImageButton) findViewById(R.id.waze_button);
         contactButton = (ImageButton) findViewById(R.id.contact_button);
+        cancel_ride_btn = (Button) findViewById(R.id.cancel_ride_btn);
 
         clientInfoLayout = (ConstraintLayout) findViewById(R.id.clientInfo);
         destinationLayout = (ConstraintLayout) findViewById(R.id.destination_layout);
@@ -256,6 +259,48 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         loadImages();
+
+        contactButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(!clientPhoneNumber.isEmpty() || clientPhoneNumber != null){
+                    try{
+                        Intent callIntent = new Intent(Intent.ACTION_CALL);
+                        callIntent.setData(Uri.parse("tel:"+clientPhoneNumber));
+                        if (ActivityCompat.checkSelfPermission(getBaseContext(), Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
+                            startActivity(callIntent);
+                        }
+                    }catch(Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+
+        cancel_ride_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case DialogInterface.BUTTON_POSITIVE:
+                                //Yes button clicked
+                                FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("state").setValue("5");
+                                FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).removeValue();
+                                break;
+
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                //No button clicked
+                                break;
+                        }
+                    }
+                };
+                AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivity.this);
+                builder.setTitle("Vous étes sure?").setMessage("Voulez-vous annuler la course?").setPositiveButton("Yes", dialogClickListener)
+                        .setNegativeButton("No", dialogClickListener).show();
+            }
+        });
 
         switchOnlineButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -932,9 +977,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             TextView fullName = (TextView) findViewById(R.id.fullName);
             TextView ratingR = (TextView) findViewById(R.id.ratings);
 
-        if(driverImage != null) {
-            if (driverImage.length() > 0)
+        if (driverImage != null) {
+            if (driverImage.length() > 0) {
                 Picasso.get().load(driverImage).fit().centerCrop().into(driverI);
+            }else{
+                driverI.setImageResource(R.drawable.driver_profil_picture);
+            }
+        }else{
+            driverI.setImageResource(R.drawable.driver_profil_picture);
         }
         fullName.setText(driverName);
         ratingR.setText(Rating+"");
