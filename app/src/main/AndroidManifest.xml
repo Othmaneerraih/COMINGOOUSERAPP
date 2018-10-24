@@ -7,6 +7,7 @@
          Google Maps Android API v2, but you must specify either coarse or fine
          location permissions for the 'MyLocation' functionality. 
     -->
+
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -50,25 +51,33 @@
             android:label="@string/title_activity_maps">
 
         </activity>
-        <activity android:name=".commandActivity"   android:configChanges="orientation"
-            android:screenOrientation="portrait">
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
-
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
-        </activity>
-        <activity android:name=".MainActivity"   android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".loginActivity"   android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".historiqueActivity"   android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".notificationActivity"   android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".aideActivity"   android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".comingoonuActivity"  android:configChanges="orientation"
+        <activity
+            android:name=".commandActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".MainActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".loginActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".historiqueActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".notificationActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".aideActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".comingoonuActivity"
+            android:configChanges="orientation"
             android:screenOrientation="portrait"></activity>
     </application>
 
