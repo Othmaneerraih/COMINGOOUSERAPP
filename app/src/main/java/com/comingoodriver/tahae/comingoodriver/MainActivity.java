@@ -204,7 +204,7 @@ import comingoo.vone.tahae.comingoodriver.R;
         }
 
         public void finishedSubscription(){
-            Toast.makeText(this, "Bienvenu chez COMINGOO.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Bienvenu chez Fousa.", Toast.LENGTH_SHORT).show();
         }
     }
 

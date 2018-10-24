@@ -1,9 +1,11 @@
 package comingoo.vone.tahae.comingoodriver;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -34,6 +36,7 @@ public class commandActivity extends AppCompatActivity {
     private Button decline;
     private Button accept;
     private MediaPlayer mp;
+    private Vibrator vibrator;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,9 +52,11 @@ public class commandActivity extends AppCompatActivity {
         window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
 
-
+        vibrator = (Vibrator)this.getSystemService(Context.VIBRATOR_SERVICE);
+// Vibrate for 1 seconds
+        vibrator.vibrate(100);
         mp = MediaPlayer.create(this, R.raw.ring);
-        mp.setLooping(true);
+        mp.setLooping(false);
         mp.start();
 
 
@@ -107,6 +112,8 @@ public class commandActivity extends AppCompatActivity {
         decline.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                mp.stop();
+                vibrator.cancel();
                 FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
             }
         });
@@ -126,10 +133,11 @@ public class commandActivity extends AppCompatActivity {
         });
 
 
-
         accept.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                mp.stop();
+                vibrator.cancel();
                 accept.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

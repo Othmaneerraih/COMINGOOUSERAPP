@@ -60,6 +60,13 @@ public class historiqueActivity extends AppCompatActivity {
         cAdapter = new MyAdapter(CoursesData);
         mLocationView.setAdapter(cAdapter);
         new CheckUserTask().execute();
+
+        findViewById(R.id.back).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
         
         
     }
@@ -261,12 +268,7 @@ public class historiqueActivity extends AppCompatActivity {
                 }
             });
 
-            findViewById(R.id.back).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    finish();
-                }
-            });
+
 
 
         }
