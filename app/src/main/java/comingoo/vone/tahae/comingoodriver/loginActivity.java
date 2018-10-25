@@ -58,7 +58,12 @@ public class loginActivity extends AppCompatActivity {
                                 //Account is Banned
                             }else {
 //                                loggedIn("+212"+ number, data.getKey());
-                                loggedIn( number, data.getKey());
+                                if(data.child("isActive").getValue(String.class).equals("0")){
+                                    Toast.makeText(loginActivity.this, "This account is currently disabled", Toast.LENGTH_SHORT).show();
+                                }else{
+                                    loggedIn( number, data.getKey());
+                                }
+
                             }
                         }else{
                             //Wrong Password
