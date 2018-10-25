@@ -42,9 +42,13 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -119,6 +123,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ConstraintLayout logout;
 
 
+    private Marker startPositionMarker;
 
 
     ////////////////////////////////////////////
@@ -130,7 +135,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     int lastImageWidth;
     int inSampleSize;
 
-    public Bitmap scaleBitmap(int reqWidth, int reqHeight , int resId) {
+    public Bitmap scaleBitmap(int reqWidth, int reqHeight, int resId) {
         // Raw height and width of image
 
         bOptions = new BitmapFactory.Options();
@@ -140,7 +145,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         imageWidth = bOptions.outWidth;
 
         imageHeight = bOptions.outHeight;
-        imageWidth= bOptions.outWidth;
+        imageWidth = bOptions.outWidth;
         inSampleSize = 1;
 
         if (imageHeight > reqHeight || imageWidth > reqWidth) {
@@ -160,7 +165,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // First decode with inJustDecodeBounds=true to check dimensions
         bOptions = new BitmapFactory.Options();
         bOptions.inJustDecodeBounds = true;
-        BitmapFactory.decodeResource(getResources() , resId, bOptions);
+        BitmapFactory.decodeResource(getResources(), resId, bOptions);
 
         // Calculate inSampleSize
         bOptions.inSampleSize = inSampleSize;
@@ -171,17 +176,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-
-    private void loadImages(){
-      //  locationStartPin.setImageBitmap(scaleBitmap(76, 56, R.drawable.depart_pin));
+    private void loadImages() {
+        //  locationStartPin.setImageBitmap(scaleBitmap(76, 56, R.drawable.depart_pin));
         switchOnlineButton.setBackground(new BitmapDrawable(getResources(), scaleBitmap((int) 60, (int) 60, R.drawable.goo_bt)));
-       // switchOnlineButton.setImageBitmap(scaleBitmap(60, 60, R.drawable.goo_bt));
-        menuButton.setBackground(new BitmapDrawable(getResources(),scaleBitmap(40, 40, R.drawable.menu_icon)));
-        myPositionButton.setBackground(new BitmapDrawable(getResources(),scaleBitmap(40, 40, R.drawable.my_location)));
-        wazeButton.setBackground(new BitmapDrawable(getResources(),scaleBitmap(40, 40, R.drawable.waze_icon)));
-        contactButton.setBackground(new BitmapDrawable(getResources(),scaleBitmap(40, 40, R.drawable.contact)));
-        arrowImage.setBackground(new BitmapDrawable(getResources(),scaleBitmap(30, 30, R.drawable.arrow_blue)));
-        whitePersonImage.setBackground(new BitmapDrawable(getResources(),scaleBitmap(30, 50, R.drawable.person_white)));
+        // switchOnlineButton.setImageBitmap(scaleBitmap(60, 60, R.drawable.goo_bt));
+        menuButton.setBackground(new BitmapDrawable(getResources(), scaleBitmap(40, 40, R.drawable.menu_icon)));
+        myPositionButton.setBackground(new BitmapDrawable(getResources(), scaleBitmap(40, 40, R.drawable.my_location)));
+        wazeButton.setBackground(new BitmapDrawable(getResources(), scaleBitmap(40, 40, R.drawable.waze_icon)));
+        contactButton.setBackground(new BitmapDrawable(getResources(), scaleBitmap(40, 40, R.drawable.contact)));
+        arrowImage.setBackground(new BitmapDrawable(getResources(), scaleBitmap(30, 30, R.drawable.arrow_blue)));
+        whitePersonImage.setBackground(new BitmapDrawable(getResources(), scaleBitmap(30, 50, R.drawable.person_white)));
     }
 
     ////////////////////////////////////////////
@@ -193,10 +197,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Intent intent;
 
     private SinchClient sinchClient;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+        try {
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -204,8 +210,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         new CheckLoginService().execute();
 
-        if(ContextCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(MapsActivity.this, new String[] {Manifest.permission.RECORD_AUDIO}, 4);
+        if (ContextCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(MapsActivity.this, new String[]{Manifest.permission.RECORD_AUDIO}, 4);
         }
         intent = new Intent(MapsActivity.this, DriverService.class);
 
@@ -213,48 +219,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         DisplayMetrics outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
 
-        density  = getResources().getDisplayMetrics().density;
+        density = getResources().getDisplayMetrics().density;
         dpHeight = outMetrics.heightPixels / density;
-        dpWidth  = outMetrics.widthPixels / density;
+        dpWidth = outMetrics.widthPixels / density;
 
-        onlineButton = (Button) findViewById(R.id.online_button);
-        offlineButton = (Button) findViewById(R.id.offline_button);
-        switchOnlineButton = (Button) findViewById(R.id.switch_online_button);
-
-        menuButton = (ImageButton) findViewById(R.id.menu_button);
-        myPositionButton = (ImageButton)findViewById(R.id.my_position_button);
-
-        wazeButton = (ImageButton) findViewById(R.id.waze_button);
-        contactButton = (ImageButton) findViewById(R.id.contact_button);
-        cancel_ride_btn = (Button) findViewById(R.id.cancel_ride_btn);
-
-        clientInfoLayout = (ConstraintLayout) findViewById(R.id.clientInfo);
-        destinationLayout = (ConstraintLayout) findViewById(R.id.destination_layout);
-
-        arrowImage = (ImageView) findViewById(R.id.arrow_image);
-        whitePersonImage = (ImageView) findViewById(R.id.white_person_image);
-
-        addressText = (TextView) findViewById(R.id.addressText);
-
-        destTime = (TextView) findViewById(R.id.destTime);
-
-        courseActionButton = (Button) findViewById(R.id.course_action_button);
-        cancelCourseButton = (ImageButton) findViewById(R.id.cancelCourse);
-
-        mDrawer = (FlowingDrawer) findViewById(R.id.drawerlayout);
-
-        Acceuil = (ConstraintLayout) findViewById(R.id.acceuil);
-        Historique = (ConstraintLayout) findViewById(R.id.historique);
-        Inbox = (ConstraintLayout) findViewById(R.id.inbox);
-        ComingoonYou = (ConstraintLayout) findViewById(R.id.comingoonyou);
-        Aide = (ConstraintLayout) findViewById(R.id.aide);
-        logout = (ConstraintLayout) findViewById(R.id.logout);
-
-        money = (Button) findViewById(R.id.money);
+        initializeViews();
 
 
         SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
-        if(prefs.getString("online", "0").equals("1"))
+        if (prefs.getString("online", "0").equals("1"))
             switchOnlineUI();
 
 
@@ -354,31 +327,59 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-
-        new checkCourseTask().execute();
-        new checkCourseFinished().execute();
-
+            new checkCourseTask().execute();
+            new checkCourseFinished().execute();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
+    private void initializeViews() {
+        onlineButton = (Button) findViewById(R.id.online_button);
+        offlineButton = (Button) findViewById(R.id.offline_button);
+        switchOnlineButton = (Button) findViewById(R.id.switch_online_button);
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
+        menuButton = (ImageButton) findViewById(R.id.menu_button);
+        myPositionButton = (ImageButton) findViewById(R.id.my_position_button);
+
+        wazeButton = (ImageButton) findViewById(R.id.waze_button);
+        contactButton = (ImageButton) findViewById(R.id.contact_button);
+        cancel_ride_btn = (Button) findViewById(R.id.cancel_ride_btn);
+
+        clientInfoLayout = (ConstraintLayout) findViewById(R.id.clientInfo);
+        destinationLayout = (ConstraintLayout) findViewById(R.id.destination_layout);
+
+        arrowImage = (ImageView) findViewById(R.id.arrow_image);
+        whitePersonImage = (ImageView) findViewById(R.id.white_person_image);
+
+        addressText = (TextView) findViewById(R.id.addressText);
+
+        destTime = (TextView) findViewById(R.id.destTime);
+
+        courseActionButton = (Button) findViewById(R.id.course_action_button);
+        cancelCourseButton = (ImageButton) findViewById(R.id.cancelCourse);
+
+        mDrawer = (FlowingDrawer) findViewById(R.id.drawerlayout);
+
+        Acceuil = (ConstraintLayout) findViewById(R.id.acceuil);
+        Historique = (ConstraintLayout) findViewById(R.id.historique);
+        Inbox = (ConstraintLayout) findViewById(R.id.inbox);
+        ComingoonYou = (ConstraintLayout) findViewById(R.id.comingoonyou);
+        Aide = (ConstraintLayout) findViewById(R.id.aide);
+        logout = (ConstraintLayout) findViewById(R.id.logout);
+
+        money = (Button) findViewById(R.id.money);
+    }
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.getUiSettings().setMapToolbarEnabled(false);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
 
-        if(ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED){
+        if (ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(MapsActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.READ_CONTACTS}, 1);
-        }else{
+        } else {
             //startLocationUpdates();
             mMap.setMyLocationEnabled(true);
             getLastLocation();
@@ -389,12 +390,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             });
         }
-
-        // Add a marker in Sydney and move the camera
     }
 
 
-    private void switchOnlineUI(){
+    private void switchOnlineUI() {
         //offlineButton.setVisibility(View.GONE);
         //switchOnlineButton.setVisibility(View.GONE);
         //onlineButton.setVisibility(View.VISIBLE);
@@ -410,7 +409,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         startService(intent);
     }
 
-    private void switchOfflineUI(boolean... params){
+    private void switchOfflineUI(boolean... params) {
 
         CustomAnimation.fadeIn(MapsActivity.this, offlineButton, 500, 10);
         CustomAnimation.fadeIn(MapsActivity.this, switchOnlineButton, 500, 10);
@@ -419,13 +418,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
         prefs.edit().putString("online", "0").apply();
         stopService(intent);
-        if(params.length > 0){
-            if(params[0] == true)
+        if (params.length > 0) {
+            if (params[0] == true)
                 switchOnlineUI();
         }
     }
 
-    private void switchToCourseUI(){
+    private void switchToCourseUI() {
         findViewById(R.id.statusConstraint).setVisibility(View.GONE);
         findViewById(R.id.money).setVisibility(View.GONE);
         menuButton.setVisibility(View.GONE);
@@ -435,7 +434,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         destinationLayout.setVisibility(View.VISIBLE);
     }
 
-    private void cancelCourseUI(){
+    private void cancelCourseUI() {
         findViewById(R.id.statusConstraint).setVisibility(View.VISIBLE);
         findViewById(R.id.money).setVisibility(View.VISIBLE);
         menuButton.setVisibility(View.VISIBLE);
@@ -463,13 +462,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public int GetUnixTime() {
         Calendar calendar = Calendar.getInstance();
         long now = calendar.getTimeInMillis();
-        int utc = (int)(now / 1000);
+        int utc = (int) (now / 1000);
         return (utc);
 
     }
 
 
     int RATE = 0;
+
     private class checkCourseFinished extends AsyncTask<String, Integer, String> {
         @Override
         protected void onPreExecute() {
@@ -484,12 +484,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             final SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
             final String userId = prefs.getString("userId", null);
 
-            if(userId == null) return "";
+            if (userId == null) return "";
             FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
-                    if(dataSnapshot.exists()){
-                        FirebaseDatabase.getInstance().getReference("DRIVERFINISHEDCOURSES").child(userId).child(dataSnapshot.getValue(String.class)).addListenerForSingleValueEvent(new ValueEventListener() {
+                    if (dataSnapshot.exists()) {
+                        FirebaseDatabase.getInstance().getReference("DRIVERFINISHEDCOURSES").
+                                child(userId).child(dataSnapshot.getValue(String.class)).addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull final DataSnapshot dataSnapshott) {
 
@@ -511,15 +512,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 final Button charge = (Button) dialog.findViewById(R.id.button2);
                                 final EditText moneyAmount = (EditText) dialog.findViewById(R.id.editText);
 
-
-
-                                // Generating prices for driver
-                                FirebaseDatabase.getInstance().getReference("DRIVERFINISHEDCOURSES").
-                                        addListenerForSingleValueEvent(new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                driverWaitTime = Integer.parseInt(dataSnapshot.child("waitTime").getValue(String.class));
+//<<<<<<< HEAD
+                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").
+                                        child(userId).child("PAID").addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        if (dataSnapshot.exists()) {
+                                            if (dataSnapshot.getValue(String.class).equals("0")) {
+                                                price.setText(dataSnapshott.child("price").getValue(String.class) + " MAD");
+                                            } else {
+                                                price.setText("0 MAD");
+                                                charge.setVisibility(View.GONE);
+                                                moneyAmount.setVisibility(View.GONE);
                                             }
+                                        } else {
+                                            price.setText(dataSnapshott.child("price").getValue(String.class) + " MAD");
+                                        }
+                                    }
+//=======
+//
+//
+//                                // Generating prices for driver
+//                                FirebaseDatabase.getInstance().getReference("DRIVERFINISHEDCOURSES").
+//                                        addListenerForSingleValueEvent(new ValueEventListener() {
+//                                            @Override
+//                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                                driverWaitTime = Integer.parseInt(dataSnapshot.child("waitTime").getValue(String.class));
+//                                            }
+//>>>>>>> 3dd2640c6911ff24e336d44d509461f36b2b1dda
 
                                             @Override
                                             public void onCancelled(@NonNull DatabaseError databaseError) {
@@ -581,8 +601,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //                                });
 
 
-
-
                                 dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                                     @Override
                                     public void onDismiss(DialogInterface dialog) {
@@ -602,18 +620,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     @Override
                                     public void onClick(View v) {
                                         String val = moneyAmount.getText().toString();
-                                        if(moneyAmount.getText().toString().length() > 0){
+                                        if (moneyAmount.getText().toString().length() > 0) {
                                             final int money = Integer.parseInt(val) - Integer.parseInt(dataSnapshott.child("price").getValue(String.class));
-                                            if(money > 0){
+                                            if (money > 0) {
                                                 dialog.dismiss();
                                                 FirebaseDatabase.getInstance().getReference("clientUSERS").child(dataSnapshott.child("client").getValue(String.class)).child("SOLDE").addListenerForSingleValueEvent(new ValueEventListener() {
                                                     @Override
                                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                         int cM = money;
-                                                        if(dataSnapshot.exists()){
+                                                        if (dataSnapshot.exists()) {
                                                             cM += Integer.parseInt(dataSnapshot.getValue(String.class));
                                                         }
-                                                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(dataSnapshott.child("client").getValue(String.class)).child("SOLDE").setValue(""+cM);
+                                                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(dataSnapshott.child("client").getValue(String.class)).child("SOLDE").setValue("" + cM);
                                                         FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").removeValue();
                                                     }
 
@@ -627,7 +645,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         }
                                     }
                                 });
-
 
 
                                 star1.setOnClickListener(new View.OnClickListener() {
@@ -702,18 +719,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 });
 
 
-
-
                                 dialog.setCancelable(false);
                                 dialog.setCanceledOnTouchOutside(false);
 
                                 dialog.show();
 
-                                dialog.findViewById(R.id.body).getLayoutParams().width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (int ) (dpWidth), MapsActivity.this.getResources().getDisplayMetrics());
+                                dialog.findViewById(R.id.body).getLayoutParams().width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (int) (dpWidth), MapsActivity.this.getResources().getDisplayMetrics());
 
 
                                 WindowManager.LayoutParams lp = dialog.getWindow().getAttributes();
-                                lp.dimAmount=0.5f;
+                                lp.dimAmount = 0.5f;
                                 dialog.getWindow().setAttributes(lp);
                                 dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                                 dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
@@ -741,8 +756,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 }
             });
-
-
 
 
             return "this string is passed to onPostExecute";
@@ -800,6 +813,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private String todayEarnings;
     private String todayTrips;
     private String driverNumber;
+
     private class CheckLoginService extends AsyncTask<String, Integer, String> {
         @Override
         protected void onPreExecute() {
@@ -812,7 +826,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         protected String doInBackground(String... params) {
 
 
-
             final SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
             final String number = prefs.getString("userId", null);
             if (number == null) {
@@ -820,9 +833,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Intent intent = new Intent(MapsActivity.this, MainActivity.class);
                 startActivity(intent);
                 finish();
-            }else {
+            } else {
 
-                if (Looper.myLooper() == null){
+                if (Looper.myLooper() == null) {
                     Looper.prepare();
                     Looper.myLooper();
                 }
@@ -840,71 +853,70 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 sinchClient.getCallClient().addCallClientListener(new SinchCallClientListener());
 
 
-
                 FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(number).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if(dataSnapshot.exists()){
+                        if (dataSnapshot.exists()) {
 
-                                String isVerified = dataSnapshot.child("isVerified").getValue(String.class);
-                                if(isVerified.equals("0")){
-                                    prefs.edit().remove("phoneNumber").apply();
-                                    prefs.edit().remove("userId").apply();
-                                    Intent intent = new Intent(MapsActivity.this, MainActivity.class);
-                                    startActivity(intent);
-                                    finish();
+                            String isVerified = dataSnapshot.child("isVerified").getValue(String.class);
+                            if (isVerified.equals("0")) {
+                                prefs.edit().remove("phoneNumber").apply();
+                                prefs.edit().remove("userId").apply();
+                                Intent intent = new Intent(MapsActivity.this, MainActivity.class);
+                                startActivity(intent);
+                                finish();
+                            }
+                            driverName = dataSnapshot.child("fullName").getValue(String.class);
+                            driverImage = dataSnapshot.child("image").getValue(String.class);
+                            driverNumber = dataSnapshot.child("phoneNumber").getValue(String.class);
+                            prefs.edit().putString("userId", dataSnapshot.getKey()).apply();
+
+
+                            int r1 = Integer.parseInt(dataSnapshot.child("rating").child("1").getValue(String.class));
+                            int r2 = Integer.parseInt(dataSnapshot.child("rating").child("2").getValue(String.class));
+                            int r3 = Integer.parseInt(dataSnapshot.child("rating").child("3").getValue(String.class));
+                            int r4 = Integer.parseInt(dataSnapshot.child("rating").child("4").getValue(String.class));
+                            int r5 = Integer.parseInt(dataSnapshot.child("rating").child("5").getValue(String.class));
+
+                            int t = r1 + (r2 * 2) + (r3 * 3) + (r4 * 4) + (r5 * 5);
+                            int total = r1 + r2 + r3 + r4 + r5;
+
+                            Rating = 0;
+                            if (total != 0)
+                                Rating = (double) (t / total);
+
+                            if (dataSnapshot.child("debt").exists())
+                                Debt = dataSnapshot.child("debt").getValue(String.class);
+                            else
+                                Debt = "0.0";
+
+
+                            todayEarnings = "0";
+                            todayTrips = "0";
+
+                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(number).child("EARNINGS").child(getDateMonth(GetUnixTime())).child(getDateDay(GetUnixTime())).addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                                    if (dataSnapshot.exists()) {
+                                        todayEarnings = dataSnapshot.child("earnings").getValue(String.class);
+                                        todayTrips = dataSnapshot.child("voyages").getValue(String.class);
+
+                                        setUserUi();
+                                    }
+
                                 }
-                                driverName = dataSnapshot.child("fullName").getValue(String.class);
-                                driverImage = dataSnapshot.child("image").getValue(String.class);
-                                driverNumber = dataSnapshot.child("phoneNumber").getValue(String.class);
-                                prefs.edit().putString("userId", dataSnapshot.getKey()).apply();
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
+
+                            setUserUi();
 
 
-                                int r1 =  Integer.parseInt(dataSnapshot.child("rating").child("1").getValue(String.class));
-                                int r2 =  Integer.parseInt(dataSnapshot.child("rating").child("2").getValue(String.class));
-                                int r3 =  Integer.parseInt(dataSnapshot.child("rating").child("3").getValue(String.class));
-                                int r4 =  Integer.parseInt(dataSnapshot.child("rating").child("4").getValue(String.class));
-                                int r5 =  Integer.parseInt(dataSnapshot.child("rating").child("5").getValue(String.class));
-
-                                int t = r1 + (r2*2) + (r3*3) + (r4*4) + (r5*5);
-                                int total = r1 + r2 + r3 + r4 + r5;
-
-                                Rating = 0;
-                                if(total != 0)
-                                    Rating = (double) (t/total);
-
-                                if(dataSnapshot.child("debt").exists())
-                                    Debt = dataSnapshot.child("debt").getValue(String.class);
-                                else
-                                    Debt = "0.0";
-
-
-                                todayEarnings = "0";
-                                todayTrips = "0";
-
-                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(number).child("EARNINGS").child(getDateMonth(GetUnixTime())).child(getDateDay(GetUnixTime())).addValueEventListener(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                                        if(dataSnapshot.exists()){
-                                            todayEarnings = dataSnapshot.child("earnings").getValue(String.class);
-                                            todayTrips = dataSnapshot.child("voyages").getValue(String.class);
-
-                                            setUserUi();
-                                        }
-
-                                    }
-
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                    }
-                                });
-
-                                setUserUi();
-
-
-                        }else{
+                        } else {
                             Toast.makeText(MapsActivity.this, number, Toast.LENGTH_SHORT).show();
                             prefs.edit().remove("phoneNumber").apply();
                             prefs.edit().remove("userId").apply();
@@ -967,15 +979,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    private void logout(){
+    private void logout() {
         final SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
         final String number = prefs.getString("userId", null);
         prefs.edit().remove("userId").apply();
     }
-    private void setUserUi(){
-            CircleImageView driverI = (CircleImageView) findViewById(R.id.profile_image);
-            TextView fullName = (TextView) findViewById(R.id.fullName);
-            TextView ratingR = (TextView) findViewById(R.id.ratings);
+
+    private void setUserUi() {
+        CircleImageView driverI = (CircleImageView) findViewById(R.id.profile_image);
+        TextView fullName = (TextView) findViewById(R.id.fullName);
+        TextView ratingR = (TextView) findViewById(R.id.ratings);
 
         if (driverImage != null) {
             if (driverImage.length() > 0) {
@@ -987,9 +1000,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             driverI.setImageResource(R.drawable.driver_profil_picture);
         }
         fullName.setText(driverName);
-        ratingR.setText(Rating+"");
+        ratingR.setText(Rating + "");
         money.setText(todayEarnings + " MAD");
-
 
 
         ComingoonYou.setOnClickListener(new View.OnClickListener() {
@@ -1008,15 +1020,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode,   @NonNull String[] permissions, @NonNull int[] grantResult) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResult) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResult);
 
         if (grantResult.length > 0 && grantResult[0] == PackageManager.PERMISSION_GRANTED) {
-            if(ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+            if (ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(MapsActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
-            }else{
+            } else {
                 //startLocationUpdates();
-                if(mMap != null)
+                if (mMap != null)
                     mMap.setMyLocationEnabled(true);
                 getLastLocation();
                 myPositionButton.setOnClickListener(new View.OnClickListener() {
@@ -1030,8 +1042,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-
-
     private String courseID;
     private String courseState;
     private DatabaseReference courseRef;
@@ -1043,13 +1053,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private String lastCourse = "";
 
     private LatLng drawRouteStart;
-    private  LatLng drawRouteArrival;
+    private LatLng drawRouteArrival;
 
     private String startAddress;
     private String destAddress;
+
     private class checkCourseTask extends AsyncTask<String, Integer, String> {
         SharedPreferences prefs;
         String userId;
+
         // Runs in UI before background thread is called
         @Override
         protected void onPreExecute() {
@@ -1066,8 +1078,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             FirebaseDatabase.getInstance().getReference("COURSES").orderByChild("driver").equalTo(userId).limitToFirst(1).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if(dataSnapshot.exists()){
-                        for (final DataSnapshot data : dataSnapshot.getChildren()){
+                    if (dataSnapshot.exists()) {
+                        for (final DataSnapshot data : dataSnapshot.getChildren()) {
                             courseID = data.getKey();
                             courseRef = FirebaseDatabase.getInstance().getReference("COURSES").child(courseID);
                             courseState = data.child("state").getValue(String.class);
@@ -1080,10 +1092,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                             String lat = data.child("startLat").getValue(String.class);
                             String lng = data.child("startLong").getValue(String.class);
-
-                            if(lat != null && lng != null){
-                                drawRouteStart = new LatLng(Double.parseDouble(lat),Double.parseDouble(lng));
-                            }
 
                             if(driverData.child("endLat").getValue(String.class)!=null){
                                 if(driverData.child("endLat").getValue(String.class).equals("")){
@@ -1111,7 +1119,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 });
                             }
                         }
-                    }else{
+                    } else {
                         //stopCourseService();
                         courseState = "4";
                         courseHandle();
@@ -1147,28 +1155,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-    private void courseHandle(){
-        if(courseState.equals("4")){
+    private void courseHandle() {
+        if (courseState.equals("4")) {
 
             wazeButton.setVisibility(View.GONE);
             findViewById(R.id.waze_button).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    return ;
+                    return;
                 }
             });
             courseUIOff();
-            if(mMap != null)
+            if (mMap != null)
                 mMap.clear();
 
 
-        }else{
+        } else {
 
             switchToCourseUI();
-            if(courseState.equals("3")){
+            if (courseState.equals("3")) {
                 stopCourseService();
                 courseState = "4";
-                if(mMap != null)
+                if (mMap != null)
                     mMap.clear();
 
             }
@@ -1180,10 +1188,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     }
+
     CircleImageView clientImage;
     TextView name, textView4;
 
-    public void checkCourseState(){
+    public void checkCourseState() {
 
         switchToCourseUI();
         clientImage = (CircleImageView) findViewById(R.id.clientImage);
@@ -1192,13 +1201,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         name.setText(clientName);
         textView4.setText(lastCourse);
-        if(clientImageUri != null) {
-            if(clientImageUri.length() > 0)
+        if (clientImageUri != null) {
+            if (clientImageUri.length() > 0)
                 Picasso.get().load(clientImageUri).fit().centerCrop().into(clientImage);
         }
 
-        if(courseState.equals("0")){
-
+        if (courseState.equals("0")) {
             addressText.setText(startAddress);
             cancelCourseButton.setVisibility(View.GONE);
             courseActionButton.setOnClickListener(new View.OnClickListener() {
@@ -1210,7 +1218,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             courseActionButton.setText("Appuyez pour arriver");
 
 
-            if(userLatLng != null && drawRouteStart != null){
+            if (userLatLng != null && drawRouteStart != null) {
                 new DrawRouteTask().execute(userLatLng, drawRouteStart);
 
                 wazeButton.setVisibility(View.VISIBLE);
@@ -1223,7 +1231,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             }
         }
-        if(courseState.equals("1")) {
+        if (courseState.equals("1")) {
             addressText.setText(destAddress);
             courseActionButton.setText("Appuyez pour commancer");
             wazeButton.setVisibility(View.GONE);
@@ -1233,10 +1241,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     courseRef.child("state").setValue("2");
                 }
             });
-            if(mMap != null)
+            if (mMap != null)
                 mMap.clear();
         }
-        if(courseState.equals("2")) {
+        if (courseState.equals("2")) {
             addressText.setText(destAddress);
             courseActionButton.setText("Appuyez pour terminer");
             courseActionButton.setOnClickListener(new View.OnClickListener() {
@@ -1247,7 +1255,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             });
 
 
-            if(drawRouteArrival != null && drawRouteStart != null){
+            if (drawRouteArrival != null && drawRouteStart != null) {
                 new DrawRouteTask().execute(drawRouteStart, drawRouteArrival);
 
                 wazeButton.setVisibility(View.VISIBLE);
@@ -1263,10 +1271,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
 
-
     }
 
-    private void switchtoCourseUI(){
+    private void switchtoCourseUI() {
         switchOfflineUI();
         findViewById(R.id.statusConstraint).setVisibility(View.GONE);
         findViewById(R.id.money).setVisibility(View.GONE);
@@ -1275,7 +1282,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         menuButton.setVisibility(View.GONE);
     }
 
-    private void courseUIOff(){
+    private void courseUIOff() {
         findViewById(R.id.statusConstraint).setVisibility(View.VISIBLE);
         findViewById(R.id.money).setVisibility(View.VISIBLE);
         clientInfoLayout.setVisibility(View.GONE);
@@ -1283,7 +1290,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         menuButton.setVisibility(View.VISIBLE);
     }
 
-    public void startCourseService(String id){
+    public void startCourseService(String id) {
         Intent intent = new Intent(this, CourseService.class);
         SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
         prefs.edit().putString("courseID", courseID).apply();
@@ -1293,27 +1300,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-    public void stopCourseService(){
+    public void stopCourseService() {
         Intent intent = new Intent(this, CourseService.class);
         stopService(intent);
     }
 
 
-    private void openWaze (LatLng location){
+    private void openWaze(LatLng location) {
         String link = "https://waze.com/ul?";
-        if(location!=null){
-            link += "ll="+location.latitude+","+location.longitude+"&navigate=yes";
+        if (location != null) {
+            link += "ll=" + location.latitude + "," + location.longitude + "&navigate=yes";
         }
 
 
-        try
-        {
-            Intent intent = new Intent( Intent.ACTION_VIEW, Uri.parse( link ) );
-            startActivity( intent );
-        }
-        catch ( ActivityNotFoundException ex  )
-        {
-            Intent intent = new Intent( Intent.ACTION_VIEW, Uri.parse( "market://details?id=com.waze" ) );
+        try {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(link));
+            startActivity(intent);
+        } catch (ActivityNotFoundException ex) {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.waze"));
             startActivity(intent);
         }
 
@@ -1327,13 +1331,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         List<LatLng> thePath;
         LatLng mid;
         LatLngBounds.Builder builder;
+
         // Runs in UI before background thread is called
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
             // Do something like display a progress bar
             mid = null;
-            builder  = new LatLngBounds.Builder();
+            builder = new LatLngBounds.Builder();
         }
 
         // This is run in a background thread
@@ -1344,8 +1349,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             start = params[0];
             arrival = params[1];
 
-            if(start != null && arrival != null)
-                mid = new LatLng((start.latitude+arrival.latitude)/2,(start.longitude+arrival.longitude)/2);
+            if (start != null && arrival != null)
+                mid = new LatLng((start.latitude + arrival.latitude) / 2, (start.longitude + arrival.longitude) / 2);
 
             //Define list to get all latlng for the route
             thePath = new ArrayList();
@@ -1357,7 +1362,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             GeoApiContext context = new GeoApiContext.Builder()
                     .apiKey("AIzaSyDKndcnw3IXjPPsP1gmkFLbeuLDfHXxc4o")
                     .build();
-            DirectionsApiRequest req = DirectionsApi.getDirections(context, start.latitude+","+start.longitude, arrival.latitude+","+arrival.longitude);
+            DirectionsApiRequest req = DirectionsApi.getDirections(context, start.latitude + "," + start.longitude, arrival.latitude + "," + arrival.longitude);
             try {
                 DirectionsResult res = req.await();
 
@@ -1365,14 +1370,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if (res.routes != null && res.routes.length > 0) {
                     DirectionsRoute route = res.routes[0];
 
-                    if (route.legs !=null) {
-                        for(int i=0; i<route.legs.length; i++) {
+                    if (route.legs != null) {
+                        for (int i = 0; i < route.legs.length; i++) {
                             DirectionsLeg leg = route.legs[i];
                             if (leg.steps != null) {
-                                for (int j=0; j<leg.steps.length;j++){
+                                for (int j = 0; j < leg.steps.length; j++) {
                                     DirectionsStep step = leg.steps[j];
-                                    if (step.steps != null && step.steps.length >0) {
-                                        for (int k=0; k<step.steps.length;k++){
+                                    if (step.steps != null && step.steps.length > 0) {
+                                        for (int k = 0; k < step.steps.length; k++) {
                                             DirectionsStep step1 = step.steps[k];
                                             EncodedPolyline points1 = step1.polyline;
                                             if (points1 != null) {
@@ -1399,7 +1404,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         }
                     }
                 }
-            } catch(Exception ex) {
+            } catch (Exception ex) {
             }
 
             return "this string is passed to onPostExecute";
@@ -1417,7 +1422,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            if(thePath != null){
+            if (thePath != null) {
                 if (thePath.size() > 0) {
                     if (mid != null) {
                         thePath.add(arrival);
@@ -1429,66 +1434,94 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding));
                     }
 
-                }else{
+                } else {
                     new DrawRouteTask().execute(start, arrival);
                 }
-            }else {
+            } else {
                 new DrawRouteTask().execute(start, arrival);
             }
         }
     }
 
-    private void drawPolyGradiant(List<LatLng> thePath, String startColor, String endColor , int width,  int quality){
+    private void drawPolyGradiant(List<LatLng> thePath, String startColor, String endColor, int width, int quality) {
 
         int Size = thePath.size();
 
-        int Red =  Integer.valueOf( startColor.substring( 1, 3 ), 16 );
-        int Green  =    Integer.valueOf( startColor.substring( 3, 5 ), 16 );
-        int Blue =                 Integer.valueOf( startColor.substring( 5, 7 ), 16 );
-        int finalRed =  Integer.valueOf( endColor.substring( 1, 3 ), 16 );
-        int finalGreen = Integer.valueOf( endColor.substring( 3, 5 ), 16 );
-        int finalBlue =   Integer.valueOf( endColor.substring( 5, 7 ), 16 );
+        int Red = Integer.valueOf(startColor.substring(1, 3), 16);
+        int Green = Integer.valueOf(startColor.substring(3, 5), 16);
+        int Blue = Integer.valueOf(startColor.substring(5, 7), 16);
+        int finalRed = Integer.valueOf(endColor.substring(1, 3), 16);
+        int finalGreen = Integer.valueOf(endColor.substring(3, 5), 16);
+        int finalBlue = Integer.valueOf(endColor.substring(5, 7), 16);
 
-        for(int i = 0; i < quality-1; i++){
+        for (int i = 0; i < quality - 1; i++) {
 
-            float percent = (float)(1/(float)(2*quality) ) + (float)i/(float)quality;
+            float percent = (float) (1 / (float) (2 * quality)) + (float) i / (float) quality;
             int color = Color.argb(255,
-                    (Red > finalRed) ?  (int) (Red - ((Red - finalRed) * percent)) : (int) (Red + ((finalRed - Red) * percent)),
+                    (Red > finalRed) ? (int) (Red - ((Red - finalRed) * percent)) : (int) (Red + ((finalRed - Red) * percent)),
                     (Green > finalGreen) ? (int) (Green - ((Green - finalGreen) * percent)) : (int) (Green + ((finalGreen - Green) * percent)),
-                    (Blue > finalBlue) ?   (int) (Blue - ((Blue - finalBlue) * percent)) :   (int) (Blue + ((finalBlue - Blue) * percent)));
+                    (Blue > finalBlue) ? (int) (Blue - ((Blue - finalBlue) * percent)) : (int) (Blue + ((finalBlue - Blue) * percent)));
 
-            PolylineOptions opts = new PolylineOptions().geodesic(false).addAll(thePath.subList((int) ((Size / quality) * i), (int)(Size / quality) * (i + 2))).color(color).width(width+1);
+            PolylineOptions opts = new PolylineOptions().geodesic(false).addAll(thePath.subList((int) ((Size / quality) * i), (int) (Size / quality) * (i + 2))).color(color).width(width + 1);
             mMap.addPolyline(opts);
         }
 
-        float percentage = (float)(1/(float)(2*quality) ) + (float)(quality-1)/(float)quality;
+        float percentage = (float) (1 / (float) (2 * quality)) + (float) (quality - 1) / (float) quality;
         int color = Color.argb(255,
-                (Red > finalRed) ?  (int) (Red - ((Red - finalRed) * percentage)) : (int) (Red + ((finalRed - Red) * percentage)),
+                (Red > finalRed) ? (int) (Red - ((Red - finalRed) * percentage)) : (int) (Red + ((finalRed - Red) * percentage)),
                 (Green > finalGreen) ? (int) (Green - ((Green - finalGreen) * percentage)) : (int) (Green + ((finalGreen - Green) * percentage)),
-                (Blue > finalBlue) ?   (int) (Blue - ((Blue - finalBlue) * percentage)) :   (int) (Blue + ((finalBlue - Blue) * percentage)));
+                (Blue > finalBlue) ? (int) (Blue - ((Blue - finalBlue) * percentage)) : (int) (Blue + ((finalBlue - Blue) * percentage)));
 
-        PolylineOptions opts = new PolylineOptions().geodesic(false).addAll(thePath.subList((int) ((Size / quality) * (quality-1)), (int)(Size / quality) * (quality))).color(color).width(width+1);
+        PolylineOptions opts = new PolylineOptions().geodesic(false).addAll(thePath.subList((int) ((Size / quality) * (quality - 1)), (int) (Size / quality) * (quality))).color(color).width(width + 1);
         mMap.addPolyline(opts);
 
-        for(int i = 0; i<(Size-1); i++){
+        for (int i = 0; i < (Size - 1); i++) {
 
-            float percent = ((float)i/(float)Size);
+            float percent = ((float) i / (float) Size);
             int usedColor = Color.argb(255,
                     (Red > finalRed) ? (int) (Red - ((Red - finalRed) * percent)) : (int) (Red + ((finalRed - Red) * percent)),
                     (Green > finalGreen) ? (int) (Green - ((Green - finalGreen) * percent)) : (int) (Green + ((finalGreen - Green) * percent)),
-                    (Blue > finalBlue) ?   (int) (Blue - ((Blue - finalBlue) * percent)) :   (int) (Blue + ((finalBlue - Blue) * percent)));
+                    (Blue > finalBlue) ? (int) (Blue - ((Blue - finalBlue) * percent)) : (int) (Blue + ((finalBlue - Blue) * percent)));
 
-            opts = new PolylineOptions().add(thePath.get(i)).geodesic(false).add(thePath.get(i+1)).color(usedColor).width(width);
+            opts = new PolylineOptions().add(thePath.get(i)).geodesic(false).add(thePath.get(i + 1)).color(usedColor).width(width);
             mMap.addPolyline(opts);
         }
     }
 
     LatLng userLatLng;
-    private void getLastLocation() {
+
+//    private void getLastLocation() {
+//        // Get last known recent location using new Google Play Services SDK (v11+)
+//        FusedLocationProviderClient locationClient = getFusedLocationProviderClient(this);
+//
+//        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+//            locationClient.getLastLocation()
+//                    .addOnSuccessListener(new OnSuccessListener<Location>() {
+//                        @Override
+//                        public void onSuccess(Location location) {
+//                            // GPS location can be null if GPS is switched off
+//                            if (location != null) {
+//                                userLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+//                                goToLocation(userLatLng.latitude, userLatLng.longitude);
+//                            }
+//                        }
+//                    })
+//                    .addOnFailureListener(new OnFailureListener() {
+//                        @Override
+//                        public void onFailure(@NonNull Exception e) {
+//                            Log.d("MapDemoActivity", "Error trying to get last GPS location");
+//                            e.printStackTrace();
+//                        }
+//                    });
+//        }
+//    }
+
+    public void getLastLocation() {
         // Get last known recent location using new Google Play Services SDK (v11+)
         FusedLocationProviderClient locationClient = getFusedLocationProviderClient(this);
 
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
             locationClient.getLastLocation()
                     .addOnSuccessListener(new OnSuccessListener<Location>() {
                         @Override
@@ -1509,7 +1542,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     });
         }
     }
-    private void goToLocation(Double lat, Double lng){
+
+    private void goToLocation(Double lat, Double lng) {
         // mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lng), 17));
         CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(new LatLng(lat, lng))      // Sets the center of the map to Mountain View
@@ -1517,8 +1551,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .build();                   // Creates a CameraPosition from the builder
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
-    }
 
+        int height = 250;
+        int width = 120;
+        BitmapDrawable bitmapdraw = (BitmapDrawable) getResources().getDrawable(R.drawable.driver_pin);
+        Bitmap b = bitmapdraw.getBitmap();
+        Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
+
+        mMap.addMarker(new MarkerOptions()
+                .position(new LatLng(lat, lng))
+                .icon(BitmapDescriptorFactory.fromBitmap(smallMarker))
+        );
+    }
 
 
 }
