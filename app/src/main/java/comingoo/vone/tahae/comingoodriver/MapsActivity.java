@@ -98,8 +98,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ImageButton myPositionButton;
 
     private ImageButton wazeButton;
-    private ImageButton contactButton;
-    private Button cancel_ride_btn;
+//    private ImageButton contactButton;
+//    private Button cancel_ride_btn;
 
     private ConstraintLayout clientInfoLayout;
     private ConstraintLayout destinationLayout;
@@ -191,7 +191,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         menuButton.setBackground(new BitmapDrawable(getResources(), scaleBitmap(40, 40, R.drawable.menu_icon)));
         myPositionButton.setBackground(new BitmapDrawable(getResources(), scaleBitmap(40, 40, R.drawable.my_location)));
         wazeButton.setBackground(new BitmapDrawable(getResources(), scaleBitmap(40, 40, R.drawable.waze_icon)));
-        contactButton.setBackground(new BitmapDrawable(getResources(), scaleBitmap(40, 40, R.drawable.contact)));
+//        contactButton.setBackground(new BitmapDrawable(getResources(), scaleBitmap(40, 40, R.drawable.contact)));
         arrowImage.setBackground(new BitmapDrawable(getResources(), scaleBitmap(30, 30, R.drawable.arrow_blue)));
         whitePersonImage.setBackground(new BitmapDrawable(getResources(), scaleBitmap(30, 50, R.drawable.person_white)));
     }
@@ -203,8 +203,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private float dpHeight;
     private float dpWidth;
     private Intent intent;
+    private TextView tv_appelle_voip,tv_appelle_telephone;
 
-    private SinchClient sinchClient;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -241,53 +242,83 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             loadImages();
 
-            contactButton.setOnClickListener(new View.OnClickListener() {
+            tv_appelle_voip = (TextView) findViewById(R.id.tv_appelle_voip);
+            tv_appelle_telephone = (TextView) findViewById(R.id.tv_appelle_telephone);
+
+            tv_appelle_telephone.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View view) {
-                    if (!clientPhoneNumber.isEmpty() || clientPhoneNumber != null) {
+                public void onClick(View v) {
+                    if (clientPhoneNumber != null) {
                         try {
                             Intent callIntent = new Intent(Intent.ACTION_CALL);
                             callIntent.setData(Uri.parse("tel:" + clientPhoneNumber));
                             if (ActivityCompat.checkSelfPermission(getBaseContext(), Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
                                 startActivity(callIntent);
                             }
-                        } catch (Exception e) {
+                        } catch (NullPointerException e) {
                             e.printStackTrace();
                         }
                     }
-                    if(!driverId.isEmpty()){
-                        Call call = sinchClient.getCallClient().callUser(clientId);
-                        call.addCallListener(new SinchCallListener());
-                    }
-
-
                 }
             });
 
-            cancel_ride_btn.setOnClickListener(new View.OnClickListener() {
+            tv_appelle_voip.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View view) {
-                    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            switch (which) {
-                                case DialogInterface.BUTTON_POSITIVE:
-                                    //Yes button clicked
-                                    FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("state").setValue("5");
-                                    FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).removeValue();
-                                    break;
+                public void onClick(View v) {
+                    if(!driverId.isEmpty()){
+                        Intent intent = new Intent(MapsActivity.this, VoipCallingActivity.class);
+                        intent.putExtra("driverId",driverId);
+                        intent.putExtra("clientId",clientId);
+                        intent.putExtra("clientName",clientName);
+                        startActivity(intent);
 
-                                case DialogInterface.BUTTON_NEGATIVE:
-                                    //No button clicked
-                                    break;
-                            }
-                        }
-                    };
-                    AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivity.this);
-                    builder.setTitle("Vous étes sure?").setMessage("Voulez-vous annuler la course?").setPositiveButton("Yes", dialogClickListener)
-                            .setNegativeButton("No", dialogClickListener).show();
+                    }
                 }
             });
+
+//
+
+//            contactButton.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+//                    if (!clientPhoneNumber.isEmpty() || clientPhoneNumber != null) {
+//                        try {
+//                            Intent callIntent = new Intent(Intent.ACTION_CALL);
+//                            callIntent.setData(Uri.parse("tel:" + clientPhoneNumber));
+//                            if (ActivityCompat.checkSelfPermission(getBaseContext(), Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
+//                                startActivity(callIntent);
+//                            }
+//                        } catch (Exception e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }
+//            });
+
+//            cancel_ride_btn.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+//                    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+//                        @Override
+//                        public void onClick(DialogInterface dialog, int which) {
+//                            switch (which) {
+//                                case DialogInterface.BUTTON_POSITIVE:
+//                                    //Yes button clicked
+//                                    FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("state").setValue("5");
+//                                    FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).removeValue();
+//                                    break;
+//
+//                                case DialogInterface.BUTTON_NEGATIVE:
+//                                    //No button clicked
+//                                    break;
+//                            }
+//                        }
+//                    };
+//                    AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivity.this);
+//                    builder.setTitle("Vous étes sure?").setMessage("Voulez-vous annuler la course?").setPositiveButton("Yes", dialogClickListener)
+//                            .setNegativeButton("No", dialogClickListener).show();
+//                }
+//            });
 
             switchOnlineButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -358,8 +389,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         myPositionButton = (ImageButton) findViewById(R.id.my_position_button);
 
         wazeButton = (ImageButton) findViewById(R.id.waze_button);
-        contactButton = (ImageButton) findViewById(R.id.contact_button);
-        cancel_ride_btn = (Button) findViewById(R.id.cancel_ride_btn);
+//        contactButton = (ImageButton) findViewById(R.id.contact_button);
+//        cancel_ride_btn = (Button) findViewById(R.id.cancel_ride_btn);
 
         clientInfoLayout = (ConstraintLayout) findViewById(R.id.clientInfo);
         destinationLayout = (ConstraintLayout) findViewById(R.id.destination_layout);
@@ -840,28 +871,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Looper.myLooper();
                 }
 
-                if (ContextCompat.checkSelfPermission(MapsActivity.this, android.Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(MapsActivity.this, android.Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(MapsActivity.this,
-                            new String[]{android.Manifest.permission.RECORD_AUDIO, android.Manifest.permission.READ_PHONE_STATE},
-                            1);
-                }
-
-                sinchClient = Sinch.getSinchClientBuilder()
-                        .context(MapsActivity.this)
-                        .userId(driverId)
-                        .applicationKey("04ae7d45-1084-4fb5-9d7c-08d82527d191")
-                        .applicationSecret("TfJrquo6qEmkV8DG/EXQPg==")
-                        .environmentHost("clientapi.sinch.com")
-//                    .applicationKey(resources.getString(R.string.sinch_app_key))
-//                    .applicationSecret(resources.getString(R.string.sinch_app_secret))
-//                    .environmentHost(resources.getString(R.string.sinch_envirentmnet_host))
-                        .build();
-                sinchClient.setSupportCalling(true);
-                sinchClient.start();
-                sinchClient.startListeningOnActiveConnection();
 
 
-//                sinchClient.getCallClient().addCallClientListener(new SinchCallClientListener());
+
 
 
 //                sinchClient = Sinch.getSinchClientBuilder()
@@ -981,42 +993,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-    private class SinchCallListener implements CallListener {
-        @Override
-        public void onCallEnded(Call endedCall) {
-            //call ended by either party
-            findViewById(R.id.callLayout).setVisibility(View.GONE);
-            setVolumeControlStream(AudioManager.USE_DEFAULT_STREAM_TYPE);
-        }
 
-        @Override
-        public void onCallEstablished(final Call establishedCall) {
-            //incoming call was picked up
-            findViewById(R.id.callLayout).setVisibility(View.VISIBLE);
-            Button hangup = findViewById(R.id.hangup);
-            hangup.setText("Hangup");
-            setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
-            hangup.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    establishedCall.hangup();
-                }
-            });
-        }
-
-        @Override
-        public void onCallProgressing(Call progressingCall) {
-            //call is ringing
-            findViewById(R.id.callLayout).setVisibility(View.VISIBLE);
-            Button hangup = (Button) findViewById(R.id.hangup);
-            hangup.setText("RINGING...");
-        }
-
-        @Override
-        public void onShouldSendPushNotification(Call call, List<PushPair> pushPairs) {
-            //don't worry about this right now
-        }
-    }
 
 //    private class SinchCallClientListener implements CallClientListener {
 //        @Override
@@ -1067,6 +1044,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         fullName.setText(driverName);
         ratingR.setText(Rating + "");
         money.setText(todayEarnings + " MAD");
+
 
 
         ComingoonYou.setOnClickListener(new View.OnClickListener() {
@@ -1358,7 +1336,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void courseUIOff() {
         findViewById(R.id.statusConstraint).setVisibility(View.VISIBLE);
         findViewById(R.id.money).setVisibility(View.VISIBLE);
-        clientInfoLayout.setVisibility(View.GONE);
+//        clientInfoLayout.setVisibility(View.GONE);
         destinationLayout.setVisibility(View.GONE);
         menuButton.setVisibility(View.VISIBLE);
     }

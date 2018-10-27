@@ -91,7 +91,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ImageButton myPositionButton;
 
     private ImageButton wazeButton;
-    private ImageButton contactButton;
+//    private ImageButton contactButton;
 
     private ConstraintLayout clientInfoLayout;
     private ConstraintLayout destinationLayout;
@@ -167,7 +167,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return BitmapFactory.decodeResource(getResources(), resId, bOptions);
     }
 
-
     private void loadImages() {
         //  locationStartPin.setImageBitmap(scaleBitmap(76, 56, R.drawable.depart_pin));
         switchOnlineButton.setBackground(new BitmapDrawable(getResources(), scaleBitmap((int) 60, (int) 60, R.drawable.goo_bt)));
@@ -175,7 +174,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         menuButton.setBackground(new BitmapDrawable(getResources(), scaleBitmap(40, 40, R.drawable.menu_icon)));
         myPositionButton.setBackground(new BitmapDrawable(getResources(), scaleBitmap(40, 40, R.drawable.my_location)));
         wazeButton.setBackground(new BitmapDrawable(getResources(), scaleBitmap(40, 40, R.drawable.waze_icon)));
-        contactButton.setBackground(new BitmapDrawable(getResources(), scaleBitmap(40, 40, R.drawable.contact)));
+//        contactButton.setBackground(new BitmapDrawable(getResources(), scaleBitmap(40, 40, R.drawable.contact)));
         arrowImage.setBackground(new BitmapDrawable(getResources(), scaleBitmap(30, 30, R.drawable.arrow_blue)));
         whitePersonImage.setBackground(new BitmapDrawable(getResources(), scaleBitmap(30, 50, R.drawable.person_white)));
     }
@@ -222,7 +221,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         myPositionButton = (ImageButton) findViewById(R.id.my_position_button);
 
         wazeButton = (ImageButton) findViewById(R.id.waze_button);
-        contactButton = (ImageButton) findViewById(R.id.contact_button);
+//        contactButton = (ImageButton) findViewById(R.id.contact_button);
 
         clientInfoLayout = (ConstraintLayout) findViewById(R.id.clientInfo);
         destinationLayout = (ConstraintLayout) findViewById(R.id.destination_layout);
