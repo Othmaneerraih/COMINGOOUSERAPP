@@ -14,6 +14,7 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -66,11 +67,13 @@ import com.google.maps.model.DirectionsRoute;
 import com.google.maps.model.DirectionsStep;
 import com.google.maps.model.EncodedPolyline;
 import com.mxn.soul.flowingdrawer_core.FlowingDrawer;
+import com.sinch.android.rtc.PushPair;
 import com.sinch.android.rtc.Sinch;
 import com.sinch.android.rtc.SinchClient;
 import com.sinch.android.rtc.calling.Call;
 import com.sinch.android.rtc.calling.CallClient;
 import com.sinch.android.rtc.calling.CallClientListener;
+import com.sinch.android.rtc.calling.CallListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -121,6 +124,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ConstraintLayout ComingoonYou;
     private ConstraintLayout Aide;
     private ConstraintLayout logout;
+    private String driverId = "";
 
 
     private Marker startPositionMarker;
@@ -251,6 +255,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             e.printStackTrace();
                         }
                     }
+                    if(!driverId.isEmpty()){
+                        Call call = sinchClient.getCallClient().callUser(clientId);
+                        call.addCallListener(new SinchCallListener());
+                    }
+
+
                 }
             });
 
@@ -488,6 +498,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             final SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
             final String userId = prefs.getString("userId", null);
+            driverId = userId;
 
             if (userId == null) return "";
             FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").addValueEventListener(new ValueEventListener() {
@@ -816,6 +827,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             final SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
             final String number = prefs.getString("userId", null);
+            driverId = number;
             if (number == null) {
                 //User Is Logged In
                 Intent intent = new Intent(MapsActivity.this, MainActivity.class);
@@ -827,18 +839,43 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Looper.prepare();
                     Looper.myLooper();
                 }
+
+                if (ContextCompat.checkSelfPermission(MapsActivity.this, android.Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(MapsActivity.this, android.Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(MapsActivity.this,
+                            new String[]{android.Manifest.permission.RECORD_AUDIO, android.Manifest.permission.READ_PHONE_STATE},
+                            1);
+                }
+
                 sinchClient = Sinch.getSinchClientBuilder()
                         .context(MapsActivity.this)
-                        .userId(number)
-                        .applicationKey("05a626b9-33a4-4b83-b7bc-2d49062ea9ae")
-                        .applicationSecret("gVW3Tm0140e9i17wRwUzzw==")
+                        .userId(driverId)
+                        .applicationKey("04ae7d45-1084-4fb5-9d7c-08d82527d191")
+                        .applicationSecret("TfJrquo6qEmkV8DG/EXQPg==")
                         .environmentHost("clientapi.sinch.com")
+//                    .applicationKey(resources.getString(R.string.sinch_app_key))
+//                    .applicationSecret(resources.getString(R.string.sinch_app_secret))
+//                    .environmentHost(resources.getString(R.string.sinch_envirentmnet_host))
                         .build();
                 sinchClient.setSupportCalling(true);
                 sinchClient.start();
                 sinchClient.startListeningOnActiveConnection();
 
-                sinchClient.getCallClient().addCallClientListener(new SinchCallClientListener());
+
+//                sinchClient.getCallClient().addCallClientListener(new SinchCallClientListener());
+
+
+//                sinchClient = Sinch.getSinchClientBuilder()
+//                        .context(MapsActivity.this)
+//                        .userId(number)
+//                        .applicationKey("05a626b9-33a4-4b83-b7bc-2d49062ea9ae")
+//                        .applicationSecret("gVW3Tm0140e9i17wRwUzzw==")
+//                        .environmentHost("clientapi.sinch.com")
+//                        .build();
+//                sinchClient.setSupportCalling(true);
+//                sinchClient.start();
+//                sinchClient.startListeningOnActiveConnection();
+//
+//                sinchClient.getCallClient().addCallClientListener(new SinchCallClientListener());
 
 
                 FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(number).addValueEventListener(new ValueEventListener() {
@@ -943,31 +980,69 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    private class SinchCallClientListener implements CallClientListener {
-        @Override
-        public void onIncomingCall(final CallClient callClient, final Call incomingCall) {
-            //Pick up the call!
 
+    private class SinchCallListener implements CallListener {
+        @Override
+        public void onCallEnded(Call endedCall) {
+            //call ended by either party
+            findViewById(R.id.callLayout).setVisibility(View.GONE);
+            setVolumeControlStream(AudioManager.USE_DEFAULT_STREAM_TYPE);
+        }
+
+        @Override
+        public void onCallEstablished(final Call establishedCall) {
+            //incoming call was picked up
             findViewById(R.id.callLayout).setVisibility(View.VISIBLE);
-            final Button hangup = (Button) findViewById(R.id.hangup);
-            hangup.setText("Answer");
+            Button hangup = findViewById(R.id.hangup);
+            hangup.setText("Hangup");
+            setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
             hangup.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    incomingCall.answer();
-                    hangup.setText("Hangup");
-                    hangup.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            incomingCall.hangup();
-                            findViewById(R.id.callLayout).setVisibility(View.GONE);
-                        }
-                    });
+                    establishedCall.hangup();
                 }
             });
+        }
 
+        @Override
+        public void onCallProgressing(Call progressingCall) {
+            //call is ringing
+            findViewById(R.id.callLayout).setVisibility(View.VISIBLE);
+            Button hangup = (Button) findViewById(R.id.hangup);
+            hangup.setText("RINGING...");
+        }
+
+        @Override
+        public void onShouldSendPushNotification(Call call, List<PushPair> pushPairs) {
+            //don't worry about this right now
         }
     }
+
+//    private class SinchCallClientListener implements CallClientListener {
+//        @Override
+//        public void onIncomingCall(final CallClient callClient, final Call incomingCall) {
+//            //Pick up the call!
+//
+//            findViewById(R.id.callLayout).setVisibility(View.VISIBLE);
+//            final Button hangup = (Button) findViewById(R.id.hangup);
+//            hangup.setText("Answer");
+//            hangup.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    incomingCall.answer();
+//                    hangup.setText("Hangup");
+//                    hangup.setOnClickListener(new View.OnClickListener() {
+//                        @Override
+//                        public void onClick(View v) {
+//                            incomingCall.hangup();
+//                            findViewById(R.id.callLayout).setVisibility(View.GONE);
+//                        }
+//                    });
+//                }
+//            });
+//
+//        }
+//    }
 
     private void logout() {
         final SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
@@ -1031,6 +1106,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    private class SinchCallClientListener implements CallClientListener {
+        @Override
+        public void onIncomingCall(CallClient callClient, Call incomingCall) {
+            //Pick up the call!
+        }
+    }
+
 
     private String courseID;
     private String courseState;
@@ -1058,6 +1140,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             super.onPreExecute();
             prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
             userId = prefs.getString("userId", null);
+            driverId = userId;
             // Do something like display a progress bar
         }
 
