@@ -1,10 +1,10 @@
-package com.comingoodriver.tahae.comingoodriver;
+package comingoo.vone.tahae.comingoodriver;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -14,8 +14,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
-import comingoo.vone.tahae.comingoodriver.R;
 
 public class loginActivity extends AppCompatActivity {
 
@@ -35,11 +33,16 @@ public class loginActivity extends AppCompatActivity {
         loginBtn = (ImageButton) findViewById(R.id.loginBtn);
 
 
+
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                loginBtn.setClickable(false);
-                login(phoneNumber.getText().toString(), password.getText().toString());
+                if(phoneNumber.getText().toString().isEmpty() && password.getText().toString().isEmpty()){
+                    Toast.makeText(loginActivity.this, "Fill all the fields", Toast.LENGTH_SHORT).show();
+                }else{
+                    login(phoneNumber.getText().toString(), password.getText().toString());
+                }
+
             }
         });
 
@@ -49,7 +52,7 @@ public class loginActivity extends AppCompatActivity {
 
     private void login(final String number,final String password){
 
-        String n = "+212"+number;
+        String n = number;//"+212"+number;
         FirebaseDatabase.getInstance().getReference("DRIVERUSERS").orderByChild("phoneNumber").equalTo(n).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -58,20 +61,20 @@ public class loginActivity extends AppCompatActivity {
                         if(data.child("password").getValue(String.class).equals(password)){
                             if(data.child("isVerified").getValue(String.class).equals("0")){
                                 //Account is Banned
+                                Toast.makeText(loginActivity.this, "This account is currently disabled", Toast.LENGTH_SHORT).show();
                             }else {
-                                loggedIn("+212"+ number, data.getKey());
+//                                loggedIn("+212"+ number, data.getKey());
+                                loggedIn( number, data.getKey());
                             }
                         }else{
                             //Wrong Password
                             Toast.makeText(loginActivity.this, "Mot de passe erroné!!", Toast.LENGTH_SHORT).show();
-                            loginBtn.setClickable(true);
                         }
 
                     }
                 }else{
                     // Number/User  Not Found
                     Toast.makeText(loginActivity.this, "Ce compt n'existe pas!", Toast.LENGTH_SHORT).show();
-                    loginBtn.setClickable(true);
                 }
             }
 
