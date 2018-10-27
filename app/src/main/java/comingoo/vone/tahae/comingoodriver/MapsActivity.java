@@ -1,7 +1,6 @@
-package comingoo.vone.tahae.comingoodriver;
+package com.comingoodriver.tahae.comingoodriver;
 
 import android.Manifest;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
@@ -16,12 +15,12 @@ import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
+import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.text.format.DateFormat;
 import android.util.DisplayMetrics;
@@ -42,13 +41,9 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -78,6 +73,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
+import comingoo.vone.tahae.comingoodriver.R;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
@@ -96,7 +92,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private ImageButton wazeButton;
     private ImageButton contactButton;
-    private Button cancel_ride_btn;
 
     private ConstraintLayout clientInfoLayout;
     private ConstraintLayout destinationLayout;
@@ -121,9 +116,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ConstraintLayout ComingoonYou;
     private ConstraintLayout Aide;
     private ConstraintLayout logout;
-
-
-    private Marker startPositionMarker;
 
 
     ////////////////////////////////////////////
@@ -202,7 +194,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-        try {
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -223,7 +214,39 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         dpHeight = outMetrics.heightPixels / density;
         dpWidth = outMetrics.widthPixels / density;
 
-        initializeViews();
+        onlineButton = (Button) findViewById(R.id.online_button);
+        offlineButton = (Button) findViewById(R.id.offline_button);
+        switchOnlineButton = (Button) findViewById(R.id.switch_online_button);
+
+        menuButton = (ImageButton) findViewById(R.id.menu_button);
+        myPositionButton = (ImageButton) findViewById(R.id.my_position_button);
+
+        wazeButton = (ImageButton) findViewById(R.id.waze_button);
+        contactButton = (ImageButton) findViewById(R.id.contact_button);
+
+        clientInfoLayout = (ConstraintLayout) findViewById(R.id.clientInfo);
+        destinationLayout = (ConstraintLayout) findViewById(R.id.destination_layout);
+
+        arrowImage = (ImageView) findViewById(R.id.arrow_image);
+        whitePersonImage = (ImageView) findViewById(R.id.white_person_image);
+
+        addressText = (TextView) findViewById(R.id.addressText);
+
+        destTime = (TextView) findViewById(R.id.destTime);
+
+        courseActionButton = (Button) findViewById(R.id.course_action_button);
+        cancelCourseButton = (ImageButton) findViewById(R.id.cancelCourse);
+
+        mDrawer = (FlowingDrawer) findViewById(R.id.drawerlayout);
+
+        Acceuil = (ConstraintLayout) findViewById(R.id.acceuil);
+        Historique = (ConstraintLayout) findViewById(R.id.historique);
+        Inbox = (ConstraintLayout) findViewById(R.id.inbox);
+        ComingoonYou = (ConstraintLayout) findViewById(R.id.comingoonyou);
+        Aide = (ConstraintLayout) findViewById(R.id.aide);
+        logout = (ConstraintLayout) findViewById(R.id.logout);
+
+        money = (Button) findViewById(R.id.money);
 
 
         SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
@@ -232,48 +255,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         loadImages();
-
-        contactButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(!clientPhoneNumber.isEmpty() || clientPhoneNumber != null){
-                    try{
-                        Intent callIntent = new Intent(Intent.ACTION_CALL);
-                        callIntent.setData(Uri.parse("tel:"+clientPhoneNumber));
-                        if (ActivityCompat.checkSelfPermission(getBaseContext(), Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
-                            startActivity(callIntent);
-                        }
-                    }catch(Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
-
-        cancel_ride_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case DialogInterface.BUTTON_POSITIVE:
-                                //Yes button clicked
-                                FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("state").setValue("5");
-                                FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).removeValue();
-                                break;
-
-                            case DialogInterface.BUTTON_NEGATIVE:
-                                //No button clicked
-                                break;
-                        }
-                    }
-                };
-                AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivity.this);
-                builder.setTitle("Vous étes sure?").setMessage("Voulez-vous annuler la course?").setPositiveButton("Yes", dialogClickListener)
-                        .setNegativeButton("No", dialogClickListener).show();
-            }
-        });
 
         switchOnlineButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -327,58 +308,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-            new checkCourseTask().execute();
-            new checkCourseFinished().execute();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        new checkCourseTask().execute();
+        new checkCourseFinished().execute();
+
     }
 
-    private void initializeViews() {
-        onlineButton = (Button) findViewById(R.id.online_button);
-        offlineButton = (Button) findViewById(R.id.offline_button);
-        switchOnlineButton = (Button) findViewById(R.id.switch_online_button);
 
-        menuButton = (ImageButton) findViewById(R.id.menu_button);
-        myPositionButton = (ImageButton) findViewById(R.id.my_position_button);
-
-        wazeButton = (ImageButton) findViewById(R.id.waze_button);
-        contactButton = (ImageButton) findViewById(R.id.contact_button);
-        cancel_ride_btn = (Button) findViewById(R.id.cancel_ride_btn);
-
-        clientInfoLayout = (ConstraintLayout) findViewById(R.id.clientInfo);
-        destinationLayout = (ConstraintLayout) findViewById(R.id.destination_layout);
-
-        arrowImage = (ImageView) findViewById(R.id.arrow_image);
-        whitePersonImage = (ImageView) findViewById(R.id.white_person_image);
-
-        addressText = (TextView) findViewById(R.id.addressText);
-
-        destTime = (TextView) findViewById(R.id.destTime);
-
-        courseActionButton = (Button) findViewById(R.id.course_action_button);
-        cancelCourseButton = (ImageButton) findViewById(R.id.cancelCourse);
-
-        mDrawer = (FlowingDrawer) findViewById(R.id.drawerlayout);
-
-        Acceuil = (ConstraintLayout) findViewById(R.id.acceuil);
-        Historique = (ConstraintLayout) findViewById(R.id.historique);
-        Inbox = (ConstraintLayout) findViewById(R.id.inbox);
-        ComingoonYou = (ConstraintLayout) findViewById(R.id.comingoonyou);
-        Aide = (ConstraintLayout) findViewById(R.id.aide);
-        logout = (ConstraintLayout) findViewById(R.id.logout);
-
-        money = (Button) findViewById(R.id.money);
-    }
-
+    /**
+     * Manipulates the map once available.
+     * This callback is triggered when the map is ready to be used.
+     * This is where we can add markers or lines, add listeners or move the camera. In this case,
+     * we just add a marker near Sydney, Australia.
+     * If Google Play services is not installed on the device, the user will be prompted to install
+     * it inside the SupportMapFragment. This method will only be triggered once the user has
+     * installed Google Play services and returned to the app.
+     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.getUiSettings().setMapToolbarEnabled(false);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
 
-        if (ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(MapsActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.READ_CONTACTS}, 1);
+        if (ActivityCompat.checkSelfPermission(MapsActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(MapsActivity.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(MapsActivity.this, android.Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(MapsActivity.this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.READ_CONTACTS}, 1);
         } else {
             //startLocationUpdates();
             mMap.setMyLocationEnabled(true);
@@ -390,6 +343,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             });
         }
+
+        // Add a marker in Sydney and move the camera
     }
 
 
@@ -469,17 +424,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     int RATE = 0;
+    int driverWaitTime = 0;
 
     private class checkCourseFinished extends AsyncTask<String, Integer, String> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-
         }
 
         // This is run in a background thread
         @Override
         protected String doInBackground(String... params) {
+
 
             final SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
             final String userId = prefs.getString("userId", null);
@@ -512,34 +468,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 final Button charge = (Button) dialog.findViewById(R.id.button2);
                                 final EditText moneyAmount = (EditText) dialog.findViewById(R.id.editText);
 
-//<<<<<<< HEAD
-                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").
-                                        child(userId).child("PAID").addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                        if (dataSnapshot.exists()) {
-                                            if (dataSnapshot.getValue(String.class).equals("0")) {
-                                                price.setText(dataSnapshott.child("price").getValue(String.class) + " MAD");
-                                            } else {
-                                                price.setText("0 MAD");
-                                                charge.setVisibility(View.GONE);
-                                                moneyAmount.setVisibility(View.GONE);
+
+                                // Generating prices for driver
+                                FirebaseDatabase.getInstance().getReference("DRIVERFINISHEDCOURSES").
+                                        addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                driverWaitTime = Integer.parseInt(dataSnapshot.child("waitTime").getValue(String.class));
                                             }
-                                        } else {
-                                            price.setText(dataSnapshott.child("price").getValue(String.class) + " MAD");
-                                        }
-                                    }
-//=======
-//
-//
-//                                // Generating prices for driver
-//                                FirebaseDatabase.getInstance().getReference("DRIVERFINISHEDCOURSES").
-//                                        addListenerForSingleValueEvent(new ValueEventListener() {
-//                                            @Override
-//                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                                                driverWaitTime = Integer.parseInt(dataSnapshot.child("waitTime").getValue(String.class));
-//                                            }
-//>>>>>>> 3dd2640c6911ff24e336d44d509461f36b2b1dda
 
                                             @Override
                                             public void onCancelled(@NonNull DatabaseError databaseError) {
@@ -575,21 +511,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         });
 
 
-
-
-
-//                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").addListenerForSingleValueEvent(new ValueEventListener() {
+//                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).
+//                                        child("PAID").addListenerForSingleValueEvent(new ValueEventListener() {
 //                                    @Override
 //                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                                        if(dataSnapshot.exists()){
-//                                            if(dataSnapshot.getValue(String.class).equals("0")) {
+//                                        if (dataSnapshot.exists()) {
+//                                            if (dataSnapshot.getValue(String.class).equals("0")) {
+//
 //                                                price.setText(dataSnapshott.child("price").getValue(String.class) + " MAD");
-//                                            }else{
+//
+//
+//                                            } else {
 //                                                price.setText("0 MAD");
 //                                                charge.setVisibility(View.GONE);
 //                                                moneyAmount.setVisibility(View.GONE);
 //                                            }
-//                                        }else{
+//                                        } else {
 //                                            price.setText(dataSnapshott.child("price").getValue(String.class) + " MAD");
 //                                        }
 //                                    }
@@ -608,6 +545,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         startService(intent);
                                     }
                                 });
+
                                 gotMoney.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
@@ -730,7 +668,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 WindowManager.LayoutParams lp = dialog.getWindow().getAttributes();
                                 lp.dimAmount = 0.5f;
                                 dialog.getWindow().setAttributes(lp);
-                                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
                                 dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
 
                             /*    String price = dataSnapshott.child("price").getValue(String.class);
@@ -779,33 +717,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-    // Calculating KM from 2 LatLong
-    private double distanceInKilometer(double lat1, double lon1, double lat2, double lon2) {
-        double theta = lon1 - lon2;
-        double dist = Math.sin(deg2rad(lat1))
-                * Math.sin(deg2rad(lat2))
-                + Math.cos(deg2rad(lat1))
-                * Math.cos(deg2rad(lat2))
-                * Math.cos(deg2rad(theta));
-        dist = Math.acos(dist);
-        dist = rad2deg(dist);
-        dist = dist * 60 * 1.1515;
-        return (dist);
-    }
-
-    private double deg2rad(double deg) {
-        return (deg * Math.PI / 180.0);
-    }
-
-    private double rad2deg(double rad) {
-        return (rad * 180.0 / Math.PI);
-    }
-
-
-
-
-
-    int driverWaitTime = 0;
     double Rating;
     private String driverName;
     private String driverImage;
@@ -871,21 +782,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             driverNumber = dataSnapshot.child("phoneNumber").getValue(String.class);
                             prefs.edit().putString("userId", dataSnapshot.getKey()).apply();
 
-                            if(dataSnapshot.child("rating").child("1").getValue(String.class) !=null || dataSnapshot.child("rating").child("2").getValue(String.class) !=null ||dataSnapshot.child("rating").child("3").getValue(String.class)!=null||dataSnapshot.child("rating").child("4").getValue(String.class)!=null||dataSnapshot.child("rating").child("5").getValue(String.class)!=null){
 
-                                int r1 = Integer.parseInt(dataSnapshot.child("rating").child("1").getValue(String.class));
-                                int r2 = Integer.parseInt(dataSnapshot.child("rating").child("2").getValue(String.class));
-                                int r3 = Integer.parseInt(dataSnapshot.child("rating").child("3").getValue(String.class));
-                                int r4 = Integer.parseInt(dataSnapshot.child("rating").child("4").getValue(String.class));
-                                int r5 = Integer.parseInt(dataSnapshot.child("rating").child("5").getValue(String.class));
+                            int r1 = Integer.parseInt(dataSnapshot.child("rating").child("1").getValue(String.class));
+                            int r2 = Integer.parseInt(dataSnapshot.child("rating").child("2").getValue(String.class));
+                            int r3 = Integer.parseInt(dataSnapshot.child("rating").child("3").getValue(String.class));
+                            int r4 = Integer.parseInt(dataSnapshot.child("rating").child("4").getValue(String.class));
+                            int r5 = Integer.parseInt(dataSnapshot.child("rating").child("5").getValue(String.class));
 
-                                int t = r1 + (r2 * 2) + (r3 * 3) + (r4 * 4) + (r5 * 5);
-                                int total = r1 + r2 + r3 + r4 + r5;
+                            int t = r1 + (r2 * 2) + (r3 * 3) + (r4 * 4) + (r5 * 5);
+                            int total = r1 + r2 + r3 + r4 + r5;
 
-                                Rating = 0;
-                                if (total != 0)
-                                    Rating = (double) (t / total);
-                            }
+                            Rating = 0;
+                            if (total != 0)
+                                Rating = (double) (t / total);
 
                             if (dataSnapshot.child("debt").exists())
                                 Debt = dataSnapshot.child("debt").getValue(String.class);
@@ -1026,8 +935,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onRequestPermissionsResult(requestCode, permissions, grantResult);
 
         if (grantResult.length > 0 && grantResult[0] == PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(MapsActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
+            if (ActivityCompat.checkSelfPermission(MapsActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MapsActivity.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(MapsActivity.this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
             } else {
                 //startLocationUpdates();
                 if (mMap != null)
@@ -1077,7 +986,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         @Override
         protected String doInBackground(String... params) {
 
-            FirebaseDatabase.getInstance().getReference("COURSES").orderByChild("driver").equalTo(userId).limitToFirst(1).addValueEventListener(new ValueEventListener() {
+            FirebaseDatabase.getInstance().getReference("COURSES").
+                    orderByChild("driver").equalTo(userId).limitToFirst(1).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if (dataSnapshot.exists()) {
@@ -1092,34 +1002,35 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                             clientId = data.child("client").getValue(String.class);
 
-                            String lat = data.child("startLat").getValue(String.class);
-                            String lng = data.child("startLong").getValue(String.class);
+                            drawRouteStart = new LatLng(Double.parseDouble(data.child("startLat").getValue(String.class)),
+                                    Double.parseDouble(data.child("startLong").getValue(String.class)));
 
-                            if(driverData.child("endLat").getValue(String.class)!=null){
-                                if(driverData.child("endLat").getValue(String.class).equals("")){
-                                    drawRouteArrival = null;
-                                }else{
-                                    drawRouteArrival = new LatLng(Double.parseDouble(data.child("endLat").getValue(String.class)), Double.parseDouble(data.child("endLong").getValue(String.class)));
-                                }
+                            if (driverData.child("endLat").getValue(String.class).equals("")) {
+                                drawRouteArrival = null;
+                            } else {
+                                drawRouteArrival = new LatLng(Double.parseDouble(data.child("endLat").getValue(String.class)),
+                                        Double.parseDouble(data.child("endLong").getValue(String.class)));
                             }
 
-                            if (clientId != null){
-                                FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                        clientImageUri = dataSnapshot.child("image").getValue(String.class);
-                                        clientName = dataSnapshot.child("fullName").getValue(String.class);
-                                        clientPhoneNumber = dataSnapshot.child("phoneNumber").getValue(String.class);
-                                        lastCourse = dataSnapshot.child("LASTCOURSE").getValue(String.class);
-                                        courseHandle();
-                                    }
 
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).
+                                    addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                            clientImageUri = dataSnapshot.child("image").getValue(String.class);
+                                            clientName = dataSnapshot.child("fullName").getValue(String.class);
+                                            clientPhoneNumber = dataSnapshot.child("phoneNumber").getValue(String.class);
+                                            lastCourse = dataSnapshot.child("LASTCOURSE").getValue(String.class);
+                                            courseHandle();
+                                        }
 
-                                    }
-                                });
-                            }
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                        }
+                                    });
+
+
                         }
                     } else {
                         //stopCourseService();
@@ -1157,6 +1068,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
+    // Calculating KM from 2 LatLong
+    private double distanceInKilometer(double lat1, double lon1, double lat2, double lon2) {
+        double theta = lon1 - lon2;
+        double dist = Math.sin(deg2rad(lat1))
+                * Math.sin(deg2rad(lat2))
+                + Math.cos(deg2rad(lat1))
+                * Math.cos(deg2rad(lat2))
+                * Math.cos(deg2rad(theta));
+        dist = Math.acos(dist);
+        dist = rad2deg(dist);
+        dist = dist * 60 * 1.1515;
+        return (dist);
+    }
+
+    private double deg2rad(double deg) {
+        return (deg * Math.PI / 180.0);
+    }
+
+    private double rad2deg(double rad) {
+        return (rad * 180.0 / Math.PI);
+    }
+
+
     private void courseHandle() {
         if (courseState.equals("4")) {
 
@@ -1170,7 +1104,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             courseUIOff();
             if (mMap != null)
                 mMap.clear();
-
 
         } else {
 
@@ -1209,6 +1142,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         if (courseState.equals("0")) {
+
             addressText.setText(startAddress);
             cancelCourseButton.setVisibility(View.GONE);
             courseActionButton.setOnClickListener(new View.OnClickListener() {
@@ -1314,7 +1248,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             link += "ll=" + location.latitude + "," + location.longitude + "&navigate=yes";
         }
 
-
         try {
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(link));
             startActivity(intent);
@@ -1322,7 +1255,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.waze"));
             startActivity(intent);
         }
-
     }
 
 
@@ -1446,7 +1378,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void drawPolyGradiant(List<LatLng> thePath, String startColor, String endColor, int width, int quality) {
-
         int Size = thePath.size();
 
         int Red = Integer.valueOf(startColor.substring(1, 3), 16);
@@ -1492,38 +1423,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     LatLng userLatLng;
 
-//    private void getLastLocation() {
-//        // Get last known recent location using new Google Play Services SDK (v11+)
-//        FusedLocationProviderClient locationClient = getFusedLocationProviderClient(this);
-//
-//        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
-//            locationClient.getLastLocation()
-//                    .addOnSuccessListener(new OnSuccessListener<Location>() {
-//                        @Override
-//                        public void onSuccess(Location location) {
-//                            // GPS location can be null if GPS is switched off
-//                            if (location != null) {
-//                                userLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-//                                goToLocation(userLatLng.latitude, userLatLng.longitude);
-//                            }
-//                        }
-//                    })
-//                    .addOnFailureListener(new OnFailureListener() {
-//                        @Override
-//                        public void onFailure(@NonNull Exception e) {
-//                            Log.d("MapDemoActivity", "Error trying to get last GPS location");
-//                            e.printStackTrace();
-//                        }
-//                    });
-//        }
-//    }
-
-    public void getLastLocation() {
+    private void getLastLocation() {
         // Get last known recent location using new Google Play Services SDK (v11+)
         FusedLocationProviderClient locationClient = getFusedLocationProviderClient(this);
 
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this,
+                android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             locationClient.getLastLocation()
                     .addOnSuccessListener(new OnSuccessListener<Location>() {
                         @Override
@@ -1538,7 +1443,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Log.d("MapDemoActivity", "Error trying to get last GPS location");
                             e.printStackTrace();
                         }
                     });
@@ -1553,17 +1457,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .build();                   // Creates a CameraPosition from the builder
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
-
-        int height = 250;
-        int width = 120;
-        BitmapDrawable bitmapdraw = (BitmapDrawable) getResources().getDrawable(R.drawable.driver_pin);
-        Bitmap b = bitmapdraw.getBitmap();
-        Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
-
-        mMap.addMarker(new MarkerOptions()
-                .position(new LatLng(lat, lng))
-                .icon(BitmapDescriptorFactory.fromBitmap(smallMarker))
-        );
     }
 
 
