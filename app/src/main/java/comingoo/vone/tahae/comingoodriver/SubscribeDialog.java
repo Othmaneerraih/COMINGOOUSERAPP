@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatDialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public class SubscribeDialog extends AppCompatDialogFragment {
 
@@ -44,8 +45,14 @@ public class SubscribeDialog extends AppCompatDialogFragment {
                 String name = nameEdit.getText().toString();
                 String password = passwordEdit.getText().toString();
                 String tele = teleEdit.getText().toString();
-                listener.applyText(name, password, tele);
-                dismiss();
+                if(name.isEmpty() || password.isEmpty() || tele.isEmpty()){
+                    Toast.makeText(getContext(), "Please fill all the fields", Toast.LENGTH_SHORT).show();
+
+                }else{
+                    listener.applyText(name, password, tele);
+                    dismiss();
+                }
+
             }
         });
 

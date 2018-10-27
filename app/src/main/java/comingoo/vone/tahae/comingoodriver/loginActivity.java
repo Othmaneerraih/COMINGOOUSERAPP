@@ -37,7 +37,12 @@ public class loginActivity extends AppCompatActivity {
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                login(phoneNumber.getText().toString(), password.getText().toString());
+                if(phoneNumber.getText().toString().isEmpty() && password.getText().toString().isEmpty()){
+                    Toast.makeText(loginActivity.this, "Fill all the fields", Toast.LENGTH_SHORT).show();
+                }else{
+                    login(phoneNumber.getText().toString(), password.getText().toString());
+                }
+
             }
         });
 
@@ -56,14 +61,10 @@ public class loginActivity extends AppCompatActivity {
                         if(data.child("password").getValue(String.class).equals(password)){
                             if(data.child("isVerified").getValue(String.class).equals("0")){
                                 //Account is Banned
+                                Toast.makeText(loginActivity.this, "This account is currently disabled", Toast.LENGTH_SHORT).show();
                             }else {
 //                                loggedIn("+212"+ number, data.getKey());
-                                if(data.child("isActive").getValue(String.class).equals("0")){
-                                    Toast.makeText(loginActivity.this, "This account is currently disabled", Toast.LENGTH_SHORT).show();
-                                }else{
-                                    loggedIn( number, data.getKey());
-                                }
-
+                                loggedIn( number, data.getKey());
                             }
                         }else{
                             //Wrong Password

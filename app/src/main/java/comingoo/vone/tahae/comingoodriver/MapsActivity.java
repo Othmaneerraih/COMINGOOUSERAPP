@@ -871,19 +871,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             driverNumber = dataSnapshot.child("phoneNumber").getValue(String.class);
                             prefs.edit().putString("userId", dataSnapshot.getKey()).apply();
 
+                            if(dataSnapshot.child("rating").child("1").getValue(String.class) !=null || dataSnapshot.child("rating").child("2").getValue(String.class) !=null ||dataSnapshot.child("rating").child("3").getValue(String.class)!=null||dataSnapshot.child("rating").child("4").getValue(String.class)!=null||dataSnapshot.child("rating").child("5").getValue(String.class)!=null){
 
-                            int r1 = Integer.parseInt(dataSnapshot.child("rating").child("1").getValue(String.class));
-                            int r2 = Integer.parseInt(dataSnapshot.child("rating").child("2").getValue(String.class));
-                            int r3 = Integer.parseInt(dataSnapshot.child("rating").child("3").getValue(String.class));
-                            int r4 = Integer.parseInt(dataSnapshot.child("rating").child("4").getValue(String.class));
-                            int r5 = Integer.parseInt(dataSnapshot.child("rating").child("5").getValue(String.class));
+                                int r1 = Integer.parseInt(dataSnapshot.child("rating").child("1").getValue(String.class));
+                                int r2 = Integer.parseInt(dataSnapshot.child("rating").child("2").getValue(String.class));
+                                int r3 = Integer.parseInt(dataSnapshot.child("rating").child("3").getValue(String.class));
+                                int r4 = Integer.parseInt(dataSnapshot.child("rating").child("4").getValue(String.class));
+                                int r5 = Integer.parseInt(dataSnapshot.child("rating").child("5").getValue(String.class));
 
-                            int t = r1 + (r2 * 2) + (r3 * 3) + (r4 * 4) + (r5 * 5);
-                            int total = r1 + r2 + r3 + r4 + r5;
+                                int t = r1 + (r2 * 2) + (r3 * 3) + (r4 * 4) + (r5 * 5);
+                                int total = r1 + r2 + r3 + r4 + r5;
 
-                            Rating = 0;
-                            if (total != 0)
-                                Rating = (double) (t / total);
+                                Rating = 0;
+                                if (total != 0)
+                                    Rating = (double) (t / total);
+                            }
 
                             if (dataSnapshot.child("debt").exists())
                                 Debt = dataSnapshot.child("debt").getValue(String.class);
