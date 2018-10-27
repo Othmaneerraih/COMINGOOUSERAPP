@@ -125,6 +125,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private Marker startPositionMarker;
 
+    int height = 250;
+    int width = 120;
+    BitmapDrawable bitmapdraw;
+    Bitmap smallMarker;
 
     ////////////////////////////////////////////
 
@@ -326,7 +330,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     finish();
                 }
             });
-
+            bitmapdraw = (BitmapDrawable) getResources().getDrawable(R.drawable.driver_pin);
+            smallMarker = Bitmap.createScaledBitmap(bitmapdraw.getBitmap(), width, height, false);
             new checkCourseTask().execute();
             new checkCourseFinished().execute();
         } catch (Exception e) {
@@ -512,7 +517,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 final Button charge = (Button) dialog.findViewById(R.id.button2);
                                 final EditText moneyAmount = (EditText) dialog.findViewById(R.id.editText);
 
-//<<<<<<< HEAD
                                 FirebaseDatabase.getInstance().getReference("DRIVERUSERS").
                                         child(userId).child("PAID").addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
@@ -529,17 +533,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                             price.setText(dataSnapshott.child("price").getValue(String.class) + " MAD");
                                         }
                                     }
-//=======
-//
-//
-//                                // Generating prices for driver
-//                                FirebaseDatabase.getInstance().getReference("DRIVERFINISHEDCOURSES").
-//                                        addListenerForSingleValueEvent(new ValueEventListener() {
-//                                            @Override
-//                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                                                driverWaitTime = Integer.parseInt(dataSnapshot.child("waitTime").getValue(String.class));
-//                                            }
-//>>>>>>> 3dd2640c6911ff24e336d44d509461f36b2b1dda
 
                                     @Override
                                     public void onCancelled(@NonNull DatabaseError databaseError) {
@@ -553,19 +546,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
+                                                if (drawRouteStart != null) {
+                                                    double distanceInKm = distanceInKilometer(drawRouteStart.latitude, drawRouteStart.longitude,
+                                                            drawRouteArrival.latitude, drawRouteArrival.longitude);
 
-                                                double distanceInKm = distanceInKilometer(drawRouteStart.latitude, drawRouteStart.longitude,
-                                                        drawRouteArrival.latitude, drawRouteArrival.longitude);
-
-                                                Log.e("kilometer", "onDataChange: " + distanceInKm);
+                                                    Log.e("kilometer", "onDataChange: " + distanceInKm);
 
 
-                                                double price1 = Double.parseDouble(dataSnapshot.child("base").getValue(String.class) +
-                                                        (Double.parseDouble(dataSnapshot.child("km").getValue(String.class)) * distanceInKm) +
-                                                        Double.parseDouble(dataSnapshot.child("att").getValue(String.class)) * driverWaitTime);
+                                                    double price1 = Double.parseDouble(dataSnapshot.child("base").getValue(String.class) +
+                                                            (Double.parseDouble(dataSnapshot.child("km").getValue(String.class)) * distanceInKm) +
+                                                            Double.parseDouble(dataSnapshot.child("att").getValue(String.class)) * driverWaitTime);
 
-                                                Log.e("kilometer price", "onDataChange: " + price1);
-                                                price.setText(price1 + " MAD");
+                                                    Log.e("kilometer price", "onDataChange: " + price1);
+                                                    price.setText(price1 + " MAD");
+                                                }
                                             }
 
                                             @Override
@@ -1537,10 +1531,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    int height = 250;
-    int width = 120;
-    BitmapDrawable bitmapdraw;
-    Bitmap smallMarker;
 
     private void goToLocation(final Double lat, final Double lng) {
 
@@ -1551,19 +1541,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .build();                   // Creates a CameraPosition from the builder
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
-        mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
-            @Override
-            public void onMapLoaded() {
-                //Add markers here
-                bitmapdraw = (BitmapDrawable) getResources().getDrawable(R.drawable.driver_pin);
-                smallMarker = Bitmap.createScaledBitmap(bitmapdraw.getBitmap(), width, height, false);
-
-                mMap.addMarker(new MarkerOptions()
-                        .position(new LatLng(lat, lng))
-                        .icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
-
-            }
-        });
+//        mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+//            @Override
+//            public void onMapLoaded() {
+//                //Add markers here
+//
+//
+//
+//                mMap.addMarker(new MarkerOptions()
+//                        .position(new LatLng(lat, lng))
+//                        .icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
+//
+//            }
+//        });
 
     }
 
