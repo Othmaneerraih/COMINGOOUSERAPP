@@ -95,8 +95,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ImageButton myPositionButton;
 
     private ImageButton wazeButton;
-    private ImageButton contactButton;
-    private Button cancel_ride_btn;
+//    private ImageButton contactButton;
+//    private Button cancel_ride_btn;
 
     private ConstraintLayout clientInfoLayout;
     private ConstraintLayout destinationLayout;
@@ -187,7 +187,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         menuButton.setBackground(new BitmapDrawable(getResources(), scaleBitmap(40, 40, R.drawable.menu_icon)));
         myPositionButton.setBackground(new BitmapDrawable(getResources(), scaleBitmap(40, 40, R.drawable.my_location)));
         wazeButton.setBackground(new BitmapDrawable(getResources(), scaleBitmap(40, 40, R.drawable.waze_icon)));
-        contactButton.setBackground(new BitmapDrawable(getResources(), scaleBitmap(40, 40, R.drawable.contact)));
+//        contactButton.setBackground(new BitmapDrawable(getResources(), scaleBitmap(40, 40, R.drawable.contact)));
         arrowImage.setBackground(new BitmapDrawable(getResources(), scaleBitmap(30, 30, R.drawable.arrow_blue)));
         whitePersonImage.setBackground(new BitmapDrawable(getResources(), scaleBitmap(30, 50, R.drawable.person_white)));
     }
@@ -237,47 +237,47 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             loadImages();
 
-            contactButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (!clientPhoneNumber.isEmpty() || clientPhoneNumber != null) {
-                        try {
-                            Intent callIntent = new Intent(Intent.ACTION_CALL);
-                            callIntent.setData(Uri.parse("tel:" + clientPhoneNumber));
-                            if (ActivityCompat.checkSelfPermission(getBaseContext(), Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
-                                startActivity(callIntent);
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            });
+//            contactButton.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+//                    if (!clientPhoneNumber.isEmpty() || clientPhoneNumber != null) {
+//                        try {
+//                            Intent callIntent = new Intent(Intent.ACTION_CALL);
+//                            callIntent.setData(Uri.parse("tel:" + clientPhoneNumber));
+//                            if (ActivityCompat.checkSelfPermission(getBaseContext(), Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
+//                                startActivity(callIntent);
+//                            }
+//                        } catch (Exception e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }
+//            });
 
-            cancel_ride_btn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            switch (which) {
-                                case DialogInterface.BUTTON_POSITIVE:
-                                    //Yes button clicked
-                                    FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("state").setValue("5");
-                                    FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).removeValue();
-                                    break;
-
-                                case DialogInterface.BUTTON_NEGATIVE:
-                                    //No button clicked
-                                    break;
-                            }
-                        }
-                    };
-                    AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivity.this);
-                    builder.setTitle("Vous étes sure?").setMessage("Voulez-vous annuler la course?").setPositiveButton("Yes", dialogClickListener)
-                            .setNegativeButton("No", dialogClickListener).show();
-                }
-            });
+//            cancel_ride_btn.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+//                    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+//                        @Override
+//                        public void onClick(DialogInterface dialog, int which) {
+//                            switch (which) {
+//                                case DialogInterface.BUTTON_POSITIVE:
+//                                    //Yes button clicked
+//                                    FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("state").setValue("5");
+//                                    FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).removeValue();
+//                                    break;
+//
+//                                case DialogInterface.BUTTON_NEGATIVE:
+//                                    //No button clicked
+//                                    break;
+//                            }
+//                        }
+//                    };
+//                    AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivity.this);
+//                    builder.setTitle("Vous étes sure?").setMessage("Voulez-vous annuler la course?").setPositiveButton("Yes", dialogClickListener)
+//                            .setNegativeButton("No", dialogClickListener).show();
+//                }
+//            });
 
             switchOnlineButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -348,8 +348,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         myPositionButton = (ImageButton) findViewById(R.id.my_position_button);
 
         wazeButton = (ImageButton) findViewById(R.id.waze_button);
-        contactButton = (ImageButton) findViewById(R.id.contact_button);
-        cancel_ride_btn = (Button) findViewById(R.id.cancel_ride_btn);
+//        contactButton = (ImageButton) findViewById(R.id.contact_button);
+//        cancel_ride_btn = (Button) findViewById(R.id.cancel_ride_btn);
 
         clientInfoLayout = (ConstraintLayout) findViewById(R.id.clientInfo);
         destinationLayout = (ConstraintLayout) findViewById(R.id.destination_layout);
