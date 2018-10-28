@@ -35,6 +35,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -101,7 +102,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //    private ImageButton contactButton;
 //    private Button cancel_ride_btn;
 
-    private ConstraintLayout clientInfoLayout;
+    private RelativeLayout clientInfoLayout;
     private ConstraintLayout destinationLayout;
 
     private ImageView arrowImage;
@@ -392,7 +393,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //        contactButton = (ImageButton) findViewById(R.id.contact_button);
 //        cancel_ride_btn = (Button) findViewById(R.id.cancel_ride_btn);
 
-        clientInfoLayout = (ConstraintLayout) findViewById(R.id.clientInfo);
+        clientInfoLayout = (RelativeLayout) findViewById(R.id.clientInfo);
         destinationLayout = (ConstraintLayout) findViewById(R.id.destination_layout);
 
         arrowImage = (ImageView) findViewById(R.id.arrow_image);
