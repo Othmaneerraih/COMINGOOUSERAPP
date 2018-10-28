@@ -193,35 +193,23 @@ public class CourseService extends Service implements GoogleApiClient.Connection
 
             //desconnect Driver if still Online
             onlineDriver = FirebaseDatabase.getInstance().getReference("ONLINEDRIVERS").child(userId);
-         /*  onlineDriver.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    listener = this;
-                    if(dataSnapshot.exists()){
-                        courseRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                if(dataSnapshot.exists())
-                                    onlineDriver.removeValue();
-                                else{
-                                    onlineDriver.removeEventListener(listener);
-                                }
-                            }
 
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                            }
-                        });
-                    }
-                }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });*/
-
+//            DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference("COURSES");
+//            DatabaseReference userNameRef = rootRef.child("ujwal");
+//            ValueEventListener eventListener = new ValueEventListener() {
+//                @Override
+//                public void onDataChange(DataSnapshot dataSnapshot) {
+//                    if(dataSnapshot.exists()) {
+//                        Log.e(TAG, "onDataChange: ujjwal exists" );
+//                    } else  Log.e(TAG, "onDataChange: ujjwal not exists" );
+//                }
+//
+//                @Override
+//                public void onCancelled(DatabaseError databaseError) {}
+//            };
+//            userNameRef.addListenerForSingleValueEvent(eventListener);
 
 
             return "this string is passed to onPostExecute";

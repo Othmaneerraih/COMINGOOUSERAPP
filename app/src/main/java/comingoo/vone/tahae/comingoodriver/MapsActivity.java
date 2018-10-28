@@ -1,7 +1,6 @@
 package comingoo.vone.tahae.comingoodriver;
 
 import android.Manifest;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
@@ -14,12 +13,12 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
-import android.media.AudioManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -44,16 +43,14 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -68,13 +65,9 @@ import com.google.maps.model.DirectionsRoute;
 import com.google.maps.model.DirectionsStep;
 import com.google.maps.model.EncodedPolyline;
 import com.mxn.soul.flowingdrawer_core.FlowingDrawer;
-import com.sinch.android.rtc.PushPair;
-import com.sinch.android.rtc.Sinch;
-import com.sinch.android.rtc.SinchClient;
 import com.sinch.android.rtc.calling.Call;
 import com.sinch.android.rtc.calling.CallClient;
 import com.sinch.android.rtc.calling.CallClientListener;
-import com.sinch.android.rtc.calling.CallListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -204,8 +197,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private float dpHeight;
     private float dpWidth;
     private Intent intent;
-    private TextView tv_appelle_voip,tv_appelle_telephone;
+    private TextView tv_appelle_voip, tv_appelle_telephone;
 
+    private String TAG = "MapsActivity";
 
 
     @Override
@@ -266,11 +260,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             tv_appelle_voip.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(!driverId.isEmpty()){
+                    if (!driverId.isEmpty()) {
                         Intent intent = new Intent(MapsActivity.this, VoipCallingActivity.class);
-                        intent.putExtra("driverId",driverId);
-                        intent.putExtra("clientId",clientId);
-                        intent.putExtra("clientName",clientName);
+                        intent.putExtra("driverId", driverId);
+                        intent.putExtra("clientId", clientId);
+                        intent.putExtra("clientName", clientName);
                         startActivity(intent);
 
                     }
@@ -374,8 +368,44 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             });
             bitmapdraw = (BitmapDrawable) getResources().getDrawable(R.drawable.driver_pin);
             smallMarker = Bitmap.createScaledBitmap(bitmapdraw.getBitmap(), width, height, false);
+
             new checkCourseTask().execute();
             new checkCourseFinished().execute();
+
+//            final ChildEventListener childEventListener = new ChildEventListener() {
+//                @Override
+//                public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+//
+//                }
+//
+//                @Override
+//                public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+//
+//                    Log.e(TAG, "onChildChanged: ujjwal not exists"+dataSnapshot.toString());
+//                }
+//
+//                @Override
+//                public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+////                    if (!dataSnapshot.child("ujjwal").exists()) {
+//                        Log.e(TAG, "onDataChange: ujjwal not exists");
+//                        Log.e(TAG, "onDataChange: ujjwal not exists" + dataSnapshot.toString());
+////                    }
+//                }
+//
+//                @Override
+//                public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+//
+//                    Log.e(TAG, "onChildMoved: ujjwal not exists" + dataSnapshot.toString());
+//                }
+//
+//                @Override
+//                public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                    Log.e(TAG, "onCancelled: ujjwal not exists" + databaseError.toString());
+//                }
+//            };
+//            FirebaseDatabase.getInstance().getReference("COURSES").addChildEventListener(childEventListener);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -516,6 +546,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     int RATE = 0;
+    int cM =0;
 
     private class checkCourseFinished extends AsyncTask<String, Integer, String> {
         @Override
@@ -557,7 +588,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 final ImageView imot = (ImageView) dialog.findViewById(R.id.stars_rating);
 
                                 final Button gotMoney = (Button) dialog.findViewById(R.id.button);
-                                final Button charge = (Button) dialog.findViewById(R.id.button2);
+                                final Button charge = (Button) dialog.findViewById(R.id.btn_recharger);
                                 final EditText moneyAmount = (EditText) dialog.findViewById(R.id.editText);
 
                                 FirebaseDatabase.getInstance().getReference("DRIVERUSERS").
@@ -658,23 +689,65 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                             final int money = Integer.parseInt(val) - Integer.parseInt(dataSnapshott.child("price").getValue(String.class));
                                             if (money > 0) {
                                                 dialog.dismiss();
-                                                FirebaseDatabase.getInstance().getReference("clientUSERS").child(dataSnapshott.child("client").getValue(String.class)).child("SOLDE").addListenerForSingleValueEvent(new ValueEventListener() {
-                                                    @Override
-                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                        int cM = money;
-                                                        if (dataSnapshot.exists()) {
-                                                            cM += Integer.parseInt(dataSnapshot.getValue(String.class));
-                                                        }
-                                                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(dataSnapshott.child("client").getValue(String.class)).child("SOLDE").setValue("" + cM);
-                                                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").removeValue();
-                                                    }
+                                                FirebaseDatabase.getInstance().getReference("clientUSERS").
+                                                        child(dataSnapshott.child("client").getValue(String.class)).child("SOLDE").
+                                                        addListenerForSingleValueEvent(new ValueEventListener() {
+                                                            @Override
+                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                cM = money;
+                                                                if (dataSnapshot.exists()) {
+                                                                    cM += Integer.parseInt(dataSnapshot.getValue(String.class));
+                                                                }
+                                                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").removeValue();
 
-                                                    @Override
-                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                                FirebaseDatabase.getInstance().getReference("DRIVERFINISHEDCOURSES").
+                                                                        child(userId).child(dataSnapshot.getValue(String.class)).addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                    @Override
+                                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                        if (dataSnapshot.exists()) {
+                                                                            String riderId = dataSnapshot.child("client").getValue(String.class);
+//                                                                            Log.e(TAG, "Rider id, onDataChange: " + riderId);
 
-                                                    }
-                                                });
+                                                                            FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(riderId).addValueEventListener(new ValueEventListener() {
+                                                                                @Override
+                                                                                public void onDataChange(DataSnapshot dataSnapshot) {
+//                                                                                    Log.e(TAG, "Rider total, onDataChange: " + dataSnapshot.getChildrenCount() + " Total");
 
+                                                                                    if (dataSnapshot.getChildrenCount() >= 3) {
+                                                                                        if (cM <= 100) {
+                                                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(dataSnapshott.child("client").getValue(String.class)).child("SOLDE").setValue("" + cM);
+                                                                                        }
+                                                                                    } else {
+                                                                                        if (cM <= 10) {
+                                                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(dataSnapshott.child("client").getValue(String.class)).child("SOLDE").setValue("" + cM);
+                                                                                        }
+                                                                                    }
+                                                                                }
+
+                                                                                @Override
+                                                                                public void onCancelled(DatabaseError databaseError) {
+
+                                                                                }
+                                                                            });
+
+
+                                                                        }
+                                                                    }
+
+                                                                    @Override
+                                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                                    }
+                                                                });
+
+
+                                                            }
+
+                                                            @Override
+                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                            }
+                                                        });
                                             }
                                         }
                                     }
@@ -873,10 +946,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
 
 
-
-
-
-
 //                sinchClient = Sinch.getSinchClientBuilder()
 //                        .context(MapsActivity.this)
 //                        .userId(number)
@@ -994,8 +1063,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-
-
 //    private class SinchCallClientListener implements CallClientListener {
 //        @Override
 //        public void onIncomingCall(final CallClient callClient, final Call incomingCall) {
@@ -1045,7 +1112,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         fullName.setText(driverName);
         ratingR.setText(Rating + "");
         money.setText(todayEarnings + " MAD");
-
 
 
         ComingoonYou.setOnClickListener(new View.OnClickListener() {
@@ -1127,7 +1193,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         @Override
         protected String doInBackground(String... params) {
 
-            FirebaseDatabase.getInstance().getReference("COURSES").orderByChild("driver").equalTo(userId).limitToFirst(1).addValueEventListener(new ValueEventListener() {
+            FirebaseDatabase.getInstance().getReference("COURSES").orderByChild("driver").
+                    equalTo(userId).limitToFirst(1).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if (dataSnapshot.exists()) {
@@ -1184,6 +1251,65 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 }
             });
+
+//            FirebaseDatabase.getInstance().getReference("COURSES").child(userId).
+//                    child("state").addListenerForSingleValueEvent(new ValueEventListener() {
+//                @Override
+//                public void onDataChange(DataSnapshot dataSnapshot) {
+//                    if (!dataSnapshot.exists()) {
+//                        try {
+//                            if (Build.VERSION.SDK_INT >= 11) {
+//                                MapsActivity.this.recreate();
+//                            } else {
+//                                finish();
+//                                startActivity(MapsActivity.this.getIntent());
+//                            }
+//
+//                        } catch (Exception e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }
+//
+//                @Override
+//                public void onCancelled(DatabaseError databaseError) {
+//
+//                }
+//            });
+
+
+            final ChildEventListener childEventListener = new ChildEventListener() {
+                @Override
+                public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                }
+
+                @Override
+                public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                    Log.e(TAG, "onChildChanged: ujjwal not exists" + dataSnapshot.toString());
+                }
+
+                @Override
+                public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+                    try {
+                        MapsActivity.this.recreate();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            };
+            FirebaseDatabase.getInstance().getReference("COURSES").child(userId).addChildEventListener(childEventListener);
 
 
             return "this string is passed to onPostExecute";
@@ -1247,7 +1373,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void checkCourseState() {
 
         switchToCourseUI();
-        clientImage = (CircleImageView) findViewById(R.id.clientImage);
+        clientImage = findViewById(R.id.clientImage);
         name = (TextView) findViewById(R.id.name);
         textView4 = (TextView) findViewById(R.id.textView4);
 

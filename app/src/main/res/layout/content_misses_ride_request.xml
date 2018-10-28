@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/colorPrimaryDark"
+    android:layout_margin="10dp"
+    android:padding="10dp">
+
+    <ImageView
+        android:id="@+id/iv_alert"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/ic_aleart"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:id="@+id/tv_miss_ride_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Vous Avez manque une course.Etes vous occupe?"
+        android:gravity="center"
+        android:layout_below="@+id/iv_alert"
+        android:textSize="18sp"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        android:layout_marginTop="10dp"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_below="@+id/tv_miss_ride_text"
+        android:layout_marginTop="10dp">
+
+        <Button
+            android:id="@+id/btn_rester_engine"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:text="Rester en ligne"
+            android:textColor="@color/colorPrimaryDark"/>
+
+        <Button
+            android:id="@+id/btn_passer_hors"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textColor="@color/colorPrimaryDark"
+            android:layout_marginLeft="20dp"
+            android:text="Passer hors ligne"/>
+
+
+    </LinearLayout>
+
+</RelativeLayout>

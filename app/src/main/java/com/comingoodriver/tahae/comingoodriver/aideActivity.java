@@ -29,7 +29,6 @@ import java.util.Map;
 import comingoo.vone.tahae.comingoodriver.R;
 
 public class aideActivity extends AppCompatActivity {
-
     private ConstraintLayout Q1, Q2, A1, A2;
     private boolean a1 = false, a2 = false;
     public ConstraintLayout fc, content;

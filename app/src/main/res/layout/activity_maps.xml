@@ -231,7 +231,6 @@
                 app:layout_constraintTop_toTopOf="parent" />
         </android.support.constraint.ConstraintLayout>
 
-
         <RelativeLayout
             android:id="@+id/clientInfo"
             android:layout_width="match_parent"
@@ -242,7 +241,6 @@
 
 
             <android.support.constraint.ConstraintLayout
-
                 android:layout_width="match_parent"
                 android:layout_height="170dp"
                 android:layout_marginStart="8dp"

@@ -28,7 +28,6 @@
         android:layout_marginStart="40dp"
         android:layout_marginTop="24dp"
         android:text="Aide"
-        
         android:textColor="@android:color/white"
         android:textSize="70sp"
         app:layout_constraintStart_toStartOf="parent"
@@ -40,7 +39,6 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
-        
         android:text="Questions fréquement poséés"
         android:textColor="@android:color/white"
         android:textSize="20sp"
@@ -64,7 +62,6 @@
             android:layout_marginLeft="28dp"
             android:layout_marginStart="28dp"
             android:layout_marginTop="8dp"
-            
             android:text="Comment puis-je obtenir l'estimation du prix d'une course?"
             android:textColor="@android:color/white"
             app:layout_constraintStart_toStartOf="parent"
@@ -161,7 +158,6 @@
             android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="12dp"
-            
             android:text="Les tarifs sont indiqué dans la section 'Comingoo and you' dans le volet 'paramétres'"
             android:textColor="@android:color/white"
             android:textSize="12sp"
@@ -172,7 +168,7 @@
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/fc"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="70dp"
         android:layout_marginEnd="8dp"
         android:layout_marginLeft="8dp"
@@ -195,7 +191,6 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:text="Contactez nous"
-            
             android:textColor="#0071bc"
             android:textSize="20sp"
             android:textStyle="bold"
@@ -229,7 +224,6 @@
             android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="16dp"
-            
             android:background="@drawable/contact_area"
             android:ems="10"
             android:gravity="top"
@@ -327,7 +321,6 @@
             android:text="Envoyer"
             android:textColor="@color/colorPrimary"
             android:textStyle="bold"
-            
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.501"
