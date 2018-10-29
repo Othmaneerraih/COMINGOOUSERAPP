@@ -716,11 +716,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                     if (dataSnapshot.getChildrenCount() >= 3) {
                                                                                         if (cM <= 100) {
                                                                                             FirebaseDatabase.getInstance().getReference("clientUSERS").child(dataSnapshott.child("client").getValue(String.class)).child("SOLDE").setValue("" + cM);
-                                                                                        }
+                                                                                        } else
+                                                                                            Toast.makeText(MapsActivity.this, "Vous ne pouvez pas dépasser 100 MAD de recharge pour ce client.", Toast.LENGTH_SHORT).show();
                                                                                     } else {
                                                                                         if (cM <= 10) {
                                                                                             FirebaseDatabase.getInstance().getReference("clientUSERS").child(dataSnapshott.child("client").getValue(String.class)).child("SOLDE").setValue("" + cM);
-                                                                                        }
+                                                                                        } else Toast.makeText(MapsActivity.this, "Vous ne pouvez pas dépasser 10 MAD de recharge pour ce client.", Toast.LENGTH_SHORT).show();
                                                                                     }
                                                                                 }
 
@@ -978,7 +979,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             driverNumber = dataSnapshot.child("phoneNumber").getValue(String.class);
                             prefs.edit().putString("userId", dataSnapshot.getKey()).apply();
 
-                            if (dataSnapshot.child("rating").child("1").getValue(String.class) != null || dataSnapshot.child("rating").child("2").getValue(String.class) != null || dataSnapshot.child("rating").child("3").getValue(String.class) != null || dataSnapshot.child("rating").child("4").getValue(String.class) != null || dataSnapshot.child("rating").child("5").getValue(String.class) != null) {
+                            if (dataSnapshot.child("rating").child("1").getValue(String.class) != null
+                                    || dataSnapshot.child("rating").child("2").getValue(String.class) != null ||
+                                    dataSnapshot.child("rating").child("3").getValue(String.class) != null ||
+                                    dataSnapshot.child("rating").child("4").getValue(String.class) != null ||
+                                    dataSnapshot.child("rating").child("5").getValue(String.class) != null) {
 
                                 int r1 = Integer.parseInt(dataSnapshot.child("rating").child("1").getValue(String.class));
                                 int r2 = Integer.parseInt(dataSnapshot.child("rating").child("2").getValue(String.class));
@@ -1216,12 +1221,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 if (driverData.child("endLat").getValue(String.class).equals("")) {
                                     drawRouteArrival = null;
                                 } else {
-                                    drawRouteArrival = new LatLng(Double.parseDouble(data.child("endLat").getValue(String.class)), Double.parseDouble(data.child("endLong").getValue(String.class)));
+                                    drawRouteArrival = new LatLng(Double.parseDouble(data.child("endLat").getValue(String.class)),
+                                            Double.parseDouble(data.child("endLong").getValue(String.class)));
                                 }
                             }
 
                             if (clientId != null) {
-                                FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).addListenerForSingleValueEvent(new ValueEventListener() {
+                                FirebaseDatabase.getInstance().getReference("clientUSERS").
+                                        child(clientId).addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                         clientImageUri = dataSnapshot.child("image").getValue(String.class);
@@ -1287,7 +1294,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 @Override
                 public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
 
-                    Log.e(TAG, "onChildChanged: ujjwal not exists" + dataSnapshot.toString());
                 }
 
                 @Override
@@ -1371,11 +1377,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     TextView name, textView4;
 
     public void checkCourseState() {
-
         switchToCourseUI();
         clientImage = findViewById(R.id.clientImage);
-        name = (TextView) findViewById(R.id.name);
-        textView4 = (TextView) findViewById(R.id.textView4);
+        name = findViewById(R.id.name);
+        textView4 = findViewById(R.id.textView4);
 
         name.setText(clientName);
         textView4.setText(lastCourse);
