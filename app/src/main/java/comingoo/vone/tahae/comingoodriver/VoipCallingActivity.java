@@ -52,7 +52,7 @@ public class VoipCallingActivity extends AppCompatActivity {
         callState = (TextView)findViewById(R.id.callState);
 
         driverId = getIntent().getStringExtra("driverId");
-        clientId = "2Yup1rVx5RVSF1XuYD0tMfKWfPY2";//getIntent().getStringExtra("clientId");
+        clientId = getIntent().getStringExtra("clientId");//"RHiU2GIxm2ZIlU4GBGgKFZWxk4J3";//getIntent().getStringExtra("clientId");
         callerName = getIntent().getStringExtra("clientName");
 
 

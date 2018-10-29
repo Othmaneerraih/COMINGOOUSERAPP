@@ -1337,7 +1337,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void courseUIOff() {
         findViewById(R.id.statusConstraint).setVisibility(View.VISIBLE);
         findViewById(R.id.money).setVisibility(View.VISIBLE);
-//        clientInfoLayout.setVisibility(View.GONE);
+        clientInfoLayout.setVisibility(View.GONE);
         destinationLayout.setVisibility(View.GONE);
         menuButton.setVisibility(View.VISIBLE);
     }
