@@ -22,6 +22,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -214,9 +215,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         dpHeight = outMetrics.heightPixels / density;
         dpWidth = outMetrics.widthPixels / density;
 
-        onlineButton = (Button) findViewById(R.id.online_button);
-        offlineButton = (Button) findViewById(R.id.offline_button);
-        switchOnlineButton = (Button) findViewById(R.id.switch_online_button);
+        onlineButton =  findViewById(R.id.online_button);
+        offlineButton =  findViewById(R.id.offline_button);
+        switchOnlineButton =  findViewById(R.id.switch_online_button);
 
         menuButton = (ImageButton) findViewById(R.id.menu_button);
         myPositionButton = (ImageButton) findViewById(R.id.my_position_button);
