@@ -236,7 +236,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         destTime = (TextView) findViewById(R.id.destTime);
 
         courseActionButton = (Button) findViewById(R.id.course_action_button);
-        cancelCourseButton = (ImageButton) findViewById(R.id.cancelCourse);
+//        cancelCourseButton = (ImageButton) findViewById(R.id.cancelCourse);
 
         mDrawer = (FlowingDrawer) findViewById(R.id.drawerlayout);
 
