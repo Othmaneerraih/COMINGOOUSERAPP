@@ -41,11 +41,13 @@ public class loginActivity extends AppCompatActivity {
                 if(phoneNumber.getText().toString().isEmpty() && password.getText().toString().isEmpty()){
                     Toast.makeText(loginActivity.this, "Fill all the fields", Toast.LENGTH_SHORT).show();
                 }else{
-                    if(phoneNumberValidation(phoneNumber.getText().toString())){
-                        login(phoneNumber.getText().toString(), password.getText().toString());
-                    }else{
-                        Toast.makeText(loginActivity.this, "Veuillez entrer un numéro de téléphone valide 0612345678", Toast.LENGTH_SHORT).show();
-                    }
+
+                    login(phoneNumber.getText().toString(), password.getText().toString());
+//                    if(phoneNumberValidation(phoneNumber.getText().toString())){
+//                        login(phoneNumber.getText().toString(), password.getText().toString());
+//                    }else{
+//                        Toast.makeText(loginActivity.this, "Veuillez entrer un numéro de téléphone valide 0612345678", Toast.LENGTH_SHORT).show();
+//                    }
                 }
 
             }
@@ -57,13 +59,16 @@ public class loginActivity extends AppCompatActivity {
     private Boolean phoneNumberValidation(String number){
         char x = number.charAt(0);
         char y = number.charAt(1);
-        if(x == '0' && y == '6'){
-            return true;
+        if(x != '0' && y != '6'){
+            return false;
         }
-        if(android.util.Patterns.PHONE.matcher(number).matches()){
-            return true;
+        else if(number.length()>10){
+            return false;
         }
-        return false;
+//        if(android.util.Patterns.PHONE.matcher(number).matches()){
+//            return true;
+//        }
+        return true;
     }
 
 

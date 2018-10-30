@@ -68,9 +68,9 @@
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                throw new RuntimeException("This is a crash");
-//                startActivity(new Intent(MainActivity.this, loginActivity.class));
-//                finish();
+//                throw new RuntimeException("This is a crash");
+                startActivity(new Intent(MainActivity.this, loginActivity.class));
+                finish();
             }
         });
 
