@@ -22,6 +22,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -33,6 +34,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -93,7 +95,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ImageButton wazeButton;
 //    private ImageButton contactButton;
 
-    private ConstraintLayout clientInfoLayout;
+    private RelativeLayout clientInfoLayout;
     private ConstraintLayout destinationLayout;
 
     private ImageView arrowImage;
@@ -213,9 +215,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         dpHeight = outMetrics.heightPixels / density;
         dpWidth = outMetrics.widthPixels / density;
 
-        onlineButton = (Button) findViewById(R.id.online_button);
-        offlineButton = (Button) findViewById(R.id.offline_button);
-        switchOnlineButton = (Button) findViewById(R.id.switch_online_button);
+        onlineButton =  findViewById(R.id.online_button);
+        offlineButton =  findViewById(R.id.offline_button);
+        switchOnlineButton =  findViewById(R.id.switch_online_button);
 
         menuButton = (ImageButton) findViewById(R.id.menu_button);
         myPositionButton = (ImageButton) findViewById(R.id.my_position_button);
@@ -223,7 +225,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         wazeButton = (ImageButton) findViewById(R.id.waze_button);
 //        contactButton = (ImageButton) findViewById(R.id.contact_button);
 
-        clientInfoLayout = (ConstraintLayout) findViewById(R.id.clientInfo);
+        clientInfoLayout =  findViewById(R.id.clientInfo);
         destinationLayout = (ConstraintLayout) findViewById(R.id.destination_layout);
 
         arrowImage = (ImageView) findViewById(R.id.arrow_image);
@@ -311,18 +313,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         new checkCourseTask().execute();
         new checkCourseFinished().execute();
 
+
+
+
     }
 
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -435,7 +431,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         @Override
         protected String doInBackground(String... params) {
 
-
             final SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
             final String userId = prefs.getString("userId", null);
 
@@ -464,7 +459,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 final ImageView imot = (ImageView) dialog.findViewById(R.id.stars_rating);
 
                                 final Button gotMoney = (Button) dialog.findViewById(R.id.button);
-                                final Button charge = (Button) dialog.findViewById(R.id.button2);
+                                final Button charge = (Button) dialog.findViewById(R.id.btn_recharger);
                                 final EditText moneyAmount = (EditText) dialog.findViewById(R.id.editText);
 
 
@@ -1045,6 +1040,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             });
 
+
+//            FirebaseDatabase.getInstance().getReference("COURSES").child(userId).
+//                    child("state").addListenerForSingleValueEvent(new ValueEventListener() {
+//                @Override
+//                public void onDataChange(DataSnapshot dataSnapshot) {
+//                    if (!dataSnapshot.exists()) {
+//                        try {
+//                            if (Build.VERSION.SDK_INT >= 11) {
+//                                MapsActivity.this.recreate();
+//                            } else {
+//                                finish();
+//                                startActivity(MapsActivity.this.getIntent());
+//                            }
+//
+//                        } catch (Exception e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }
+//
+//                @Override
+//                public void onCancelled(DatabaseError databaseError) {
+//
+//                }
+//            });
 
             return "this string is passed to onPostExecute";
         }
