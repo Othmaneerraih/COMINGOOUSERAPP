@@ -1,6 +1,7 @@
     package comingoo.vone.tahae.comingoodriver;
 
     import android.content.Intent;
+    import android.net.Uri;
     import android.os.Bundle;
     import android.support.annotation.NonNull;
     import android.support.v7.app.AppCompatActivity;
@@ -52,7 +53,11 @@
             @Override
             public void onClick(View view) {
             //    startActivity(new Intent(MainActivity.this, signupActivity.class));
-                OpenDialog();
+//                OpenDialog();
+                String url = "https://www.comingoo.com/driver/signup";
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(url));
+                startActivity(i);
             }
         });
 

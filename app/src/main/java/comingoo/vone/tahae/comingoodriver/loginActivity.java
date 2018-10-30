@@ -37,16 +37,33 @@ public class loginActivity extends AppCompatActivity {
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 if(phoneNumber.getText().toString().isEmpty() && password.getText().toString().isEmpty()){
                     Toast.makeText(loginActivity.this, "Fill all the fields", Toast.LENGTH_SHORT).show();
                 }else{
-                    login(phoneNumber.getText().toString(), password.getText().toString());
+                    if(phoneNumberValidation(phoneNumber.getText().toString())){
+                        login(phoneNumber.getText().toString(), password.getText().toString());
+                    }else{
+                        Toast.makeText(loginActivity.this, "Veuillez entrer un numéro de téléphone valide 0612345678", Toast.LENGTH_SHORT).show();
+                    }
                 }
 
             }
         });
 
 
+    }
+
+    private Boolean phoneNumberValidation(String number){
+        char x = number.charAt(0);
+        char y = number.charAt(1);
+        if(x == '0' && y == '6'){
+            return true;
+        }
+        if(android.util.Patterns.PHONE.matcher(number).matches()){
+            return true;
+        }
+        return false;
     }
 
 
