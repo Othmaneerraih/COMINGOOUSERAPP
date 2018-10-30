@@ -54,6 +54,12 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
+        <!--<meta-data-->
+            <!--android:name="io.fabric.ApiKey"-->
+            <!--android:value="9d2f04b9fa154d690885532b8443aab2fbe59bb8"-->
+            <!--/>-->
+
+
         <activity
             android:name=".MapsActivity"
             android:label="@string/title_activity_maps">
