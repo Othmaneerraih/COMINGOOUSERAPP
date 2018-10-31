@@ -863,7 +863,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         public void onIncomingCall(final CallClient callClient, final Call incomingCall) {
             //Pick up the call!
 
-            findViewById(R.id.callLayout).setVisibility(View.VISIBLE);
+            findViewById(R.id.ca).setVisibility(View.VISIBLE);
             final Button hangup = (Button) findViewById(R.id.hangup);
             hangup.setText("Answer");
             hangup.setOnClickListener(new View.OnClickListener() {
