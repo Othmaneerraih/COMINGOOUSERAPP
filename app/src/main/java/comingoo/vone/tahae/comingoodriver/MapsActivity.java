@@ -268,7 +268,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         intent.putExtra("clientId", clientId);
                         intent.putExtra("clientName", clientName);
                         startActivity(intent);
-
                     }
                 }
             });
@@ -548,7 +547,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     int RATE = 0;
-    int cM =0;
+    int cM = 0;
 
     private class checkCourseFinished extends AsyncTask<String, Integer, String> {
         @Override
@@ -723,7 +722,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                     } else {
                                                                                         if (cM <= 10) {
                                                                                             FirebaseDatabase.getInstance().getReference("clientUSERS").child(dataSnapshott.child("client").getValue(String.class)).child("SOLDE").setValue("" + cM);
-                                                                                        } else Toast.makeText(MapsActivity.this, "Vous ne pouvez pas dépasser 10 MAD de recharge pour ce client.", Toast.LENGTH_SHORT).show();
+                                                                                        } else
+                                                                                            Toast.makeText(MapsActivity.this, "Vous ne pouvez pas dépasser 10 MAD de recharge pour ce client.", Toast.LENGTH_SHORT).show();
                                                                                     }
                                                                                 }
 
@@ -1368,8 +1368,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-    CircleImageView clientImage,close_button,call_button;
-    TextView name, textView5,totalCourse,date;
+    CircleImageView clientImage, close_button, call_button;
+    TextView name, textView5, totalCourse, date;
     LinearLayout voip_view;
 
     public void checkCourseState() {
@@ -1407,12 +1407,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         name.setText(clientName);
         textView5.setText(lastCourse);
-        if(clientId !=null || !clientId.isEmpty()){
+        if (clientId != null || !clientId.isEmpty()) {
             FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(clientId).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     String sourceString = "<b>" + "Courses :" + "</b> " + name;
-                    totalCourse.setText(Html.fromHtml(sourceString)+" "+ dataSnapshot.getChildrenCount());
+                    totalCourse.setText(Html.fromHtml(sourceString) + " " + dataSnapshot.getChildrenCount());
                 }
 
                 @Override
