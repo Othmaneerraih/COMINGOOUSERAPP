@@ -15,6 +15,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
@@ -215,9 +216,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         dpHeight = outMetrics.heightPixels / density;
         dpWidth = outMetrics.widthPixels / density;
 
-        onlineButton =  findViewById(R.id.online_button);
-        offlineButton =  findViewById(R.id.offline_button);
-        switchOnlineButton =  findViewById(R.id.switch_online_button);
+        onlineButton = findViewById(R.id.online_button);
+        offlineButton = findViewById(R.id.offline_button);
+        switchOnlineButton = findViewById(R.id.switch_online_button);
 
         menuButton = (ImageButton) findViewById(R.id.menu_button);
         myPositionButton = (ImageButton) findViewById(R.id.my_position_button);
@@ -225,7 +226,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         wazeButton = (ImageButton) findViewById(R.id.waze_button);
 //        contactButton = (ImageButton) findViewById(R.id.contact_button);
 
-        clientInfoLayout =  findViewById(R.id.clientInfo);
+        clientInfoLayout = findViewById(R.id.clientInfo);
         destinationLayout = (ConstraintLayout) findViewById(R.id.destination_layout);
 
         arrowImage = (ImageView) findViewById(R.id.arrow_image);
@@ -236,7 +237,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         destTime = (TextView) findViewById(R.id.destTime);
 
         courseActionButton = (Button) findViewById(R.id.course_action_button);
-        cancelCourseButton = (ImageButton) findViewById(R.id.cancelCourse);
+//        cancelCourseButton = (ImageButton) findViewById(R.id.cancelCourse);
 
         mDrawer = (FlowingDrawer) findViewById(R.id.drawerlayout);
 
@@ -314,8 +315,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         new checkCourseFinished().execute();
 
 
-
-
     }
 
 
@@ -379,7 +378,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         findViewById(R.id.money).setVisibility(View.GONE);
         menuButton.setVisibility(View.GONE);
 
-
         clientInfoLayout.setVisibility(View.VISIBLE);
         destinationLayout.setVisibility(View.VISIBLE);
     }
@@ -388,7 +386,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         findViewById(R.id.statusConstraint).setVisibility(View.VISIBLE);
         findViewById(R.id.money).setVisibility(View.VISIBLE);
         menuButton.setVisibility(View.VISIBLE);
-
 
         clientInfoLayout.setVisibility(View.GONE);
         destinationLayout.setVisibility(View.GONE);
@@ -435,75 +432,80 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             final String userId = prefs.getString("userId", null);
 
             if (userId == null) return "";
-            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").addValueEventListener(new ValueEventListener() {
+
+            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).
+                    child("COURSE").addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
                     if (dataSnapshot.exists()) {
                         FirebaseDatabase.getInstance().getReference("DRIVERFINISHEDCOURSES").
-                                child(userId).child(dataSnapshot.getValue(String.class)).addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull final DataSnapshot dataSnapshott) {
+                                child(userId).child(dataSnapshot.getValue(String.class)).
+                                addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull final DataSnapshot dataSnapshott) {
 
-                                final Dialog dialog = new Dialog(MapsActivity.this);
-                                dialog.setContentView(R.layout.finished_course);
+                                        final Dialog dialog = new Dialog(MapsActivity.this);
+                                        dialog.setContentView(R.layout.finished_course);
 
-                                Button dialogButton = (Button) dialog.findViewById(R.id.button);
-                                final Button star1 = (Button) dialog.findViewById(R.id.star1);
-                                final Button star2 = (Button) dialog.findViewById(R.id.star2);
-                                final Button star3 = (Button) dialog.findViewById(R.id.star3);
-                                final Button star4 = (Button) dialog.findViewById(R.id.star4);
-                                final Button star5 = (Button) dialog.findViewById(R.id.star5);
+                                        Button dialogButton = (Button) dialog.findViewById(R.id.button);
+                                        final Button star1 = (Button) dialog.findViewById(R.id.star1);
+                                        final Button star2 = (Button) dialog.findViewById(R.id.star2);
+                                        final Button star3 = (Button) dialog.findViewById(R.id.star3);
+                                        final Button star4 = (Button) dialog.findViewById(R.id.star4);
+                                        final Button star5 = (Button) dialog.findViewById(R.id.star5);
 
-                                final Button price = (Button) dialog.findViewById(R.id.button3);
+                                        final Button price = (Button) dialog.findViewById(R.id.button3);
 
-                                final ImageView imot = (ImageView) dialog.findViewById(R.id.stars_rating);
+                                        final ImageView imot = (ImageView) dialog.findViewById(R.id.stars_rating);
 
-                                final Button gotMoney = (Button) dialog.findViewById(R.id.button);
-                                final Button charge = (Button) dialog.findViewById(R.id.btn_recharger);
-                                final EditText moneyAmount = (EditText) dialog.findViewById(R.id.editText);
+                                        final Button gotMoney = (Button) dialog.findViewById(R.id.button);
+                                        final Button charge = (Button) dialog.findViewById(R.id.btn_recharger);
+                                        final EditText moneyAmount = (EditText) dialog.findViewById(R.id.editText);
 
+                                        if (dataSnapshot.exists()) {
+                                            // Generating prices for driver
+                                            FirebaseDatabase.getInstance().getReference("DRIVERFINISHEDCOURSES").
+                                                    addListenerForSingleValueEvent(new ValueEventListener() {
+                                                        @Override
+                                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                            driverWaitTime = Integer.parseInt(
+                                                                    dataSnapshot.child("waitTime").getValue(String.class));
+                                                        }
 
-                                // Generating prices for driver
-                                FirebaseDatabase.getInstance().getReference("DRIVERFINISHEDCOURSES").
-                                        addListenerForSingleValueEvent(new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                driverWaitTime = Integer.parseInt(dataSnapshot.child("waitTime").getValue(String.class));
+                                                        @Override
+                                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                        }
+                                                    });
+
+                                            try {
+                                                FirebaseDatabase.getInstance().getReference("PRICES").
+                                                        addListenerForSingleValueEvent(new ValueEventListener() {
+                                                            @Override
+                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                try {
+                                                                    double distanceInKm = distanceInKilometer(drawRouteStart.latitude, drawRouteStart.longitude,
+                                                                            drawRouteArrival.latitude, drawRouteArrival.longitude);
+
+                                                                    double price1 = Double.parseDouble(dataSnapshot.child("base").getValue(String.class) +
+                                                                            (Double.parseDouble(dataSnapshot.child("km").getValue(String.class)) * distanceInKm) +
+                                                                            Double.parseDouble(dataSnapshot.child("att").getValue(String.class)) * driverWaitTime);
+
+                                                                    price.setText(price1 + " MAD");
+                                                                } catch (Exception e) {
+                                                                    e.printStackTrace();
+                                                                }
+                                                            }
+
+                                                            @Override
+                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                            }
+                                                        });
+
+                                            } catch (Exception e) {
+                                                e.printStackTrace();
                                             }
-
-                                            @Override
-                                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                            }
-                                        });
-
-
-                                FirebaseDatabase.getInstance().getReference("PRICES").
-                                        addListenerForSingleValueEvent(new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-
-                                                double distanceInKm = distanceInKilometer(drawRouteStart.latitude, drawRouteStart.longitude,
-                                                        drawRouteArrival.latitude, drawRouteArrival.longitude);
-
-                                                Log.e("kilometer", "onDataChange: " + distanceInKm);
-
-
-                                                double price1 = Double.parseDouble(dataSnapshot.child("base").getValue(String.class) +
-                                                        (Double.parseDouble(dataSnapshot.child("km").getValue(String.class)) * distanceInKm) +
-                                                        Double.parseDouble(dataSnapshot.child("att").getValue(String.class)) * driverWaitTime);
-
-                                                Log.e("kilometer price", "onDataChange: " + price1);
-                                                price.setText(price1 + " MAD");
-                                            }
-
-                                            @Override
-                                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                            }
-                                        });
-
 
 //                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).
 //                                        child("PAID").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -532,138 +534,138 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //                                });
 
 
-                                dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                                    @Override
-                                    public void onDismiss(DialogInterface dialog) {
-                                        stopService(intent);
-                                        startService(intent);
-                                    }
-                                });
+                                            dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                                @Override
+                                                public void onDismiss(DialogInterface dialog) {
+                                                    stopService(intent);
+                                                    startService(intent);
+                                                }
+                                            });
 
-                                gotMoney.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").removeValue();
-                                        dialog.dismiss();
-                                    }
-                                });
+                                            gotMoney.setOnClickListener(new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View v) {
+                                                    FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").removeValue();
+                                                    dialog.dismiss();
+                                                }
+                                            });
 
-                                charge.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        String val = moneyAmount.getText().toString();
-                                        if (moneyAmount.getText().toString().length() > 0) {
-                                            final int money = Integer.parseInt(val) - Integer.parseInt(dataSnapshott.child("price").getValue(String.class));
-                                            if (money > 0) {
-                                                dialog.dismiss();
-                                                FirebaseDatabase.getInstance().getReference("clientUSERS").child(dataSnapshott.child("client").getValue(String.class)).child("SOLDE").addListenerForSingleValueEvent(new ValueEventListener() {
-                                                    @Override
-                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                        int cM = money;
-                                                        if (dataSnapshot.exists()) {
-                                                            cM += Integer.parseInt(dataSnapshot.getValue(String.class));
+                                            charge.setOnClickListener(new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View v) {
+                                                    String val = moneyAmount.getText().toString();
+                                                    if (moneyAmount.getText().toString().length() > 0) {
+                                                        final int money = Integer.parseInt(val) - Integer.parseInt(dataSnapshott.child("price").getValue(String.class));
+                                                        if (money > 0) {
+                                                            dialog.dismiss();
+                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(dataSnapshott.child("client").getValue(String.class)).child("SOLDE").addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                @Override
+                                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                    int cM = money;
+                                                                    if (dataSnapshot.exists()) {
+                                                                        cM += Integer.parseInt(dataSnapshot.getValue(String.class));
+                                                                    }
+                                                                    FirebaseDatabase.getInstance().getReference("clientUSERS").child(dataSnapshott.child("client").getValue(String.class)).child("SOLDE").setValue("" + cM);
+                                                                    FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").removeValue();
+                                                                }
+
+                                                                @Override
+                                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                                }
+                                                            });
+
                                                         }
-                                                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(dataSnapshott.child("client").getValue(String.class)).child("SOLDE").setValue("" + cM);
-                                                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").removeValue();
                                                     }
-
-                                                    @Override
-                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                                    }
-                                                });
-
-                                            }
+                                                }
+                                            });
                                         }
-                                    }
-                                });
+
+                                        star1.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                RATE = 1;
+
+                                                star1.setBackgroundResource(R.drawable.selected_star);
+                                                star2.setBackgroundResource(R.drawable.unselected_star);
+                                                star3.setBackgroundResource(R.drawable.unselected_star);
+                                                star4.setBackgroundResource(R.drawable.unselected_star);
+                                                star5.setBackgroundResource(R.drawable.unselected_star);
+
+                                                imot.setImageBitmap(scaleBitmap(150, 150, R.drawable.one_star));
+                                            }
+                                        });
+                                        star2.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                RATE = 2;
+
+                                                star1.setBackgroundResource(R.drawable.normal_star);
+                                                star2.setBackgroundResource(R.drawable.selected_star);
+                                                star3.setBackgroundResource(R.drawable.unselected_star);
+                                                star4.setBackgroundResource(R.drawable.unselected_star);
+                                                star5.setBackgroundResource(R.drawable.unselected_star);
+
+                                                imot.setImageBitmap(scaleBitmap(150, 150, R.drawable.two_stars));
+                                            }
+                                        });
+                                        star3.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                RATE = 3;
+
+                                                star1.setBackgroundResource(R.drawable.normal_star);
+                                                star2.setBackgroundResource(R.drawable.normal_star);
+                                                star3.setBackgroundResource(R.drawable.selected_star);
+                                                star4.setBackgroundResource(R.drawable.unselected_star);
+                                                star5.setBackgroundResource(R.drawable.unselected_star);
+
+                                                imot.setImageBitmap(scaleBitmap(150, 150, R.drawable.three_stars));
+                                            }
+                                        });
+                                        star4.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                RATE = 4;
+
+                                                star1.setBackgroundResource(R.drawable.normal_star);
+                                                star2.setBackgroundResource(R.drawable.normal_star);
+                                                star3.setBackgroundResource(R.drawable.normal_star);
+                                                star4.setBackgroundResource(R.drawable.selected_star);
+                                                star5.setBackgroundResource(R.drawable.unselected_star);
+
+                                                imot.setImageBitmap(scaleBitmap(150, 150, R.drawable.four_stars));
+                                            }
+                                        });
+                                        star5.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                RATE = 5;
+
+                                                star1.setBackgroundResource(R.drawable.normal_star);
+                                                star2.setBackgroundResource(R.drawable.normal_star);
+                                                star3.setBackgroundResource(R.drawable.normal_star);
+                                                star4.setBackgroundResource(R.drawable.normal_star);
+                                                star5.setBackgroundResource(R.drawable.selected_star);
+
+                                                imot.setImageBitmap(scaleBitmap(150, 150, R.drawable.five_stars));
+                                            }
+                                        });
 
 
-                                star1.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        RATE = 1;
+                                        dialog.setCancelable(false);
+                                        dialog.setCanceledOnTouchOutside(false);
 
-                                        star1.setBackgroundResource(R.drawable.selected_star);
-                                        star2.setBackgroundResource(R.drawable.unselected_star);
-                                        star3.setBackgroundResource(R.drawable.unselected_star);
-                                        star4.setBackgroundResource(R.drawable.unselected_star);
-                                        star5.setBackgroundResource(R.drawable.unselected_star);
+                                        dialog.show();
 
-                                        imot.setImageBitmap(scaleBitmap(150, 150, R.drawable.one_star));
-                                    }
-                                });
-                                star2.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        RATE = 2;
-
-                                        star1.setBackgroundResource(R.drawable.normal_star);
-                                        star2.setBackgroundResource(R.drawable.selected_star);
-                                        star3.setBackgroundResource(R.drawable.unselected_star);
-                                        star4.setBackgroundResource(R.drawable.unselected_star);
-                                        star5.setBackgroundResource(R.drawable.unselected_star);
-
-                                        imot.setImageBitmap(scaleBitmap(150, 150, R.drawable.two_stars));
-                                    }
-                                });
-                                star3.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        RATE = 3;
-
-                                        star1.setBackgroundResource(R.drawable.normal_star);
-                                        star2.setBackgroundResource(R.drawable.normal_star);
-                                        star3.setBackgroundResource(R.drawable.selected_star);
-                                        star4.setBackgroundResource(R.drawable.unselected_star);
-                                        star5.setBackgroundResource(R.drawable.unselected_star);
-
-                                        imot.setImageBitmap(scaleBitmap(150, 150, R.drawable.three_stars));
-                                    }
-                                });
-                                star4.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        RATE = 4;
-
-                                        star1.setBackgroundResource(R.drawable.normal_star);
-                                        star2.setBackgroundResource(R.drawable.normal_star);
-                                        star3.setBackgroundResource(R.drawable.normal_star);
-                                        star4.setBackgroundResource(R.drawable.selected_star);
-                                        star5.setBackgroundResource(R.drawable.unselected_star);
-
-                                        imot.setImageBitmap(scaleBitmap(150, 150, R.drawable.four_stars));
-                                    }
-                                });
-                                star5.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        RATE = 5;
-
-                                        star1.setBackgroundResource(R.drawable.normal_star);
-                                        star2.setBackgroundResource(R.drawable.normal_star);
-                                        star3.setBackgroundResource(R.drawable.normal_star);
-                                        star4.setBackgroundResource(R.drawable.normal_star);
-                                        star5.setBackgroundResource(R.drawable.selected_star);
-
-                                        imot.setImageBitmap(scaleBitmap(150, 150, R.drawable.five_stars));
-                                    }
-                                });
+                                        dialog.findViewById(R.id.body).getLayoutParams().width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (int) (dpWidth), MapsActivity.this.getResources().getDisplayMetrics());
 
 
-                                dialog.setCancelable(false);
-                                dialog.setCanceledOnTouchOutside(false);
-
-                                dialog.show();
-
-                                dialog.findViewById(R.id.body).getLayoutParams().width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (int) (dpWidth), MapsActivity.this.getResources().getDisplayMetrics());
-
-
-                                WindowManager.LayoutParams lp = dialog.getWindow().getAttributes();
-                                lp.dimAmount = 0.5f;
-                                dialog.getWindow().setAttributes(lp);
-                                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-                                dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                                        WindowManager.LayoutParams lp = dialog.getWindow().getAttributes();
+                                        lp.dimAmount = 0.5f;
+                                        dialog.getWindow().setAttributes(lp);
+                                        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+                                        dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
 
                             /*    String price = dataSnapshott.child("price").getValue(String.class);
                                 Intent finishedCour²se = new Intent(MainActivity.this, finishedCourse.class);
@@ -673,13 +675,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                 startActivity(finishedCourse);
 */
-                            }
+                                    }
 
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                            }
-                        });
+                                    }
+                                });
                     }
                 }
 
@@ -898,10 +900,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (driverImage != null) {
             if (driverImage.length() > 0) {
                 Picasso.get().load(driverImage).fit().centerCrop().into(driverI);
-            }else{
+            } else {
                 driverI.setImageResource(R.drawable.driver_profil_picture);
             }
-        }else{
+        } else {
             driverI.setImageResource(R.drawable.driver_profil_picture);
         }
         fullName.setText(driverName);
@@ -1041,30 +1043,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             });
 
 
-//            FirebaseDatabase.getInstance().getReference("COURSES").child(userId).
-//                    child("state").addListenerForSingleValueEvent(new ValueEventListener() {
-//                @Override
-//                public void onDataChange(DataSnapshot dataSnapshot) {
-//                    if (!dataSnapshot.exists()) {
-//                        try {
-//                            if (Build.VERSION.SDK_INT >= 11) {
-//                                MapsActivity.this.recreate();
-//                            } else {
-//                                finish();
-//                                startActivity(MapsActivity.this.getIntent());
-//                            }
-//
-//                        } catch (Exception e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
-//                }
-//
-//                @Override
-//                public void onCancelled(DatabaseError databaseError) {
-//
-//                }
-//            });
+            FirebaseDatabase.getInstance().getReference("COURSES").child(userId).
+                    child("state").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (!dataSnapshot.exists()) {
+                        try {
+                            if (Build.VERSION.SDK_INT >= 11) {
+                                MapsActivity.this.recreate();
+                            } else {
+                                finish();
+                                startActivity(MapsActivity.this.getIntent());
+                            }
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
 
             return "this string is passed to onPostExecute";
         }
@@ -1085,7 +1087,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             // Do things like hide the progress bar or change a TextView
         }
     }
-
 
     // Calculating KM from 2 LatLong
     private double distanceInKilometer(double lat1, double lon1, double lat2, double lon2) {
@@ -1108,7 +1109,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private double rad2deg(double rad) {
         return (rad * 180.0 / Math.PI);
     }
-
 
     private void courseHandle() {
         if (courseState.equals("4")) {

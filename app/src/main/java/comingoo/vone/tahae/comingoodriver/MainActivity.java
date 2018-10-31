@@ -1,6 +1,7 @@
     package comingoo.vone.tahae.comingoodriver;
 
     import android.content.Intent;
+    import android.net.Uri;
     import android.os.Bundle;
     import android.support.annotation.NonNull;
     import android.support.v7.app.AppCompatActivity;
@@ -8,6 +9,7 @@
     import android.widget.Button;
     import android.widget.Toast;
 
+    import com.crashlytics.android.Crashlytics;
     import com.google.android.gms.tasks.OnCompleteListener;
     import com.google.android.gms.tasks.Task;
     import com.google.firebase.FirebaseException;
@@ -20,6 +22,8 @@
     import com.google.firebase.database.DatabaseReference;
     import com.google.firebase.database.FirebaseDatabase;
     import com.google.firebase.database.ValueEventListener;
+    import com.crashlytics.android.Crashlytics;
+    import io.fabric.sdk.android.Fabric;
 
     import java.util.HashMap;
     import java.util.Map;
@@ -47,18 +51,24 @@
 
         signup = (Button) findViewById(R.id.signup);
         login = (Button) findViewById(R.id.login);
+        Fabric.with(this, new Crashlytics());
 
         signup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
             //    startActivity(new Intent(MainActivity.this, signupActivity.class));
-                OpenDialog();
+//                OpenDialog();
+                String url = "https://www.comingoo.com/driver/signup";
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(url));
+                startActivity(i);
             }
         });
 
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+//                throw new RuntimeException("This is a crash");
                 startActivity(new Intent(MainActivity.this, loginActivity.class));
                 finish();
             }

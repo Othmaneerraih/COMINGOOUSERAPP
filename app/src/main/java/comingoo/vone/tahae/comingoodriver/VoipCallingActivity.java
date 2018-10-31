@@ -10,10 +10,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.sinch.android.rtc.PushPair;
 import com.sinch.android.rtc.Sinch;
 import com.sinch.android.rtc.SinchClient;
+import com.sinch.android.rtc.SinchError;
 import com.sinch.android.rtc.calling.Call;
 import com.sinch.android.rtc.calling.CallClient;
 import com.sinch.android.rtc.calling.CallClientListener;
@@ -34,6 +36,10 @@ public class VoipCallingActivity extends AppCompatActivity {
     private TextView callState,caller_name;
     private CircleImageView iv_user_image_voip_one,iv_cancel_call_voip_one;
 
+    private static final String APP_KEY = "185d9822-a953-4af6-a780-b0af1fd31bf7";
+    private static final String APP_SECRET = "ZiJ6FqH5UEWYbkMZd1rWbw==";
+    private static final String ENVIRONMENT = "sandbox.sinch.com";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,7 +52,7 @@ public class VoipCallingActivity extends AppCompatActivity {
         callState = (TextView)findViewById(R.id.callState);
 
         driverId = getIntent().getStringExtra("driverId");
-        clientId = getIntent().getStringExtra("clientId");
+        clientId = getIntent().getStringExtra("clientId");//"RHiU2GIxm2ZIlU4GBGgKFZWxk4J3";//getIntent().getStringExtra("clientId");
         callerName = getIntent().getStringExtra("clientName");
 
 
@@ -58,26 +64,21 @@ public class VoipCallingActivity extends AppCompatActivity {
 
         caller_name.setText(callerName);
 
-        if(!driverId.isEmpty()){
-            sinchClient = Sinch.getSinchClientBuilder()
-                    .context(VoipCallingActivity.this)
-                    .userId(driverId)
-                    .applicationKey("04ae7d45-1084-4fb5-9d7c-08d82527d191")
-                    .applicationSecret("TfJrquo6qEmkV8DG/EXQPg==")
-                    .environmentHost("clientapi.sinch.com")
-//                    .applicationKey(resources.getString(R.string.sinch_app_key))
-//                    .applicationSecret(resources.getString(R.string.sinch_app_secret))
-//                    .environmentHost(resources.getString(R.string.sinch_envirentmnet_host))
-                    .build();
-            sinchClient.setSupportCalling(true);
-            sinchClient.start();
-            sinchClient.startListeningOnActiveConnection();
-        }
+        sinchClient = Sinch.getSinchClientBuilder()
+                .context(this)
+                .userId(driverId)
+                .applicationKey(APP_KEY)
+                .applicationSecret(APP_SECRET)
+                .environmentHost(ENVIRONMENT)
+                .build();
 
+        sinchClient.setSupportCalling(true);
+        sinchClient.startListeningOnActiveConnection();
+        sinchClient.start();
 
+        sinchClient.getCallClient().addCallClientListener(new VoipCallingActivity.SinchCallClientListener());
 
-
-//                sinchClient.getCallClient().addCallClientListener(new SinchCallClientListener());
+        iv_cancel_call_voip_one.setEnabled(false);
 
 
 
@@ -106,7 +107,11 @@ public class VoipCallingActivity extends AppCompatActivity {
                 if(!clientId.isEmpty()){
                     if (call == null) {
                         call = sinchClient.getCallClient().callUser(clientId);
-                        call.addCallListener(new SinchCallListener());
+                        call.addCallListener(new VoipCallingActivity.SinchCallListener());
+//                        button.setText("Hang Up");
+                        iv_cancel_call_voip_one.setEnabled(true);
+                    } else {
+                        call.hangup();
                     }
                 }
             }
@@ -117,36 +122,39 @@ public class VoipCallingActivity extends AppCompatActivity {
     private class SinchCallListener implements CallListener {
         @Override
         public void onCallEnded(Call endedCall) {
-            //call ended by either party
-
             call = null;
+            SinchError a = endedCall.getDetails().getError();
+//            button.setText("Call");
+            iv_cancel_call_voip_one.setEnabled(false);
             callState.setText("");
             setVolumeControlStream(AudioManager.USE_DEFAULT_STREAM_TYPE);
         }
 
         @Override
-        public void onCallEstablished(final Call establishedCall) {
-            //incoming call was picked up
+        public void onCallEstablished(Call establishedCall) {
             callState.setText("connected");
             setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
         }
 
         @Override
         public void onCallProgressing(Call progressingCall) {
-            //call is ringing
             callState.setText("ringing");
         }
 
         @Override
         public void onShouldSendPushNotification(Call call, List<PushPair> pushPairs) {
-            //don't worry about this right now
         }
     }
 
     private class SinchCallClientListener implements CallClientListener {
         @Override
         public void onIncomingCall(CallClient callClient, Call incomingCall) {
-            //Pick up the call!
+            call = incomingCall;
+            Toast.makeText(VoipCallingActivity.this, "incoming call", Toast.LENGTH_SHORT).show();
+            call.answer();
+            call.addCallListener(new VoipCallingActivity.SinchCallListener());
+//            button.setText("Hang Up");
+            iv_cancel_call_voip_one.setEnabled(true);
         }
     }
 }

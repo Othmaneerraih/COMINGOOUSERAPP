@@ -23,6 +23,7 @@ import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.text.Html;
 import android.text.format.DateFormat;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -34,6 +35,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -106,7 +108,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private TextView destTime;
 
     private Button courseActionButton;
-    private ImageButton cancelCourseButton;
+    private RelativeLayout cancel_view;
 
     private Button money;
 
@@ -434,7 +436,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         destTime = (TextView) findViewById(R.id.destTime);
 
         courseActionButton = (Button) findViewById(R.id.course_action_button);
-        cancelCourseButton = (ImageButton) findViewById(R.id.cancelCourse);
+        cancel_view = (RelativeLayout) findViewById(R.id.cancel_view);
 
         mDrawer = (FlowingDrawer) findViewById(R.id.drawerlayout);
 
@@ -1341,14 +1343,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void courseHandle() {
         if (courseState.equals("4")) {
-
             wazeButton.setVisibility(View.GONE);
-            findViewById(R.id.waze_button).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    return;
-                }
-            });
             courseUIOff();
             if (mMap != null)
                 mMap.clear();
@@ -1373,17 +1368,59 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-    CircleImageView clientImage;
-    TextView name, textView4;
+    CircleImageView clientImage,close_button,call_button;
+    TextView name, textView5,totalCourse,date;
+    LinearLayout voip_view;
 
     public void checkCourseState() {
         switchToCourseUI();
         clientImage = findViewById(R.id.clientImage);
         name = findViewById(R.id.name);
-        textView4 = findViewById(R.id.textView4);
+        textView5 = findViewById(R.id.textView5);
+        totalCourse = findViewById(R.id.textView2);
+        close_button = findViewById(R.id.close_button);
+        call_button = findViewById(R.id.call_button);
+        voip_view = findViewById(R.id.voip_view);
+        date = findViewById(R.id.textView6);
+
+        close_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                close_button.setVisibility(View.GONE);
+                call_button.setVisibility(View.VISIBLE);
+                voip_view.setVisibility(View.GONE);
+            }
+        });
+
+        call_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                close_button.setVisibility(View.VISIBLE);
+                call_button.setVisibility(View.GONE);
+                voip_view.setVisibility(View.VISIBLE);
+
+            }
+        });
+
+        // last date will show here
+        date.setText("will show here");
 
         name.setText(clientName);
-        textView4.setText(lastCourse);
+        textView5.setText(lastCourse);
+        if(clientId !=null || !clientId.isEmpty()){
+            FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(clientId).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    String sourceString = "<b>" + "Courses :" + "</b> " + name;
+                    totalCourse.setText(Html.fromHtml(sourceString)+" "+ dataSnapshot.getChildrenCount());
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            });
+        }
+
         if (clientImageUri != null) {
             if (clientImageUri.length() > 0)
                 Picasso.get().load(clientImageUri).fit().centerCrop().into(clientImage);
@@ -1391,8 +1428,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         if (courseState.equals("0")) {
             addressText.setText(startAddress);
-            cancelCourseButton.setVisibility(View.GONE);
-            courseActionButton.setOnClickListener(new View.OnClickListener() {
+            cancel_view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     courseRef.child("state").setValue("1");
@@ -1418,7 +1454,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             addressText.setText(destAddress);
             courseActionButton.setText("Appuyez pour commancer");
             wazeButton.setVisibility(View.GONE);
-            courseActionButton.setOnClickListener(new View.OnClickListener() {
+            cancel_view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     courseRef.child("state").setValue("2");
@@ -1430,7 +1466,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (courseState.equals("2")) {
             addressText.setText(destAddress);
             courseActionButton.setText("Appuyez pour terminer");
-            courseActionButton.setOnClickListener(new View.OnClickListener() {
+            cancel_view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     courseRef.child("state").setValue("3");
@@ -1468,7 +1504,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void courseUIOff() {
         findViewById(R.id.statusConstraint).setVisibility(View.VISIBLE);
         findViewById(R.id.money).setVisibility(View.VISIBLE);
-//        clientInfoLayout.setVisibility(View.GONE);
+        clientInfoLayout.setVisibility(View.GONE);
         destinationLayout.setVisibility(View.GONE);
         menuButton.setVisibility(View.VISIBLE);
     }
@@ -1494,15 +1530,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (location != null) {
             link += "ll=" + location.latitude + "," + location.longitude + "&navigate=yes";
         }
-
-
         try {
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(link));
             startActivity(intent);
         } catch (ActivityNotFoundException ex) {
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.waze"));
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.waze"));
             startActivity(intent);
         }
+//        final String appPackageName = getPackageName(); // getPackageName() from Context or Activity object
+//        try {
+//            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.waze" + appPackageName)));
+//        } catch (android.content.ActivityNotFoundException anfe) {
+//            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.waze" + appPackageName)));
+//        }
 
     }
 

@@ -52,7 +52,7 @@ public class commandActivity extends AppCompatActivity {
 
 
         mp = MediaPlayer.create(this, R.raw.ring);
-        mp.setLooping(true);
+        mp.setLooping(false);
         mp.start();
 
 
@@ -108,6 +108,7 @@ public class commandActivity extends AppCompatActivity {
         decline.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                mp.stop();
                 FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
             }
         });
@@ -131,12 +132,13 @@ public class commandActivity extends AppCompatActivity {
         accept.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                accept.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        return ;
-                    }
-                });
+//                accept.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        return ;
+//                    }
+//                });
+                mp.stop();
                 FirebaseDatabase.getInstance().getReference("COURSES").orderByChild("client").equalTo(clientID).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -267,7 +269,7 @@ public class commandActivity extends AppCompatActivity {
     @Override
     public void onStop() {
         super.onStop();
-
+        mp.stop();
         active = false;
     }
 
