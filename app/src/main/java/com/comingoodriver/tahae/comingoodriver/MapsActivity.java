@@ -310,11 +310,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-
         new checkCourseTask().execute();
         new checkCourseFinished().execute();
-
-
     }
 
 

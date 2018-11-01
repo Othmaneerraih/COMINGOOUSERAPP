@@ -48,7 +48,8 @@ import java.util.Map;
 
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
-public class CourseService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class CourseService extends Service implements GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener {
 
     private DatabaseReference onlineDriver;
     private DatabaseReference courseRef;
@@ -72,7 +73,6 @@ public class CourseService extends Service implements GoogleApiClient.Connection
     private double time = 0;
 
 
-
     private Service myService;
 
 
@@ -87,7 +87,7 @@ public class CourseService extends Service implements GoogleApiClient.Connection
     private LatLng startPos;
     private LatLng endPos;
 
-    private  String startA;
+    private String startA;
     private String endA;
 
     private boolean isFixed;
@@ -115,7 +115,6 @@ public class CourseService extends Service implements GoogleApiClient.Connection
     private String driverName;
 
 
-
     private class CourseServiceTask extends AsyncTask<String, Integer, String> {
         @Override
         protected void onPreExecute() {
@@ -129,9 +128,10 @@ public class CourseService extends Service implements GoogleApiClient.Connection
 
             SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
             userId = prefs.getString("userId", null);
-            courseID = prefs.getString("courseID", null);;
+            courseID = prefs.getString("courseID", null);
+            ;
 
-            if(userId == null)
+            if (userId == null)
                 thisService.stopSelf();
 
 
@@ -145,33 +145,33 @@ public class CourseService extends Service implements GoogleApiClient.Connection
             courseRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if(dataSnapshot.exists()){
+                    if (dataSnapshot.exists()) {
                         try {
                             clientID = dataSnapshot.child("client").getValue(String.class);
                             state = Integer.parseInt(dataSnapshot.child("state").getValue(String.class));
                             preWaitTime = Integer.parseInt(dataSnapshot.child("preWaitTime").getValue(String.class));
-                            if(!dataSnapshot.child("distanceTraveled").getValue(String.class).equals("0"))
+                            if (!dataSnapshot.child("distanceTraveled").getValue(String.class).equals("0"))
                                 distanceTraveled = Double.parseDouble(dataSnapshot.child("distanceTraveled").getValue(String.class));
 
                             waitTime = Integer.parseInt(dataSnapshot.child("waitTime").getValue(String.class));
                             price = Double.parseDouble(dataSnapshot.child("price").getValue(String.class));
-                            if(Double.parseDouble(dataSnapshot.child("fixedDest").getValue(String.class)) == 1){
+                            if (Double.parseDouble(dataSnapshot.child("fixedDest").getValue(String.class)) == 1) {
                                 isFixed = true;
                                 fixedPrice = Double.parseDouble(dataSnapshot.child("fixedPrice").getValue(String.class));
                             }
                             //checkState();
 
 
-                            if(state == 3 && !checkedState) {
+                            if (state == 3 && !checkedState) {
                                 new CheckStateTask().execute();
                                 courseRef.removeEventListener(this);
-                            }else{
+                            } else {
                                 new CheckStateTask().execute();
                             }
-                        }catch (Exception e){
+                        } catch (Exception e) {
                             thisService.stopSelf();
                         }
-                    }else{
+                    } else {
                         state = 4;
                         thisService.stopSelf();
                     }
@@ -184,20 +184,19 @@ public class CourseService extends Service implements GoogleApiClient.Connection
             });
 
 
-
             //desconnect Driver if still Online
             onlineDriver = FirebaseDatabase.getInstance().getReference("ONLINEDRIVERS").child(userId);
-         /*  onlineDriver.addValueEventListener(new ValueEventListener() {
+            onlineDriver.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     listener = this;
-                    if(dataSnapshot.exists()){
+                    if (dataSnapshot.exists()) {
                         courseRef.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                if(dataSnapshot.exists())
+                                if (dataSnapshot.exists())
                                     onlineDriver.removeValue();
-                                else{
+                                else {
                                     onlineDriver.removeEventListener(listener);
                                 }
                             }
@@ -214,8 +213,7 @@ public class CourseService extends Service implements GoogleApiClient.Connection
                 public void onCancelled(@NonNull DatabaseError databaseError) {
 
                 }
-            });*/
-
+            });
 
 
             return "this string is passed to onPostExecute";
@@ -237,9 +235,6 @@ public class CourseService extends Service implements GoogleApiClient.Connection
             // Do things like hide the progress bar or change a TextView
         }
     }
-
-
-
 
 
     @Override
@@ -268,9 +263,9 @@ public class CourseService extends Service implements GoogleApiClient.Connection
         r = new Runnable() {
             @Override
             public void run() {
-                if(countingDistance){
-                    if(checkIfLocationOpened()){
-                        time+=0.3;
+                if (countingDistance) {
+                    if (checkIfLocationOpened()) {
+                        time += 0.3;
                         getLastLocation();
                     }
                     h.postDelayed(this, 300);
@@ -280,7 +275,6 @@ public class CourseService extends Service implements GoogleApiClient.Connection
 
         new LocationUpdatesTask().execute();
         new CourseServiceTask().execute();
-
 
 
         return START_STICKY;
@@ -302,7 +296,7 @@ public class CourseService extends Service implements GoogleApiClient.Connection
             // FINDING USER STATE
 
 
-            if(state == 0){
+            if (state == 0) {
 
             }
 
@@ -318,7 +312,7 @@ public class CourseService extends Service implements GoogleApiClient.Connection
             final Runnable runnable = new Runnable() {
                 @Override
                 public void run() {
-                    if(countingPreWait){
+                    if (countingPreWait) {
                         int time = preWaitTime + 1;
                         courseRef.child("preWaitTime").setValue(Integer.toString(time));
                         handler.postDelayed(this, 1000);
@@ -326,8 +320,8 @@ public class CourseService extends Service implements GoogleApiClient.Connection
                 }
             };
 
-            if(state == 1){
-                if(!countingPreWait){
+            if (state == 1) {
+                if (!countingPreWait) {
                     countingPreWait = true;
                     runnable.run();
                 }
@@ -341,12 +335,9 @@ public class CourseService extends Service implements GoogleApiClient.Connection
             // DURING COURSE USER STATE
 
 
-
-
-
-            if(state == 2){
+            if (state == 2) {
                 countingPreWait = false;
-                if(!countingDistance){
+                if (!countingDistance) {
                     countingDistance = true;
                     r.run();
                 }
@@ -360,7 +351,7 @@ public class CourseService extends Service implements GoogleApiClient.Connection
             // COURSE ENDED
 
 
-            if(state == 3 && !checkedState){
+            if (state == 3 && !checkedState) {
                 getLastLocation();
                 checkedState = true;
                 countingPreWait = false;
@@ -385,14 +376,11 @@ public class CourseService extends Service implements GoogleApiClient.Connection
                             //  new GeoCoderTask().execute();
 
 
-
-
-
                             FirebaseDatabase.getInstance().getReference("PRICES").addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                                    if(dataSnapshot.exists()){
+                                    if (dataSnapshot.exists()) {
                                         double att = Double.parseDouble(dataSnapshot.child("att").getValue(String.class));
                                         double base = Double.parseDouble(dataSnapshot.child("base").getValue(String.class));
                                         double km = Double.parseDouble(dataSnapshot.child("km").getValue(String.class));
@@ -403,15 +391,15 @@ public class CourseService extends Service implements GoogleApiClient.Connection
 
                                         double preWaitT = 0;
 
-                                        if(preWaitTime > 180){
+                                        if (preWaitTime > 180) {
                                             preWaitT = 3;
                                         }
-                                        int preWait = (int) (waitTime/60);
+                                        int preWait = (int) (waitTime / 60);
 
 
                                         double price = Math.ceil(base + (distanceTraveled * km) + (preWait * att) + preWaitT);
-                                        if(price < min){
-                                            price  = min;
+                                        if (price < min) {
+                                            price = min;
                                         }
 
 
@@ -428,12 +416,12 @@ public class CourseService extends Service implements GoogleApiClient.Connection
                                         data.put("driver", userId);
                                         data.put("distance", Double.toString(distanceTraveled));
                                         data.put("waitTime", Integer.toString(preWait));
-                                        data.put("preWaitTime", Integer.toString((int) preWaitTime/60));
-                                        if(isFixed){
+                                        data.put("preWaitTime", Integer.toString((int) preWaitTime / 60));
+                                        if (isFixed) {
                                             data.put("fixedDest", "1");
                                             data.put("price", Integer.toString((int) fixedPrice));
 
-                                        }else {
+                                        } else {
                                             data.put("fixedDest", "0");
                                             data.put("price", Integer.toString((int) price));
                                         }
@@ -449,12 +437,12 @@ public class CourseService extends Service implements GoogleApiClient.Connection
                                         dData.put("endAddress", endA);
                                         dData.put("distance", Double.toString(distanceTraveled));
                                         dData.put("waitTime", Integer.toString(preWait));
-                                        dData.put("preWaitTime", Integer.toString((int) preWaitTime/60));
-                                        if(isFixed){
+                                        dData.put("preWaitTime", Integer.toString((int) preWaitTime / 60));
+                                        if (isFixed) {
                                             dData.put("fixedDest", "1");
                                             dData.put("price", Integer.toString((int) fixedPrice));
 
-                                        }else {
+                                        } else {
                                             dData.put("fixedDest", "0");
                                             dData.put("price", Integer.toString((int) price));
                                         }
@@ -462,14 +450,13 @@ public class CourseService extends Service implements GoogleApiClient.Connection
                                         dCourse.child("date").setValue(timestamp);
 
 
-
-                                        final double getP  = price;
+                                        final double getP = price;
                                         FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("EARNINGS").child(getDateMonth(GetUnixTime())).child(getDateDay(GetUnixTime())).addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                 double earned = 0;
                                                 int voyages = 0;
-                                                if(dataSnapshot.exists()){
+                                                if (dataSnapshot.exists()) {
 
                                                     earned = Double.parseDouble(dataSnapshot.child("earnings").getValue(String.class));
                                                     voyages = Integer.parseInt(dataSnapshot.child("voyages").getValue(String.class));
@@ -477,46 +464,44 @@ public class CourseService extends Service implements GoogleApiClient.Connection
                                                 }
 
 
-
-                                                if(isFixed)
+                                                if (isFixed)
                                                     earned += fixedPrice;
                                                 else
                                                     earned += getP;
 
-                                                voyages +=1;
+                                                voyages += 1;
 
 
-                                                final double ee =  earned;
-                                                final  int vv = voyages;
+                                                final double ee = earned;
+                                                final int vv = voyages;
                                                 FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").addListenerForSingleValueEvent(new ValueEventListener() {
                                                     @Override
                                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                         float debt = 0;
-                                                        if(dataSnapshot.exists()){
+                                                        if (dataSnapshot.exists()) {
                                                             debt = Float.parseFloat(dataSnapshot.getValue(String.class));
                                                         }
 
 
                                                         final Map<String, String> earnings = new HashMap<>();
                                                         earnings.put("earnings", "" + ee);
-                                                        earnings.put("voyages", ""+vv);
-
+                                                        earnings.put("voyages", "" + vv);
 
 
                                                         final float ddd = debt;
                                                         FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).addListenerForSingleValueEvent(new ValueEventListener() {
                                                             @Override
                                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                                if(dataSnapshot.child("USECREDIT").getValue(String.class).equals("1") && Integer.parseInt(dataSnapshot.child("SOLDE").getValue(String.class)) >= (int) getP){
+                                                                if (dataSnapshot.child("USECREDIT").getValue(String.class).equals("1") && Integer.parseInt(dataSnapshot.child("SOLDE").getValue(String.class)) >= (int) getP) {
                                                                     int newSolde = Integer.parseInt(dataSnapshot.child("SOLDE").getValue(String.class)) - (int) getP;
-                                                                    FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("SOLDE").setValue(""+newSolde);
+                                                                    FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("SOLDE").setValue("" + newSolde);
                                                                     FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("1");
 
-                                                                    float newDebt = (ddd - (float) getP )+ (float)  (getP * percent);
+                                                                    float newDebt = (ddd - (float) getP) + (float) (getP * percent);
                                                                     FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Float.toString(newDebt));
-                                                                }else{
+                                                                } else {
                                                                     FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("0");
-                                                                    FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Float.toString((float)(ddd + (float)  (getP * percent))));
+                                                                    FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Float.toString((float) (ddd + (float) (getP * percent))));
                                                                 }
                                                             }
 
@@ -528,10 +513,10 @@ public class CourseService extends Service implements GoogleApiClient.Connection
                                                         FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("level").addListenerForSingleValueEvent(new ValueEventListener() {
                                                             @Override
                                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                                if(dataSnapshot.getValue(String.class).equals("2"))
+                                                                if (dataSnapshot.getValue(String.class).equals("2"))
                                                                     FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("level").setValue("1");
 
-                                                                if(dataSnapshot.getValue(String.class).equals("1"))
+                                                                if (dataSnapshot.getValue(String.class).equals("1"))
                                                                     FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("level").setValue("0");
                                                             }
 
@@ -547,7 +532,6 @@ public class CourseService extends Service implements GoogleApiClient.Connection
                                                         FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("EARNINGS").child(getDateMonth(GetUnixTime())).child(getDateDay(GetUnixTime())).setValue(earnings);
 
 
-
                                                     }
 
                                                     @Override
@@ -555,8 +539,6 @@ public class CourseService extends Service implements GoogleApiClient.Connection
 
                                                     }
                                                 });
-
-
 
 
                                             }
@@ -568,8 +550,6 @@ public class CourseService extends Service implements GoogleApiClient.Connection
                                         });
 
 
-
-
                                     }
                                 }
 
@@ -578,19 +558,6 @@ public class CourseService extends Service implements GoogleApiClient.Connection
 
                                 }
                             });
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
                         }
@@ -607,7 +574,7 @@ public class CourseService extends Service implements GoogleApiClient.Connection
             ///////////////////////////////////////////////////////////////////////////
             //Course Canceled
 
-            if(state == 5){
+            if (state == 5) {
                 countingPreWait = false;
                 countingDistance = false;
 
@@ -637,7 +604,6 @@ public class CourseService extends Service implements GoogleApiClient.Connection
     }
 
 
-
     public double GetDistanceFromLatLonInKm(double lat1, double lon1, double lat2, double lon2) {
         final int R = 6371;
         // Radius of the earth in km
@@ -651,8 +617,7 @@ public class CourseService extends Service implements GoogleApiClient.Connection
         return d;
     }
 
-    private double deg2rad(double deg)
-    {
+    private double deg2rad(double deg) {
         return deg * (Math.PI / 180);
     }
 
@@ -671,7 +636,7 @@ public class CourseService extends Service implements GoogleApiClient.Connection
         h.removeCallbacks(r);
         hh.removeCallbacks(rr);
         //fusedLocationProviderClient.removeLocationUpdates(locationCallback);
-        if(mGoogleApiClient != null)
+        if (mGoogleApiClient != null)
             mGoogleApiClient.disconnect();
 
 
@@ -691,8 +656,6 @@ public class CourseService extends Service implements GoogleApiClient.Connection
     public IBinder onBind(Intent intent) {
 
 
-
-
         return null;
     }
 
@@ -701,6 +664,7 @@ public class CourseService extends Service implements GoogleApiClient.Connection
         // Runs in UI before background thread is called
         String startAddress;
         String endAddress;
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -713,7 +677,7 @@ public class CourseService extends Service implements GoogleApiClient.Connection
 
             startAddress = "";
             endAddress = "";
-            if(startPos != null) {
+            if (startPos != null) {
                 Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
                 List<Address> listAddresses = null;
                 try {
@@ -731,7 +695,7 @@ public class CourseService extends Service implements GoogleApiClient.Connection
                     e.printStackTrace();
                 }
             }
-            if(endPos != null) {
+            if (endPos != null) {
                 Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
                 List<Address> listAddresses = null;
                 try {
@@ -751,22 +715,21 @@ public class CourseService extends Service implements GoogleApiClient.Connection
             }
 
 
-            if(startAddress.length() > 0) {
+            if (startAddress.length() > 0) {
                 startA = startAddress;
             }
 
 
-            if(endAddress.length() > 0) {
+            if (endAddress.length() > 0) {
                 endA = endAddress;
             }
-
 
 
             FirebaseDatabase.getInstance().getReference("PRICES").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                    if(dataSnapshot.exists()){
+                    if (dataSnapshot.exists()) {
                         double att = Double.parseDouble(dataSnapshot.child("att").getValue(String.class));
                         double base = Double.parseDouble(dataSnapshot.child("base").getValue(String.class));
                         double km = Double.parseDouble(dataSnapshot.child("km").getValue(String.class));
@@ -777,15 +740,15 @@ public class CourseService extends Service implements GoogleApiClient.Connection
 
                         double preWaitT = 0;
 
-                        if(preWaitTime > 180){
+                        if (preWaitTime > 180) {
                             preWaitT = 3;
                         }
-                        int preWait = (int) (waitTime/60);
+                        int preWait = (int) (waitTime / 60);
 
 
                         double price = Math.ceil(base + (distanceTraveled * km) + (preWait * att) + preWaitT);
-                        if(price < min){
-                            price  = min;
+                        if (price < min) {
+                            price = min;
                         }
 
 
@@ -802,12 +765,12 @@ public class CourseService extends Service implements GoogleApiClient.Connection
                         data.put("driver", userId);
                         data.put("distance", Double.toString(distanceTraveled));
                         data.put("waitTime", Integer.toString(preWait));
-                        data.put("preWaitTime", Integer.toString((int) preWaitTime/60));
-                        if(isFixed){
+                        data.put("preWaitTime", Integer.toString((int) preWaitTime / 60));
+                        if (isFixed) {
                             data.put("fixedDest", "1");
                             data.put("price", Integer.toString((int) fixedPrice));
 
-                        }else {
+                        } else {
                             data.put("fixedDest", "0");
                             data.put("price", Integer.toString((int) price));
                         }
@@ -823,12 +786,12 @@ public class CourseService extends Service implements GoogleApiClient.Connection
                         dData.put("endAddress", endA);
                         dData.put("distance", Double.toString(distanceTraveled));
                         dData.put("waitTime", Integer.toString(preWait));
-                        dData.put("preWaitTime", Integer.toString((int) preWaitTime/60));
-                        if(isFixed){
+                        dData.put("preWaitTime", Integer.toString((int) preWaitTime / 60));
+                        if (isFixed) {
                             dData.put("fixedDest", "1");
                             dData.put("price", Integer.toString((int) fixedPrice));
 
-                        }else {
+                        } else {
                             dData.put("fixedDest", "0");
                             dData.put("price", Integer.toString((int) price));
                         }
@@ -836,14 +799,13 @@ public class CourseService extends Service implements GoogleApiClient.Connection
                         dCourse.child("date").setValue(timestamp);
 
 
-
-                        final double getP  = price;
+                        final double getP = price;
                         FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("EARNINGS").child(getDateMonth(GetUnixTime())).child(getDateDay(GetUnixTime())).addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                 double earned = 0;
                                 int voyages = 0;
-                                if(dataSnapshot.exists()){
+                                if (dataSnapshot.exists()) {
 
                                     earned = Double.parseDouble(dataSnapshot.child("earnings").getValue(String.class));
                                     voyages = Integer.parseInt(dataSnapshot.child("voyages").getValue(String.class));
@@ -851,33 +813,32 @@ public class CourseService extends Service implements GoogleApiClient.Connection
                                 }
 
 
-
-                                if(isFixed)
+                                if (isFixed)
                                     earned += fixedPrice;
                                 else
                                     earned += getP;
 
-                                voyages +=1;
+                                voyages += 1;
 
 
-                                final double ee =  earned;
-                                final  int vv = voyages;
+                                final double ee = earned;
+                                final int vv = voyages;
                                 FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                         double debt = 0;
-                                        if(dataSnapshot.exists()){
+                                        if (dataSnapshot.exists()) {
                                             debt = Double.parseDouble(dataSnapshot.getValue(String.class));
                                         }
 
-                                        if(isFixed)
+                                        if (isFixed)
                                             debt += (fixedPrice * percent);
                                         else
                                             debt += (getP * percent);
 
                                         final Map<String, String> earnings = new HashMap<>();
                                         earnings.put("earnings", "" + ee);
-                                        earnings.put("voyages", ""+vv);
+                                        earnings.put("voyages", "" + vv);
 
                                         final double ddd = debt;
                                       /*  FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -918,8 +879,6 @@ public class CourseService extends Service implements GoogleApiClient.Connection
                                 });
 
 
-
-
                             }
 
                             @Override
@@ -927,8 +886,6 @@ public class CourseService extends Service implements GoogleApiClient.Connection
 
                             }
                         });
-
-
 
 
                     }
@@ -939,7 +896,6 @@ public class CourseService extends Service implements GoogleApiClient.Connection
 
                 }
             });
-
 
 
             return "this string is passed to onPostExecute";
@@ -959,12 +915,9 @@ public class CourseService extends Service implements GoogleApiClient.Connection
             super.onPostExecute(result);
 
 
-
-
             // Do things like hide the progress bar or change a TextView
         }
     }
-
 
 
     private String getDateMonth(long time) {
@@ -984,7 +937,7 @@ public class CourseService extends Service implements GoogleApiClient.Connection
     public int GetUnixTime() {
         Calendar calendar = Calendar.getInstance();
         long now = calendar.getTimeInMillis();
-        int utc = (int)(now / 1000);
+        int utc = (int) (now / 1000);
         return (utc);
 
     }
@@ -996,6 +949,7 @@ public class CourseService extends Service implements GoogleApiClient.Connection
     private class LocationChangedTask extends AsyncTask<Location, Integer, String> {
         SharedPreferences prefs;
         String userId;
+
         // Runs in UI before background thread is called
         @Override
         protected void onPreExecute() {
@@ -1010,22 +964,22 @@ public class CourseService extends Service implements GoogleApiClient.Connection
         protected String doInBackground(Location... params) {
             Location location = params[0];
 
-            if(countingDistance && userLoc != null && location != null && time != 0){
+            if (countingDistance && userLoc != null && location != null && time != 0) {
                 double distance = GetDistanceFromLatLonInKm(userLoc.getLatitude(), userLoc.getLongitude(), location.getLatitude(), location.getLongitude());
-                if(distance < 0.005)
+                if (distance < 0.005)
                     return "";
 
 
                 int TT = (int) time;
-                int speed = (int) (((distance) * 3600)/TT);
+                int speed = (int) (((distance) * 3600) / TT);
                 // speed = (int) location.getSpeed() * 18 / 5;
                 finalDistance += distance;
                 distance += distanceTraveled;
 
-                if(speed <= 16)
+                if (speed <= 16)
                     waitTime += time;
 
-                if(finalDistance > distance)
+                if (finalDistance > distance)
                     distance = finalDistance;
 
 
@@ -1036,9 +990,9 @@ public class CourseService extends Service implements GoogleApiClient.Connection
                 time = 0;
             }
             userLoc = location;
-            if(state == 0 || state == 1 || state == 2){
-                FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("driverPosLat").setValue(""+userLoc.getLatitude());
-                FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("driverPosLong").setValue(""+userLoc.getLongitude());
+            if (state == 0 || state == 1 || state == 2) {
+                FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("driverPosLat").setValue("" + userLoc.getLatitude());
+                FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("driverPosLong").setValue("" + userLoc.getLongitude());
             }
 
 
@@ -1062,10 +1016,10 @@ public class CourseService extends Service implements GoogleApiClient.Connection
     }
 
 
-
     private class LocationUpdatesTask extends AsyncTask<String, Integer, String> {
 
         private static final long FASTEST_INTERVAL = 1000 * 1;
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -1078,7 +1032,6 @@ public class CourseService extends Service implements GoogleApiClient.Connection
             //createLocationCallback();
             startLocationUpdates();
             getLastLocation();
-
 
 
             return "this string is passed to onPostExecute";
@@ -1106,7 +1059,7 @@ public class CourseService extends Service implements GoogleApiClient.Connection
         // Get last known recent location using new Google Play Services SDK (v11+)
         FusedLocationProviderClient locationClient = getFusedLocationProviderClient(this);
 
-        if(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             locationClient.getLastLocation()
                     .addOnSuccessListener(new OnSuccessListener<Location>() {
                         @Override
@@ -1128,26 +1081,22 @@ public class CourseService extends Service implements GoogleApiClient.Connection
     }
 
 
-
     private static final String TAG = "BOOMBOOMTESTGPS";
     private LocationManager mLocationManager = null;
     private static final int LOCATION_INTERVAL = 1000;
     private static final float LOCATION_DISTANCE = 10f;
 
 
-
-    LocationListener[] mLocationListeners = new LocationListener[] {
+    LocationListener[] mLocationListeners = new LocationListener[]{
             new LocationListener(LocationManager.GPS_PROVIDER),
             new LocationListener(LocationManager.NETWORK_PROVIDER)
     };
 
-    private class LocationListener implements android.location.LocationListener
-    {
+    private class LocationListener implements android.location.LocationListener {
         Location mLastLocation;
 
 
-        public LocationListener(String provider)
-        {
+        public LocationListener(String provider) {
             Log.e(TAG, "LocationListener " + provider);
             mLastLocation = new Location(provider);
         }
@@ -1160,29 +1109,26 @@ public class CourseService extends Service implements GoogleApiClient.Connection
         }
 
         @Override
-        public void onProviderDisabled(String provider)
-        {
+        public void onProviderDisabled(String provider) {
             Log.e(TAG, "onProviderDisabled: " + provider);
         }
 
         @Override
-        public void onProviderEnabled(String provider)
-        {
+        public void onProviderEnabled(String provider) {
             Log.e(TAG, "onProviderEnabled: " + provider);
         }
 
         @Override
-        public void onStatusChanged(String provider, int status, Bundle extras)
-        {
+        public void onStatusChanged(String provider, int status, Bundle extras) {
             Log.e(TAG, "onStatusChanged: " + provider);
         }
     }
 
 
-    private void startLocationUpdates(){
+    private void startLocationUpdates() {
         initializeLocationManager();
         try {
-            if(Looper.myLooper() == null)
+            if (Looper.myLooper() == null)
                 Looper.prepare();
 
             mLocationManager.requestLocationUpdates(
@@ -1211,21 +1157,18 @@ public class CourseService extends Service implements GoogleApiClient.Connection
     }
 
 
-
-
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         try {
 
-            if (Looper.myLooper() == null)
-            {
+            if (Looper.myLooper() == null) {
                 Looper.prepare();
             }
             final Handler h = new Handler(Looper.getMainLooper());
             final Runnable r = new Runnable() {
                 @Override
                 public void run() {
-                    if(ContextCompat.checkSelfPermission(myService, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    if (ContextCompat.checkSelfPermission(myService, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
                         getFusedLocationProviderClient(myService).requestLocationUpdates(mLocationRequest, new LocationCallback() {
                                     @Override
