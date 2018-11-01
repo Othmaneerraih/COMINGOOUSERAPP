@@ -188,7 +188,7 @@
         public void applyText(String n, String p, String t) {
             name = n;
             password = p;
-            tele = t;//"+212"+t;
+            tele = "+212"+t;
             FirebaseDatabase.getInstance().getReference("DRIVERUSERS").orderByChild("phoneNumber").equalTo(tele).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

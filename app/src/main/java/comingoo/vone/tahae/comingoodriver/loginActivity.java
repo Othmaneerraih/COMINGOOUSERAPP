@@ -42,12 +42,12 @@ public class loginActivity extends AppCompatActivity {
                     Toast.makeText(loginActivity.this, "Fill all the fields", Toast.LENGTH_SHORT).show();
                 }else{
 
-                    login(phoneNumber.getText().toString(), password.getText().toString());
-//                    if(phoneNumberValidation(phoneNumber.getText().toString())){
-//                        login(phoneNumber.getText().toString(), password.getText().toString());
-//                    }else{
-//                        Toast.makeText(loginActivity.this, "Veuillez entrer un numéro de téléphone valide 0612345678", Toast.LENGTH_SHORT).show();
-//                    }
+//                    login(phoneNumber.getText().toString(), password.getText().toString());
+                    if(phoneNumberValidation(phoneNumber.getText().toString())){
+                        login(phoneNumber.getText().toString(), password.getText().toString());
+                    }else{
+                        Toast.makeText(loginActivity.this, "Veuillez entrer un numéro de téléphone valide 0612345678", Toast.LENGTH_SHORT).show();
+                    }
                 }
 
             }
@@ -74,7 +74,7 @@ public class loginActivity extends AppCompatActivity {
 
     private void login(final String number,final String password){
 
-        String n = number;//"+212"+number;
+        String n = "+212"+number;
         FirebaseDatabase.getInstance().getReference("DRIVERUSERS").orderByChild("phoneNumber").equalTo(n).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -85,8 +85,8 @@ public class loginActivity extends AppCompatActivity {
                                 //Account is Banned
                                 Toast.makeText(loginActivity.this, "This account is currently disabled", Toast.LENGTH_SHORT).show();
                             }else {
-//                                loggedIn("+212"+ number, data.getKey());
-                                loggedIn( number, data.getKey());
+                                loggedIn("+212"+ number, data.getKey());
+//                                loggedIn( number, data.getKey());
                             }
                         }else{
                             //Wrong Password
