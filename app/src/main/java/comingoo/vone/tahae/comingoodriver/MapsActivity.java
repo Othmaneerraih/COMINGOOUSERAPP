@@ -421,6 +421,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         logout = (ConstraintLayout) findViewById(R.id.logout);
 
         money = (Button) findViewById(R.id.money);
+
+        clientInfoLayout.setVisibility(View.GONE);
     }
 
     @Override
@@ -1295,8 +1297,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 }
             };
-            FirebaseDatabase.getInstance().getReference("COURSES").child(userId).addChildEventListener(childEventListener);
+            if(userId !=null){
+                FirebaseDatabase.getInstance().getReference("COURSES").child(userId).addChildEventListener(childEventListener);
 
+            }
 
             return "this string is passed to onPostExecute";
         }
