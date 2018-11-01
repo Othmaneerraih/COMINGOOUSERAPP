@@ -276,7 +276,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         intent.putExtra("clientId", clientId);
                         intent.putExtra("clientName", clientName);
                         startActivity(intent);
-
                     }
                 }
             });

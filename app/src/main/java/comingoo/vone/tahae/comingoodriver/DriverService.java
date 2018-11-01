@@ -35,9 +35,7 @@ import java.util.List;
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
 public class DriverService  extends Service {
-
     private LatLng userLoc;
-
     private DatabaseReference driverLcoationDatabase;
     private GeoFire geoFire;
 
@@ -45,8 +43,6 @@ public class DriverService  extends Service {
     private DatabaseReference driverPickupRequests;
 
     private String userId;
-
-
 
     private List<String> requestUsersID;
     private List<String> requestUsersLocation;
@@ -90,7 +86,6 @@ public class DriverService  extends Service {
         // otherwise return false
         return false;
     }
-
 
 
     private class CheckDebtTask extends AsyncTask<String, Integer, String> {
@@ -194,14 +189,9 @@ public class DriverService  extends Service {
 
 
 
-
-
-
-
             mDatabase = FirebaseDatabase.getInstance().getReference().child("DRIVERUSERS");
             driverLcoationDatabase = FirebaseDatabase.getInstance().getReference().child("ONLINEDRIVERS");
             driverPickupRequests = FirebaseDatabase.getInstance().getReference().child("PICKUPREQUEST");
-
 
 
             requestUsersID = new ArrayList<>();
@@ -581,7 +571,6 @@ public class DriverService  extends Service {
             // Do something like display a progress bar
         }
 
-
         // This is run in a background thread
         @Override
         protected String doInBackground(Location... params) {
@@ -635,7 +624,8 @@ public class DriverService  extends Service {
         // Get last known recent location using new Google Play Services SDK (v11+)
         FusedLocationProviderClient locationClient = getFusedLocationProviderClient(this);
 
-        if(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+        if(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED){
             locationClient.getLastLocation()
                     .addOnSuccessListener(new OnSuccessListener<Location>() {
                         @Override
