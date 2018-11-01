@@ -275,6 +275,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         intent.putExtra("driverId", driverId);
                         intent.putExtra("clientId", clientId);
                         intent.putExtra("clientName", clientName);
+                        intent.putExtra("clientImage", clientImageUri);
                         startActivity(intent);
                     }
                 }
@@ -323,6 +324,36 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //                            .setNegativeButton("No", dialogClickListener).show();
 //                }
 //            });
+
+
+            clientImage = findViewById(R.id.clientImage);
+            name = findViewById(R.id.name);
+            textView5 = findViewById(R.id.textView5);
+            totalCourse = findViewById(R.id.textView2);
+            close_button = findViewById(R.id.close_button);
+            call_button = findViewById(R.id.call_button);
+            voip_view = findViewById(R.id.voip_view);
+            date = findViewById(R.id.textView6);
+
+            close_button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    close_button.setVisibility(View.GONE);
+                    call_button.setVisibility(View.VISIBLE);
+                    voip_view.setVisibility(View.GONE);
+                }
+            });
+
+            call_button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    close_button.setVisibility(View.VISIBLE);
+                    call_button.setVisibility(View.GONE);
+                    voip_view.setVisibility(View.VISIBLE);
+
+                }
+            });
+
 
             switchOnlineButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -1356,33 +1387,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public void checkCourseState() {
         switchToCourseUI();
-        clientImage = findViewById(R.id.clientImage);
-        name = findViewById(R.id.name);
-        textView5 = findViewById(R.id.textView5);
-        totalCourse = findViewById(R.id.textView2);
-        close_button = findViewById(R.id.close_button);
-        call_button = findViewById(R.id.call_button);
-        voip_view = findViewById(R.id.voip_view);
-        date = findViewById(R.id.textView6);
-
-        close_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                close_button.setVisibility(View.GONE);
-                call_button.setVisibility(View.VISIBLE);
-                voip_view.setVisibility(View.GONE);
-            }
-        });
-
-        call_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                close_button.setVisibility(View.VISIBLE);
-                call_button.setVisibility(View.GONE);
-                voip_view.setVisibility(View.VISIBLE);
-
-            }
-        });
 
 
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
