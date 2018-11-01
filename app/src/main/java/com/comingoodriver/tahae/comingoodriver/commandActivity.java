@@ -82,7 +82,7 @@ public class commandActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if(dataSnapshot.child("image").getValue(String.class) != null){
                     if(dataSnapshot.child("image").getValue(String.class).length() > 0){
-                        Picasso.get().load(dataSnapshot.child("image").getValue(String.class)).fit().centerCrop().into((CircleImageView) findViewById(R.id.centerImage));
+//                        Picasso.get().load(dataSnapshot.child("image").getValue(String.class)).fit().centerCrop().into((CircleImageView) findViewById(R.id.centerImage));
                     }
 
                     if(dataSnapshot.child("level").getValue(String.class).equals("2"))

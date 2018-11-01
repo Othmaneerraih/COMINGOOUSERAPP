@@ -306,7 +306,8 @@ public class DriverService  extends Service {
                     startActivity(intent);
 
 
-                    final DatabaseReference clientRequetFollow = FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(requestUsersID.get(counter));
+                    final DatabaseReference clientRequetFollow = FirebaseDatabase.getInstance()
+                            .getReference("PICKUPREQUEST").child(userId).child(requestUsersID.get(counter));
                     clientRequetFollow.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

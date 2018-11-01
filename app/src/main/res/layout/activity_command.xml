@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:circleview="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -9,7 +10,7 @@
     <com.skyfishjy.library.RippleBackground xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/content"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="300dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -20,20 +21,64 @@
         app:rb_radius="25dp"
         app:rb_rippleAmount="4"
         app:rb_scale="6">
+
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/centerImage"
+            <FrameLayout
+                android:id="@+id/map_container"
                 android:layout_width="150dp"
                 android:layout_height="150dp"
-                android:layout_marginBottom="8dp"
-                android:src="@color/colorPrimary"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                android:background="@drawable/drawable_circle_dark_blue">
+
+                <!--<rjsv.circularview.CircleView-->
+                    <!--android:id="@+id/circle_view"-->
+                    <!--circleview:layout_constraintTop_toTopOf="parent"-->
+                    <!--circleview:layout_constraintBottom_toBottomOf="parent"-->
+                    <!--circleview:layout_constraintStart_toStartOf="parent"-->
+                    <!--circleview:layout_constraintEnd_toEndOf="parent"-->
+                    <!--android:layout_width="500dp"-->
+                    <!--android:layout_height="500dp"-->
+                    <!--circleview:suffixEnabled="true"-->
+                    <!--circleview:suffixValue="EUR"-->
+                    <!--circleview:arcBorderColor="@color/color_arc"-->
+                    <!--circleview:arcColor="@color/color_arc"-->
+                    <!--circleview:arcHasBorder="false"-->
+                    <!--circleview:arcWidth="15dp"-->
+                    <!--circleview:hasIndicator="false"-->
+                    <!--circleview:indicatorColor="@android:color/black"-->
+                    <!--circleview:indicatorRadius="6"-->
+                    <!--circleview:progressColor="@color/color_progress"-->
+                    <!--circleview:progressMaximumValue="10"-->
+                    <!--circleview:progressMinimumValue="0"-->
+                    <!--circleview:progressStepValue="1"-->
+                    <!--circleview:progressStepAsInteger="false"-->
+                    <!--circleview:progressWidth="15dp"-->
+                    <!--circleview:textEnabled="true"-->
+                    <!--circleview:textFont="fonts/Roboto-Bold.ttf"-->
+                    <!--circleview:textSize="36sp"/>-->
+
+                <fragment
+                    android:id="@+id/map_command"
+                    android:name="com.google.android.gms.maps.SupportMapFragment"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_margin="3dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/drawable_circle_dark_blue" />
+
+                <ImageView
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:background="@drawable/drawable_circle_dark_blue" />
+
+            </FrameLayout>
+
         </android.support.constraint.ConstraintLayout>
 
     </com.skyfishjy.library.RippleBackground>
@@ -82,12 +127,12 @@
         <LinearLayout
             android:layout_width="320dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
             android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="8dp"
             android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -119,12 +164,12 @@
             android:id="@+id/imageView"
             android:layout_width="70dp"
             android:layout_height="70dp"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
             android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -136,10 +181,10 @@
         android:id="@+id/constr"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView6">
