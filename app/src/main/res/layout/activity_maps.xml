@@ -249,7 +249,7 @@
                 android:layout_marginBottom="8dp"
                 android:layout_alignParentBottom="true"
                 android:visibility="visible"
-                android:background="@android:color/transparent"
+                android:background="@android:color/white"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent">
@@ -263,9 +263,9 @@
                     android:layout_marginLeft="8dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="8dp"
-                    android:background="@android:color/transparent"
                     android:layout_marginRight="8dp"
                     android:elevation="10dp"
+                    android:background="@android:color/white"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent">
 
@@ -368,8 +368,8 @@
                         android:layout_marginTop="32dp"
                         android:layout_marginEnd="16dp"
                         android:layout_marginRight="16dp"
-                        android:background="@drawable/cancel_x"
                         android:src="@drawable/cancel_x"
+                        android:background="@drawable/rectangle_blue"
                         android:visibility="gone"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
@@ -381,7 +381,6 @@
                         android:layout_marginTop="32dp"
                         android:layout_marginEnd="16dp"
                         android:layout_marginRight="16dp"
-                        android:background="@drawable/circle_image"
                         android:src="@drawable/contact"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
@@ -403,6 +402,7 @@
                         android:id="@+id/iv_course_action"
                         android:layout_width="30dp"
                         android:layout_height="30dp"
+                        android:clickable="false"
                         android:layout_centerVertical="true"
                         android:layout_marginLeft="15dp"
                         android:src="@drawable/cancel_x"
@@ -424,10 +424,11 @@
                         android:layout_marginStart="40dp"
                         android:layout_marginLeft="40dp"
                         android:layout_marginEnd="8dp"
+                        android:clickable="false"
                         android:layout_marginRight="8dp"
                         android:layout_toRightOf="@+id/view"
-                        android:background="@drawable/online_button"
                         android:elevation="10dp"
+                        android:background="@color/transp"
                         android:gravity="left|center_vertical"
                         android:text="Appuyez pour arriver"
                         android:textAllCaps="false"

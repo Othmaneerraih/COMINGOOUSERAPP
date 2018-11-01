@@ -8,6 +8,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.Button;
@@ -133,6 +134,8 @@ public class VoipCallingActivity extends AppCompatActivity {
                         call.hangup();
                     }
                 }
+
+
             }
         });
 
@@ -142,26 +145,28 @@ public class VoipCallingActivity extends AppCompatActivity {
                 AudioManager audioManager =  (AudioManager)getSystemService(Context.AUDIO_SERVICE);
                 audioManager.setMode(AudioManager.MODE_IN_CALL);
                 audioManager.setSpeakerphoneOn(true);
-
-
             }
         });
 
         iv_mute.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
-                audioManager.setMode(AudioManager.MODE_IN_CALL);
-                if (audioManager.isMicrophoneMute() == false) {
-                    audioManager.setMicrophoneMute(true);
-
-                } else {
-                    audioManager.setMicrophoneMute(false);
-
-                }
+                mute();
             }
         });
 
+    }
+
+    private void mute(){
+        audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+        audioManager.setMode(AudioManager.MODE_IN_CALL);
+        if (audioManager.isMicrophoneMute() == false) {
+            audioManager.setMicrophoneMute(true);
+
+        } else {
+            audioManager.setMicrophoneMute(false);
+
+        }
     }
 
     private class SinchCallListener implements CallListener {
@@ -175,7 +180,7 @@ public class VoipCallingActivity extends AppCompatActivity {
             iv_cancel_call_voip_one.setEnabled(false);
             callState.setText("");
             setVolumeControlStream(AudioManager.USE_DEFAULT_STREAM_TYPE);
-            audioManager.setSpeakerphoneOn(false);
+            mute();
         }
 
         @Override
@@ -187,7 +192,7 @@ public class VoipCallingActivity extends AppCompatActivity {
 
         @Override
         public void onCallProgressing(Call progressingCall) {
-            caller_name.setText(progressingCall.getDetails().getDuration());
+            caller_name.setText(progressingCall.getDetails().getDuration()+"");
             caller_name.setTextSize(TypedValue.COMPLEX_UNIT_SP,20);
             onGoing_call_layout.setVisibility(View.VISIBLE);
             caller_name.setTypeface(null, Typeface.BOLD);
