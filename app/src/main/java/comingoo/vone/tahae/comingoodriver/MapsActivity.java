@@ -275,6 +275,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         intent.putExtra("driverId", driverId);
                         intent.putExtra("clientId", clientId);
                         intent.putExtra("clientName", clientName);
+                        intent.putExtra("clientImage", clientImageUri);
                         startActivity(intent);
                     }
                 }

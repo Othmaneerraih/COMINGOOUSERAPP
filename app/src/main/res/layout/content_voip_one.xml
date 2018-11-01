@@ -22,40 +22,90 @@
         android:layout_centerHorizontal="true"
         android:layout_margin="@dimen/place_autocomplete_button_padding" />
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/iv_user_image_voip_one"
-        android:layout_width="90dp"
-        android:layout_height="90dp"
-        android:src="@drawable/name_cnu"
-        app:civ_border_color="#85050c61"
-        app:civ_border_width="10dp"
-        android:layout_centerInParent="true"/>
+
+    <TextView
+        android:id="@+id/callerName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:layout_above="@+id/image_layout"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp"
+        android:text="" />
+
+
+    <RelativeLayout
+        android:id="@+id/image_layout"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_centerInParent="true"
+        android:background="@drawable/circle_fade">
+        <RelativeLayout
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_centerInParent="true"
+            android:background="@drawable/rectangle_blue">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/iv_user_image_voip_one"
+                android:layout_width="90dp"
+                android:layout_height="90dp"
+                android:layout_centerInParent="true"
+                android:src="@drawable/name_cnu"
+                app:civ_border_color="#85050c61"
+                app:civ_border_width="10dp"
+                />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/callState"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/iv_user_image_voip_one"
+        android:layout_below="@+id/image_layout"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
         android:layout_marginBottom="200dp"
         android:text="" />
 
-    <TextView
-        android:id="@+id/callerName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="User's Name vous appelle"
-        android:layout_centerHorizontal="true"
-        android:layout_above="@+id/iv_user_image_voip_one"
-        android:layout_marginBottom="@dimen/txt_size_large"/>
+   <LinearLayout
+       android:id="@+id/onGoing_call_layout"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:orientation="horizontal"
+       android:layout_marginTop="15dp"
+       android:layout_centerHorizontal="true"
+       android:layout_below="@+id/image_layout">
+
+       <de.hdodenhof.circleimageview.CircleImageView
+           android:id="@+id/iv_mute"
+           android:layout_width="50dp"
+           android:layout_height="90dp"
+           android:layout_marginRight="20dp"
+           android:src="@drawable/clicked_mute"
+           app:civ_border_color="@android:color/darker_gray"
+           app:civ_border_width="5dp"
+           android:layout_alignParentBottom="true"/>
+
+       <de.hdodenhof.circleimageview.CircleImageView
+           android:id="@+id/iv_loud"
+           android:layout_width="50dp"
+           android:layout_height="90dp"
+           android:layout_marginLeft="20dp"
+           android:src="@drawable/clicked_speaker_bt"
+           android:layout_marginBottom="@dimen/txt_size_large"
+           app:civ_border_color="@android:color/darker_gray"
+           app:civ_border_width="5dp" />
+   </LinearLayout>
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/iv_recv_call_voip_one"
         android:layout_width="50dp"
         android:layout_height="90dp"
-        android:src="@drawable/name_cnu"
+        android:src="@drawable/answer"
         app:civ_border_color="@android:color/holo_green_dark"
         app:civ_border_width="5dp"
         android:layout_marginBottom="@dimen/txt_size_large"
@@ -66,7 +116,7 @@
         android:id="@+id/iv_cancel_call_voip_one"
         android:layout_width="50dp"
         android:layout_height="90dp"
-        android:src="@drawable/name_cnu"
+        android:src="@drawable/decline_call"
         android:layout_marginBottom="@dimen/txt_size_large"
         android:layout_marginRight="50dp"
         app:civ_border_color="@android:color/holo_green_dark"
