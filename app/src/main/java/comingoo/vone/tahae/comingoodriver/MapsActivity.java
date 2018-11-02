@@ -1272,32 +1272,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             });
 
-//            FirebaseDatabase.getInstance().getReference("COURSES").child(userId).
-//                    child("state").addListenerForSingleValueEvent(new ValueEventListener() {
-//                @Override
-//                public void onDataChange(DataSnapshot dataSnapshot) {
-//                    if (!dataSnapshot.exists()) {
-//                        try {
-//                            if (Build.VERSION.SDK_INT >= 11) {
-//                                MapsActivity.this.recreate();
-//                            } else {
-//                                finish();
-//                                startActivity(MapsActivity.this.getIntent());
-//                            }
-//
-//                        } catch (Exception e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
-//                }
-//
-//                @Override
-//                public void onCancelled(DatabaseError databaseError) {
-//
-//                }
-//            });
-
-
             final ChildEventListener childEventListener = new ChildEventListener() {
                 @Override
                 public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
@@ -1328,9 +1302,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 }
             };
-            if(userId !=null){
-                FirebaseDatabase.getInstance().getReference("COURSES").child(userId).addChildEventListener(childEventListener);
-
+            try {
+                if (userId != null) {
+                    FirebaseDatabase.getInstance().getReference("COURSES").child(userId).
+                            addChildEventListener(childEventListener);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
 
             return "this string is passed to onPostExecute";
