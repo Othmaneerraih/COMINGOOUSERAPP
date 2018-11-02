@@ -1,24 +1,37 @@
 package comingoo.vone.tahae.comingoodriver;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import com.google.android.gms.maps.model.LatLng;
 import com.skyfishjy.library.RippleBackground;
 import com.squareup.picasso.Picasso;
 
@@ -26,8 +39,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import rjsv.circularview.CircleView;
+import rjsv.circularview.CircleViewAnimation;
+import rjsv.circularview.enumerators.AnimationStyle;
 
-public class commandActivity extends AppCompatActivity {
+public class commandActivity extends AppCompatActivity implements OnMapReadyCallback {
     public static Activity clientR;
     private TextView name;
     private TextView distance;
@@ -37,7 +53,10 @@ public class commandActivity extends AppCompatActivity {
     private Button accept;
     private MediaPlayer mp;
     private Vibrator vibrator;
-    
+    private SupportMapFragment map;
+    private String lat, lng;
+    private String clientID, userId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,13 +71,12 @@ public class commandActivity extends AppCompatActivity {
         window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
 
-        vibrator = (Vibrator)this.getSystemService(Context.VIBRATOR_SERVICE);
+        vibrator = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
 // Vibrate for 1 seconds
         vibrator.vibrate(100);
         mp = MediaPlayer.create(this, R.raw.ring);
         mp.setLooping(false);
         mp.start();
-
 
 
         // name  = (TextView) findViewById(R.id.textView10);
@@ -69,44 +87,84 @@ public class commandActivity extends AppCompatActivity {
 
         final TextView clientLevel = (TextView) findViewById(R.id.textView6);
 
-        final RippleBackground rippleBackground=(RippleBackground)findViewById(R.id.content);
+
+//        CircleView circleView = (CircleView) findViewById(R.id.circle_view);
+//        CircleViewAnimation circleViewAnimation = new CircleViewAnimation(circleView)
+//                .setAnimationStyle(AnimationStyle.CONTINUOUS)
+//                .setDuration(circleView.getProgressValue())
+//                .setCustomAnimationListener(new Animation.AnimationListener() {
+//                    @Override
+//                    public void onAnimationStart(Animation animation) {
+//                        // Animation Starts
+//                    }
+//
+//                    @Override
+//                    public void onAnimationEnd(Animation animation) {
+//                        // Animation Ends
+//                    }
+//
+//                    @Override
+//                    public void onAnimationRepeat(Animation animation) {
+//
+//                    }
+//                }).setTimerOperationOnFinish(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        // Run when the duration reaches 0. Regardless of the AnimationLifecycle or main thread.
+//                        // Runs and triggers on background.
+//                    }
+//                })
+//                .setCustomInterpolator(new LinearInterpolator());
+
+
+        final RippleBackground rippleBackground = (RippleBackground) findViewById(R.id.content);
         rippleBackground.startRippleAnimation();
 
         final Intent intent = getIntent();
 
         double Dist = Double.parseDouble(intent.getStringExtra("distance"));
         int dist = (int) Dist;
-        final String clientID = intent.getStringExtra("name");
-        final String userId = intent.getStringExtra("userId");
+        clientID = intent.getStringExtra("name");
+        userId = intent.getStringExtra("userId");
 
         double time = Double.parseDouble(intent.getStringExtra("distance")) * 1.5;
-        distance.setText(intent.getStringExtra("distance") +"Km,  " + time + " min");
-        FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(dataSnapshot.child("image").getValue(String.class) != null){
-                    if(dataSnapshot.child("image").getValue(String.class).length() > 0){
-                        Picasso.get().load(dataSnapshot.child("image").getValue(String.class)).fit().centerCrop().into((CircleImageView) findViewById(R.id.centerImage));
-                    }
+        distance.setText(intent.getStringExtra("distance") + "Km,  " + time + " min");
+//        FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).
+// addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                if(dataSnapshot.child("image").getValue(String.class) != null){
+//                    if(dataSnapshot.child("image").getValue(String.class).length() > 0){
+//                        Picasso.get().load(dataSnapshot.child("image").getValue(String.class))
+//                                .fit().centerCrop().into((CircleImageView) findViewById(R.id.centerImage));
+//                    }
+//
+//                    if(dataSnapshot.child("level").getValue(String.class).equals("2"))
+//                        clientLevel.setText("Nouveau client");
+//
+//                    if(dataSnapshot.child("level").getValue(String.class).equals("1"))
+//                        clientLevel.setText("Client potentiel");
+//
+//                    if(dataSnapshot.child("level").getValue(String.class).equals("0"))
+//                        clientLevel.setText("Bon level");
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//            }
+//        });
 
-                    if(dataSnapshot.child("level").getValue(String.class).equals("2"))
-                        clientLevel.setText("Nouveau client");
 
-                    if(dataSnapshot.child("level").getValue(String.class).equals("1"))
-                        clientLevel.setText("Client potentiel");
+        map = ((SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map_command));
+        map.getMapAsync(this);
 
-                    if(dataSnapshot.child("level").getValue(String.class).equals("0"))
-                        clientLevel.setText("Bon level");
-                }
-            }
+        lat = intent.getStringExtra("startLat");
+        lng = intent.getStringExtra("startLong");
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-        distance.setText("5 min " +dist + "km");
+        distance.setText("5 min " + dist + "km");
         startText.setText("De : " + intent.getStringExtra("start"));
 
         decline.setOnClickListener(new View.OnClickListener() {
@@ -118,10 +176,11 @@ public class commandActivity extends AppCompatActivity {
             }
         });
 
-        FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).addValueEventListener(new ValueEventListener() {
+        FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").
+                child(userId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(!dataSnapshot.exists()) {
+                if (!dataSnapshot.exists()) {
                     finish();
                 }
             }
@@ -132,7 +191,6 @@ public class commandActivity extends AppCompatActivity {
             }
         });
 
-
         accept.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -141,13 +199,13 @@ public class commandActivity extends AppCompatActivity {
                 accept.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        return ;
+                        return;
                     }
                 });
                 FirebaseDatabase.getInstance().getReference("COURSES").orderByChild("client").equalTo(clientID).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if(!dataSnapshot.exists()){
+                        if (!dataSnapshot.exists()) {
 
                             DatabaseReference courseDatabase = FirebaseDatabase.getInstance().getReference("COURSES").push();
                             Map<String, String> data = new HashMap<>();
@@ -181,7 +239,7 @@ public class commandActivity extends AppCompatActivity {
                             FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                    for(DataSnapshot data : dataSnapshot.getChildren()){
+                                    for (DataSnapshot data : dataSnapshot.getChildren()) {
                                         FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(data.getKey()).child(clientID).removeValue();
                                     }
                                 }
@@ -192,10 +250,10 @@ public class commandActivity extends AppCompatActivity {
                                 }
                             });
 
-                        }else{
+                        } else {
 
-                            for (DataSnapshot dataS : dataSnapshot.getChildren()){
-                                if(dataS.child("state").getValue(String.class).equals("3")){
+                            for (DataSnapshot dataS : dataSnapshot.getChildren()) {
+                                if (dataS.child("state").getValue(String.class).equals("3")) {
 
                                     DatabaseReference courseDatabase = FirebaseDatabase.getInstance().getReference("COURSES").push();
                                     Map<String, String> data = new HashMap<>();
@@ -215,7 +273,6 @@ public class commandActivity extends AppCompatActivity {
                                     data.put("endAddress", intent.getStringExtra("arrival"));
 
 
-
                                     //default Values
                                     data.put("state", "0");
                                     data.put("preWaitTime", "0");
@@ -231,7 +288,7 @@ public class commandActivity extends AppCompatActivity {
                                     FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                            for(DataSnapshot data : dataSnapshot.getChildren()){
+                                            for (DataSnapshot data : dataSnapshot.getChildren()) {
                                                 FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(data.getKey()).child(clientID).removeValue();
                                             }
                                         }
@@ -253,14 +310,18 @@ public class commandActivity extends AppCompatActivity {
 
                     }
                 });
-
-
-
             }
         });
 
+        new CountDownTimer(15000, 1000) {
+            public void onTick(long millisUntilFinished) {
+            }
 
+            public void onFinish() {
+                showCustomDialog(getApplicationContext());
+            }
 
+        }.start();
     }
 
     static boolean active = false;
@@ -274,9 +335,50 @@ public class commandActivity extends AppCompatActivity {
     @Override
     public void onStop() {
         super.onStop();
-
         active = false;
     }
 
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        LatLng latLng = new LatLng(Double.parseDouble(lat), Double.parseDouble(lng));
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(latLng)      // Sets the center of the map to Mountain View
+                .zoom(17)                   // Sets the zoom
+                .build();                   // Creates a CameraPosition from the builder
+        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+    }
 
+    public void showCustomDialog(final Context context) {
+        final Dialog dialog = new Dialog(context);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View view = inflater.inflate(R.layout.content_misses_ride_request, null, false);
+        ((Activity) context).getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE |
+                WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+        dialog.setContentView(view);
+
+        Button btnOk = view.findViewById(R.id.btn_passer_hors);
+        btnOk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+                mp.stop();
+                vibrator.cancel();
+                FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
+            }
+        });
+
+        Button btnCancel = view.findViewById(R.id.btn_rester_engine);
+        btnOk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+
+        final Window window = dialog.getWindow();
+        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+        window.setGravity(Gravity.CENTER);
+        dialog.show();
+    }
 }
