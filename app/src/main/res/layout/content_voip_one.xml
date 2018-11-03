@@ -69,6 +69,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
         android:layout_marginBottom="200dp"
+        android:visibility="gone"
         android:text="" />
 
    <LinearLayout
