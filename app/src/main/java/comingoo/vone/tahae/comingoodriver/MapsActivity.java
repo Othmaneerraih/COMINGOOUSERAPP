@@ -15,6 +15,7 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -73,9 +74,13 @@ import com.google.maps.model.DirectionsRoute;
 import com.google.maps.model.DirectionsStep;
 import com.google.maps.model.EncodedPolyline;
 import com.mxn.soul.flowingdrawer_core.FlowingDrawer;
+import com.sinch.android.rtc.PushPair;
+import com.sinch.android.rtc.Sinch;
+import com.sinch.android.rtc.SinchClient;
 import com.sinch.android.rtc.calling.Call;
 import com.sinch.android.rtc.calling.CallClient;
 import com.sinch.android.rtc.calling.CallClientListener;
+import com.sinch.android.rtc.calling.CallListener;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
@@ -137,6 +142,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     int width = 120;
     BitmapDrawable bitmapdraw;
     Bitmap smallMarker;
+
+    private static final String APP_KEY = "185d9822-a953-4af6-a780-b0af1fd31bf7";
+    private static final String APP_SECRET = "ZiJ6FqH5UEWYbkMZd1rWbw==";
+    private static final String ENVIRONMENT = "sandbox.sinch.com";
 
     ////////////////////////////////////////////
 
@@ -207,8 +216,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private float dpHeight;
     private float dpWidth;
     private Intent intent;
+    private Call call;
     private TextView tv_appelle_voip, tv_appelle_telephone;
-
+    private SinchClient sinchClient;
     private String TAG = "MapsActivity";
 
 
@@ -334,6 +344,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             call_button = findViewById(R.id.call_button);
             voip_view = findViewById(R.id.voip_view);
             date = findViewById(R.id.textView6);
+
+            sinchClient = Sinch.getSinchClientBuilder()
+                    .context(this)
+                    .userId(driverId)
+                    .applicationKey(APP_KEY)
+                    .applicationSecret(APP_SECRET)
+                    .environmentHost(ENVIRONMENT)
+                    .build();
+
+            sinchClient.setSupportCalling(true);
+            sinchClient.startListeningOnActiveConnection();
+            sinchClient.start();
+
+            sinchClient.getCallClient().addCallClientListener(new MapsActivity.SinchCallClientListener());
+
 
             close_button.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -479,6 +504,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    private class SinchCallClientListener implements CallClientListener {
+        @Override
+        public void onIncomingCall(CallClient callClient, Call incomingCall) {
+            call = incomingCall;
+            Toast.makeText(MapsActivity.this, "incoming call", Toast.LENGTH_SHORT).show();
+            call.answer();
+            call.addCallListener(new MapsActivity.SinchCallListener());
+        }
+    }
+
 
     private void switchOnlineUI() {
         //offlineButton.setVisibility(View.GONE);
@@ -508,6 +543,43 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (params.length > 0) {
             if (params[0] == true)
                 switchOnlineUI();
+        }
+    }
+
+    private class SinchCallListener implements CallListener {
+        @Override
+        public void onCallEnded(Call endedCall) {
+            //call ended by either party
+            findViewById(R.id.clientInfo).setVisibility(View.GONE);
+            setVolumeControlStream(AudioManager.USE_DEFAULT_STREAM_TYPE);
+        }
+
+        @Override
+        public void onCallEstablished(final Call establishedCall) {
+            //incoming call was picked up
+            findViewById(R.id.clientInfo).setVisibility(View.VISIBLE);
+//            Button hangup = findViewById(R.id.hangup);
+//            hangup.setText("Hangup");
+            setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
+//            hangup.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    establishedCall.hangup();
+//                }
+//            });
+        }
+
+        @Override
+        public void onCallProgressing(Call progressingCall) {
+            //call is ringing
+            findViewById(R.id.clientInfo).setVisibility(View.VISIBLE);
+//            Button hangup = (Button) findViewById(R.id.hangup);
+//            hangup.setText("RINGING...");
+        }
+
+        @Override
+        public void onShouldSendPushNotification(Call call, List<PushPair> pushPairs) {
+            //don't worry about this right now
         }
     }
 
@@ -1169,13 +1241,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     }
                 });
             }
-        }
-    }
-
-    private class SinchCallClientListener implements CallClientListener {
-        @Override
-        public void onIncomingCall(CallClient callClient, Call incomingCall) {
-            //Pick up the call!
         }
     }
 
