@@ -1,15 +1,21 @@
 package comingoo.vone.tahae.comingoodriver;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,13 +24,17 @@ import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -51,11 +61,14 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
     private TextView arrivalText;
     private Button decline;
     private Button accept;
-    private MediaPlayer mp;
-    private Vibrator vibrator;
+    public static MediaPlayer mp;
+    public static Vibrator vibrator;
     private SupportMapFragment map;
     private String lat, lng;
     private String clientID, userId;
+    private ProgressBar barTimer;
+    public static CountDownTimer countDownTimer;
+    private String clientType = "new";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,11 +85,22 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
 
 
         vibrator = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
-// Vibrate for 1 seconds
-        vibrator.vibrate(100);
+
+        long[] pattern = { 0, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500};
+        vibrator.vibrate(pattern , 0);
+
         mp = MediaPlayer.create(this, R.raw.ring);
-        mp.setLooping(false);
         mp.start();
+
+
+        mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                mp.stop();
+                mp.release();
+                vibrator.cancel();
+            }
+        });
 
 
         // name  = (TextView) findViewById(R.id.textView10);
@@ -84,42 +108,10 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         startText = (TextView) findViewById(R.id.textView9);
         decline = (Button) findViewById(R.id.decline);
         accept = (Button) findViewById(R.id.accept);
+        barTimer = (ProgressBar) findViewById(R.id.barTimer);
+
 
         final TextView clientLevel = (TextView) findViewById(R.id.textView6);
-
-
-//        CircleView circleView = (CircleView) findViewById(R.id.circle_view);
-//        CircleViewAnimation circleViewAnimation = new CircleViewAnimation(circleView)
-//                .setAnimationStyle(AnimationStyle.CONTINUOUS)
-//                .setDuration(circleView.getProgressValue())
-//                .setCustomAnimationListener(new Animation.AnimationListener() {
-//                    @Override
-//                    public void onAnimationStart(Animation animation) {
-//                        // Animation Starts
-//                    }
-//
-//                    @Override
-//                    public void onAnimationEnd(Animation animation) {
-//                        // Animation Ends
-//                    }
-//
-//                    @Override
-//                    public void onAnimationRepeat(Animation animation) {
-//
-//                    }
-//                }).setTimerOperationOnFinish(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        // Run when the duration reaches 0. Regardless of the AnimationLifecycle or main thread.
-//                        // Runs and triggers on background.
-//                    }
-//                })
-//                .setCustomInterpolator(new LinearInterpolator());
-
-
-        final RippleBackground rippleBackground = (RippleBackground) findViewById(R.id.content);
-        rippleBackground.startRippleAnimation();
-
         final Intent intent = getIntent();
 
         double Dist = Double.parseDouble(intent.getStringExtra("distance"));
@@ -129,59 +121,30 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
 
         double time = Double.parseDouble(intent.getStringExtra("distance")) * 1.5;
         distance.setText(intent.getStringExtra("distance") + "Km,  " + time + " min");
-//        FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).
-// addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                if(dataSnapshot.child("image").getValue(String.class) != null){
-//                    if(dataSnapshot.child("image").getValue(String.class).length() > 0){
-//                        Picasso.get().load(dataSnapshot.child("image").getValue(String.class))
-//                                .fit().centerCrop().into((CircleImageView) findViewById(R.id.centerImage));
-//                    }
-//
-//                    if(dataSnapshot.child("level").getValue(String.class).equals("2"))
-//                        clientLevel.setText("Nouveau client");
-//
-//                    if(dataSnapshot.child("level").getValue(String.class).equals("1"))
-//                        clientLevel.setText("Client potentiel");
-//
-//                    if(dataSnapshot.child("level").getValue(String.class).equals("0"))
-//                        clientLevel.setText("Bon level");
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//            }
-//        });
 
 
-        map = ((SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map_command));
-        map.getMapAsync(this);
-
-        lat = intent.getStringExtra("startLat");
-        lng = intent.getStringExtra("startLong");
-
-        distance.setText("5 min " + dist + "km");
-        startText.setText("De : " + intent.getStringExtra("start"));
-
-        decline.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mp.stop();
-                vibrator.cancel();
-                FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
-            }
-        });
-
-        FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").
-                child(userId).addValueEventListener(new ValueEventListener() {
+        FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").
+                addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (!dataSnapshot.exists()) {
-                    finish();
+                if (dataSnapshot.hasChild(clientID)) {
+                    FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(clientID)
+                            .addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    if (dataSnapshot.exists()) {
+                                        int size = (int) dataSnapshot.getChildrenCount();
+                                        if (size > 0) {
+                                            clientType = "bon";
+                                        } else clientType = "new";
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
                 }
             }
 
@@ -191,18 +154,50 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
             }
         });
 
+        if (clientType.equalsIgnoreCase("bon")) {
+            barTimer.setProgressDrawable(getResources().getDrawable(R.drawable.drawable_new_client));
+        } else {
+            barTimer.setProgressDrawable(getResources().getDrawable(R.drawable.green_circular));
+        }
+
+
+        map = ((SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map_command));
+        map.getMapAsync(this);
+
+        lat = intent.getStringExtra("startLat");
+        lng = intent.getStringExtra("startLong");
+
+        distance.setText("5 min /" + dist + "km");
+        startText.setText("De : " + intent.getStringExtra("start"));
+
+        decline.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
+            }
+        });
+
+        FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").
+                child(userId).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (!dataSnapshot.exists()) {
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        startTimer();
         accept.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mp.stop();
-                vibrator.cancel();
-                accept.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        return;
-                    }
-                });
-                FirebaseDatabase.getInstance().getReference("COURSES").orderByChild("client").equalTo(clientID).addListenerForSingleValueEvent(new ValueEventListener() {
+                FirebaseDatabase.getInstance().getReference("COURSES").orderByChild("client").
+                        equalTo(clientID).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (!dataSnapshot.exists()) {
@@ -300,9 +295,8 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
                                     });
                                 }
                             }
-
-
                         }
+//                        commandActivity.this.finish();
                     }
 
                     @Override
@@ -313,15 +307,6 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
             }
         });
 
-        new CountDownTimer(15000, 1000) {
-            public void onTick(long millisUntilFinished) {
-            }
-
-            public void onFinish() {
-                showCustomDialog(getApplicationContext());
-            }
-
-        }.start();
     }
 
     static boolean active = false;
@@ -332,53 +317,78 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         active = true;
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        active = false;
+    private void startTimer() {
+        countDownTimer = new CountDownTimer(15000, 1000) {
+            @Override
+            public void onTick(long leftTimeInMilliseconds) {
+                long seconds = leftTimeInMilliseconds / 1000;
+                barTimer.setProgress((int) seconds);
+            }
+
+            @Override
+            public void onFinish() {
+                showCustomDialog();
+            }
+        }.start();
+
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         LatLng latLng = new LatLng(Double.parseDouble(lat), Double.parseDouble(lng));
+//        BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.person_green);
+        int height = 150;
+        int width = 80;
+        BitmapDrawable bitmapdraw=(BitmapDrawable)getResources().getDrawable(R.drawable.person_green);
+        Bitmap b=bitmapdraw.getBitmap();
+        Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
+
+        MarkerOptions markerOptions = new MarkerOptions().position(latLng)
+                .icon(BitmapDescriptorFactory.fromBitmap(smallMarker));
         CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(latLng)      // Sets the center of the map to Mountain View
                 .zoom(17)                   // Sets the zoom
-                .build();                   // Creates a CameraPosition from the builder
+                .build();
+        googleMap.addMarker(markerOptions);
+        // Creates a CameraPosition from the builder
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
 
-    public void showCustomDialog(final Context context) {
-        final Dialog dialog = new Dialog(context);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View view = inflater.inflate(R.layout.content_misses_ride_request, null, false);
-        ((Activity) context).getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE |
-                WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
-        dialog.setContentView(view);
-
-        Button btnOk = view.findViewById(R.id.btn_passer_hors);
+     AlertDialog.Builder dialogBuilder;
+     AlertDialog OptionDialog;
+    public void showCustomDialog() {
+         dialogBuilder = new AlertDialog.Builder(commandActivity.this);
+        LayoutInflater inflater = this.getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.content_misses_ride_request, null);
+        dialogBuilder.setView(dialogView);
+         OptionDialog = dialogBuilder.create();
+        Button btnOk = dialogView.findViewById(R.id.btn_passer_hors);
         btnOk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dialog.dismiss();
-                mp.stop();
-                vibrator.cancel();
+                OptionDialog.dismiss();
                 FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
             }
         });
 
-        Button btnCancel = view.findViewById(R.id.btn_rester_engine);
-        btnOk.setOnClickListener(new View.OnClickListener() {
+        Button btnCancel = dialogView.findViewById(R.id.btn_rester_engine);
+        btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dialog.dismiss();
+                OptionDialog.dismiss();
+                finish();
             }
         });
-
-        final Window window = dialog.getWindow();
-        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
-        window.setGravity(Gravity.CENTER);
-        dialog.show();
+        AlertDialog alertDialog = dialogBuilder.create();
+        alertDialog.show();
     }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        active = false;
+        if (OptionDialog != null)
+        OptionDialog.dismiss();
+    }
+
 }

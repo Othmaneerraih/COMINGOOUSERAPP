@@ -12,9 +12,12 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -73,9 +76,13 @@ import com.google.maps.model.DirectionsRoute;
 import com.google.maps.model.DirectionsStep;
 import com.google.maps.model.EncodedPolyline;
 import com.mxn.soul.flowingdrawer_core.FlowingDrawer;
+import com.sinch.android.rtc.PushPair;
+import com.sinch.android.rtc.Sinch;
+import com.sinch.android.rtc.SinchClient;
 import com.sinch.android.rtc.calling.Call;
 import com.sinch.android.rtc.calling.CallClient;
 import com.sinch.android.rtc.calling.CallClientListener;
+import com.sinch.android.rtc.calling.CallListener;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
@@ -137,6 +144,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     int width = 120;
     BitmapDrawable bitmapdraw;
     Bitmap smallMarker;
+
+    private static final String APP_KEY = "185d9822-a953-4af6-a780-b0af1fd31bf7";
+    private static final String APP_SECRET = "ZiJ6FqH5UEWYbkMZd1rWbw==";
+    private static final String ENVIRONMENT = "sandbox.sinch.com";
 
     ////////////////////////////////////////////
 
@@ -207,8 +218,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private float dpHeight;
     private float dpWidth;
     private Intent intent;
+    private Call call;
     private TextView tv_appelle_voip, tv_appelle_telephone;
-
+    private SinchClient sinchClient;
     private String TAG = "MapsActivity";
 
 
@@ -255,12 +267,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 public void onClick(View v) {
                     if (clientPhoneNumber != null) {
                         try {
-                            Intent callIntent = new Intent(Intent.ACTION_CALL);
-                            callIntent.setData(Uri.parse("tel:" + clientPhoneNumber));
-                            if (ActivityCompat.checkSelfPermission(getBaseContext(), Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
-                                startActivity(callIntent);
-                            }
+                            Intent intent = new Intent(Intent.ACTION_DIAL);
+                            intent.setData(Uri.parse("tel:"+ clientPhoneNumber));
+                            startActivity(intent);
                         } catch (NullPointerException e) {
+                            e.printStackTrace();
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
@@ -334,6 +346,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             call_button = findViewById(R.id.call_button);
             voip_view = findViewById(R.id.voip_view);
             date = findViewById(R.id.textView6);
+
+            sinchClient = Sinch.getSinchClientBuilder()
+                    .context(this)
+                    .userId(driverId)
+                    .applicationKey(APP_KEY)
+                    .applicationSecret(APP_SECRET)
+                    .environmentHost(ENVIRONMENT)
+                    .build();
+
+            sinchClient.setSupportCalling(true);
+            sinchClient.startListeningOnActiveConnection();
+            sinchClient.start();
+
+            sinchClient.getCallClient().addCallClientListener(new MapsActivity.SinchCallClientListener());
+
 
             close_button.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -412,6 +439,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             new checkCourseTask().execute();
             new checkCourseFinished().execute();
 
+        } catch (NullPointerException e) {
+            e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -477,6 +506,165 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    private class SinchCallClientListener implements CallClientListener {
+        @Override
+        public void onIncomingCall(CallClient callClient, Call incomingCall) {
+            call = incomingCall;
+            Toast.makeText(MapsActivity.this, "incoming call", Toast.LENGTH_SHORT).show();
+            showDialog(MapsActivity.this,call);
+        }
+    }
+
+    public void showDialog(final Context context, final Call call) {
+        final Dialog dialog = new Dialog(context);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View view = inflater.inflate(R.layout.activity_incomming_call, null, false);
+//        ((Activity) context).getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE |
+//                WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+        dialog.setContentView(view);
+
+        final MediaPlayer mp;
+        final TextView callState,caller_name,tv_name_voip_one;
+        final CircleImageView iv_user_image_voip_one,iv_cancel_call_voip_one,iv_mute,iv_loud,iv_recv_call_voip_one;
+
+        iv_user_image_voip_one = (CircleImageView)dialog.findViewById(R.id.iv_user_image_voip_one);
+        iv_cancel_call_voip_one = (CircleImageView)dialog.findViewById(R.id.iv_cancel_call_voip_one);
+        iv_recv_call_voip_one = (CircleImageView)dialog.findViewById(R.id.iv_recv_call_voip_one);
+        caller_name = (TextView)dialog.findViewById(R.id.callerName);
+        callState = (TextView)dialog.findViewById(R.id.callState);
+
+        iv_mute = (CircleImageView)dialog.findViewById(R.id.iv_mute);
+        iv_loud = (CircleImageView)dialog.findViewById(R.id.iv_loud);
+        tv_name_voip_one = (TextView)dialog.findViewById(R.id.tv_name_voip_one);
+
+
+        iv_mute.setVisibility(View.GONE);
+        iv_loud.setVisibility(View.GONE);
+
+        mp = MediaPlayer.create(this, R.raw.ring);
+        mp.setLooping(false);
+        mp.start();
+
+        if (ContextCompat.checkSelfPermission(MapsActivity.this, android.Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(MapsActivity.this, android.Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(MapsActivity.this,
+                    new String[]{android.Manifest.permission.RECORD_AUDIO, android.Manifest.permission.READ_PHONE_STATE},
+                    1);
+        }
+
+        caller_name.setVisibility(View.VISIBLE);
+        caller_name.setTextSize(TypedValue.COMPLEX_UNIT_SP,16);
+        caller_name.setTypeface(null, Typeface.NORMAL);      // for Normal Text
+
+        caller_name.setText(clientName+ " vous appelle");
+        tv_name_voip_one.setText(clientName);
+        if(clientImageUri != null){
+            Picasso.get().load(clientImageUri).fit().centerCrop().into(iv_user_image_voip_one);
+        }
+
+
+        iv_cancel_call_voip_one.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                call.hangup();
+                mp.stop();
+                dialog.dismiss();
+            }
+        });
+
+        iv_recv_call_voip_one.setOnClickListener(new View.OnClickListener() {
+
+
+            class SinchCallListener implements CallListener {
+                @Override
+                public void onCallEnded(Call endedCall) {
+                    //call ended by either party
+                    dialog.findViewById(R.id.incoming_call_view).setVisibility(View.GONE);
+                    setVolumeControlStream(AudioManager.USE_DEFAULT_STREAM_TYPE);
+
+                    mp.stop();
+                    iv_mute.setVisibility(View.GONE);
+                    iv_loud.setVisibility(View.GONE);
+                    caller_name.setVisibility(View.GONE);
+                    callState.setText("");
+                    dialog.dismiss();
+                }
+
+                @Override
+                public void onCallEstablished(final Call establishedCall) {
+                    //incoming call was picked up
+                    dialog.findViewById(R.id.incoming_call_view).setVisibility(View.VISIBLE);
+                    setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
+                    callState.setText("connected");
+                    iv_mute.setVisibility(View.VISIBLE);
+                    iv_loud.setVisibility(View.VISIBLE);
+                    mp.stop();
+                }
+
+                @Override
+                public void onCallProgressing(Call progressingCall) {
+                    //call is ringing
+                    dialog.findViewById(R.id.incoming_call_view).setVisibility(View.VISIBLE);
+                    caller_name.setText(progressingCall.getDetails().getDuration()+"");
+                    caller_name.setTextSize(TypedValue.COMPLEX_UNIT_SP,20);
+                    iv_mute.setVisibility(View.VISIBLE);
+                    iv_loud.setVisibility(View.VISIBLE);
+                    caller_name.setTypeface(null, Typeface.BOLD);
+                    callState.setText("ringing");
+                    mp.stop();
+                }
+
+                @Override
+                public void onShouldSendPushNotification(Call call, List<PushPair> pushPairs) {
+                    //don't worry about this right now
+                }
+            }
+
+
+            @Override
+            public void onClick(View v) {
+                if(call !=null){
+                    mp.stop();
+                    call.answer();
+                    call.addCallListener(new SinchCallListener());
+                }
+            }
+        });
+
+        iv_loud.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AudioManager audioManager =  (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+                audioManager.setMode(AudioManager.MODE_IN_CALL);
+                audioManager.setSpeakerphoneOn(true);
+            }
+        });
+
+        iv_mute.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AudioManager audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+                audioManager.setMode(AudioManager.MODE_IN_CALL);
+                if (audioManager.isMicrophoneMute() == false) {
+                    audioManager.setMicrophoneMute(true);
+
+                } else {
+                    audioManager.setMicrophoneMute(false);
+
+                }
+            }
+        });
+
+
+
+        final Window window = dialog.getWindow();
+        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
+        window.setGravity(Gravity.CENTER);
+        dialog.show();
+
+
+    }
+
 
     private void switchOnlineUI() {
         //offlineButton.setVisibility(View.GONE);
@@ -508,6 +696,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 switchOnlineUI();
         }
     }
+
 
     private void switchToCourseUI() {
         findViewById(R.id.statusConstraint).setVisibility(View.GONE);
@@ -642,6 +831,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //                                                    Log.e("kilometer price", "onDataChange: " + price1);
                                                         price.setText(price1 + " MAD");
                                                     }
+                                                } catch (NullPointerException e) {
+                                                    e.printStackTrace();
                                                 } catch (Exception e) {
                                                     e.printStackTrace();
                                                 }
@@ -1168,13 +1359,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    private class SinchCallClientListener implements CallClientListener {
-        @Override
-        public void onIncomingCall(CallClient callClient, Call incomingCall) {
-            //Pick up the call!
-        }
-    }
-
 
     private String courseID;
     private String courseState;
@@ -1287,6 +1471,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
                     try {
                         MapsActivity.this.recreate();
+                    } catch (NullPointerException e) {
+                        e.printStackTrace();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -1307,6 +1493,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     FirebaseDatabase.getInstance().getReference("COURSES").child(userId).
                             addChildEventListener(childEventListener);
                 }
+            } catch (NullPointerException e) {
+                e.printStackTrace();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -1397,11 +1585,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         name.setText(clientName);
         textView5.setText(lastCourse);
         if (clientId != null || !clientId.isEmpty()) {
-            FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(clientId).addValueEventListener(new ValueEventListener() {
+            FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(clientId).
+                    addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    String sourceString = "<b>" + "Courses :" + "</b> " + name;
-                    totalCourse.setText(Html.fromHtml(sourceString) + " " + dataSnapshot.getChildrenCount());
+                    totalCourse.setText("Courses:" + dataSnapshot.getChildrenCount());
                 }
 
                 @Override
@@ -1616,7 +1804,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         }
                     }
                 }
-            } catch (Exception ex) {
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
 
             return "this string is passed to onPostExecute";
