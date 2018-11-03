@@ -255,11 +255,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 public void onClick(View v) {
                     if (clientPhoneNumber != null) {
                         try {
-                            Intent callIntent = new Intent(Intent.ACTION_CALL);
-                            callIntent.setData(Uri.parse("tel:" + clientPhoneNumber));
-                            if (ActivityCompat.checkSelfPermission(getBaseContext(), Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
-                                startActivity(callIntent);
-                            }
+                            Intent intent = new Intent(Intent.ACTION_DIAL);
+                            intent.setData(Uri.parse("tel:"+ clientPhoneNumber));
+                            startActivity(intent);
                         } catch (NullPointerException e) {
                             e.printStackTrace();
                         } catch (Exception e) {
