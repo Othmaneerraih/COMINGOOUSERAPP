@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.media.AudioManager;
+import android.os.CountDownTimer;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -38,6 +39,7 @@ public class VoipCallingActivity extends AppCompatActivity {
     String callerName = "";
     String clientImage = "";
     private Call call;
+    private CountDownTimer countDownTimer;
     private AudioManager audioManager;
     private SinchClient sinchClient;
     private ImageView iv_back_voip_one;
@@ -70,7 +72,8 @@ public class VoipCallingActivity extends AppCompatActivity {
         iv_loud.setVisibility(View.VISIBLE);
 
         driverId = getIntent().getStringExtra("driverId");
-        clientId = getIntent().getStringExtra("clientId");//"RHiU2GIxm2ZIlU4GBGgKFZWxk4J3";//getIntent().getStringExtra("clientId");
+        clientId = getIntent().getStringExtra("clientId");
+//        clientId = "2Yup1rVx5RVSF1XuYD0tMfKWfPY2";
         callerName = getIntent().getStringExtra("clientName");
         clientImage = getIntent().getStringExtra("clientImage");
 
@@ -156,16 +159,35 @@ public class VoipCallingActivity extends AppCompatActivity {
             }
         });
 
-        if(!clientId.isEmpty()){
-            if (call == null) {
-                call = sinchClient.getCallClient().callUser(clientId);
-                call.addCallListener(new VoipCallingActivity.SinchCallListener());
-//                        button.setText("Hang Up");
-                iv_cancel_call_voip_one.setEnabled(true);
-            } else {
-                call.hangup();
+        startTimer();
+
+
+    }
+
+    private void startTimer() {
+        countDownTimer = new CountDownTimer(1000, 1000) {
+            // 500 means, onTick function will be called at every 500 milliseconds
+
+            @Override
+            public void onTick(long leftTimeInMilliseconds) {
+
             }
-        }
+            @Override
+            public void onFinish() {
+                if(sinchClient != null){
+                    if(!clientId.isEmpty()){
+                        if (call == null) {
+                            call = sinchClient.getCallClient().callUser(clientId);
+                            call.addCallListener(new VoipCallingActivity.SinchCallListener());
+//                        button.setText("Hang Up");
+                            iv_cancel_call_voip_one.setEnabled(true);
+                        } else {
+                            call.hangup();
+                        }
+                    }
+                }
+            }
+        }.start();
 
     }
 
@@ -206,7 +228,7 @@ public class VoipCallingActivity extends AppCompatActivity {
 
         @Override
         public void onCallProgressing(Call progressingCall) {
-            caller_name.setText(progressingCall.getDetails().getDuration()+"");
+            caller_name.setText("0 : "+progressingCall.getDetails().getDuration()+"");
             caller_name.setTextSize(TypedValue.COMPLEX_UNIT_SP,20);
             iv_mute.setVisibility(View.VISIBLE);
             iv_loud.setVisibility(View.VISIBLE);

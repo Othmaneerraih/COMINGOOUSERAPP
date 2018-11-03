@@ -116,7 +116,7 @@
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/iv_cancel_call_voip_one"
         android:layout_width="50dp"
-        android:layout_height="90dp"
+        android:layout_height="50dp"
         android:src="@drawable/decline_call"
         android:layout_marginBottom="@dimen/txt_size_large"
         android:layout_marginRight="50dp"
