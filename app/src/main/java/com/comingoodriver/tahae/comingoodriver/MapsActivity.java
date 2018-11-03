@@ -1158,7 +1158,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         if (courseState.equals("0")) {
-
             addressText.setText(startAddress);
             cancelCourseButton.setVisibility(View.GONE);
             courseActionButton.setOnClickListener(new View.OnClickListener() {
@@ -1183,6 +1182,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             }
         }
+
         if (courseState.equals("1")) {
             addressText.setText(destAddress);
             courseActionButton.setText("Appuyez pour commancer");

@@ -35,7 +35,7 @@ public class commandActivity extends AppCompatActivity {
     private Button decline;
     private Button accept;
     private MediaPlayer mp;
-    
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,12 +50,16 @@ public class commandActivity extends AppCompatActivity {
         window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
 
-
         mp = MediaPlayer.create(this, R.raw.ring);
-        mp.setLooping(false);
+//        mp.setLooping(false);
         mp.start();
 
-
+        mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                mp.release();
+            }
+        });
 
         // name  = (TextView) findViewById(R.id.textView10);
         distance = (TextView) findViewById(R.id.textView8);
@@ -65,7 +69,7 @@ public class commandActivity extends AppCompatActivity {
 
         final TextView clientLevel = (TextView) findViewById(R.id.textView6);
 
-        final RippleBackground rippleBackground=(RippleBackground)findViewById(R.id.content);
+        final RippleBackground rippleBackground = (RippleBackground) findViewById(R.id.content);
         rippleBackground.startRippleAnimation();
 
         final Intent intent = getIntent();
@@ -76,22 +80,22 @@ public class commandActivity extends AppCompatActivity {
         final String userId = intent.getStringExtra("userId");
 
         double time = Double.parseDouble(intent.getStringExtra("distance")) * 1.5;
-        distance.setText(intent.getStringExtra("distance") +"Km,  " + time + " min");
+        distance.setText(intent.getStringExtra("distance") + "Km,  " + time + " min");
         FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(dataSnapshot.child("image").getValue(String.class) != null){
-                    if(dataSnapshot.child("image").getValue(String.class).length() > 0){
+                if (dataSnapshot.child("image").getValue(String.class) != null) {
+                    if (dataSnapshot.child("image").getValue(String.class).length() > 0) {
 //                        Picasso.get().load(dataSnapshot.child("image").getValue(String.class)).fit().centerCrop().into((CircleImageView) findViewById(R.id.centerImage));
                     }
 
-                    if(dataSnapshot.child("level").getValue(String.class).equals("2"))
+                    if (dataSnapshot.child("level").getValue(String.class).equals("2"))
                         clientLevel.setText("Nouveau client");
 
-                    if(dataSnapshot.child("level").getValue(String.class).equals("1"))
+                    if (dataSnapshot.child("level").getValue(String.class).equals("1"))
                         clientLevel.setText("Client potentiel");
 
-                    if(dataSnapshot.child("level").getValue(String.class).equals("0"))
+                    if (dataSnapshot.child("level").getValue(String.class).equals("0"))
                         clientLevel.setText("Bon level");
                 }
             }
@@ -102,7 +106,7 @@ public class commandActivity extends AppCompatActivity {
             }
         });
 
-        distance.setText("5 min " +dist + "km");
+        distance.setText("5 min " + dist + "km");
         startText.setText("De : " + intent.getStringExtra("start"));
 
         decline.setOnClickListener(new View.OnClickListener() {
@@ -116,7 +120,7 @@ public class commandActivity extends AppCompatActivity {
         FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(!dataSnapshot.exists()) {
+                if (!dataSnapshot.exists()) {
                     finish();
                 }
             }
@@ -128,21 +132,14 @@ public class commandActivity extends AppCompatActivity {
         });
 
 
-
         accept.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                accept.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//                        return ;
-//                    }
-//                });
                 mp.stop();
                 FirebaseDatabase.getInstance().getReference("COURSES").orderByChild("client").equalTo(clientID).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if(!dataSnapshot.exists()){
+                        if (!dataSnapshot.exists()) {
 
                             DatabaseReference courseDatabase = FirebaseDatabase.getInstance().getReference("COURSES").push();
                             Map<String, String> data = new HashMap<>();
@@ -176,7 +173,7 @@ public class commandActivity extends AppCompatActivity {
                             FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                    for(DataSnapshot data : dataSnapshot.getChildren()){
+                                    for (DataSnapshot data : dataSnapshot.getChildren()) {
                                         FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(data.getKey()).child(clientID).removeValue();
                                     }
                                 }
@@ -187,10 +184,10 @@ public class commandActivity extends AppCompatActivity {
                                 }
                             });
 
-                        }else{
+                        } else {
 
-                            for (DataSnapshot dataS : dataSnapshot.getChildren()){
-                                if(dataS.child("state").getValue(String.class).equals("3")){
+                            for (DataSnapshot dataS : dataSnapshot.getChildren()) {
+                                if (dataS.child("state").getValue(String.class).equals("3")) {
 
                                     DatabaseReference courseDatabase = FirebaseDatabase.getInstance().getReference("COURSES").push();
                                     Map<String, String> data = new HashMap<>();
@@ -210,7 +207,6 @@ public class commandActivity extends AppCompatActivity {
                                     data.put("endAddress", intent.getStringExtra("arrival"));
 
 
-
                                     //default Values
                                     data.put("state", "0");
                                     data.put("preWaitTime", "0");
@@ -226,7 +222,7 @@ public class commandActivity extends AppCompatActivity {
                                     FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                            for(DataSnapshot data : dataSnapshot.getChildren()){
+                                            for (DataSnapshot data : dataSnapshot.getChildren()) {
                                                 FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(data.getKey()).child(clientID).removeValue();
                                             }
                                         }
@@ -250,10 +246,8 @@ public class commandActivity extends AppCompatActivity {
                 });
 
 
-
             }
         });
-
 
 
     }

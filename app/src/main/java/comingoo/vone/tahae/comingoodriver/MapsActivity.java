@@ -1585,11 +1585,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         name.setText(clientName);
         textView5.setText(lastCourse);
         if (clientId != null || !clientId.isEmpty()) {
-            FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(clientId).addValueEventListener(new ValueEventListener() {
+            FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(clientId).
+                    addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    String sourceString = "<b>" + "Courses :" + "</b> " + name;
-                    totalCourse.setText(Html.fromHtml(sourceString) + " " + dataSnapshot.getChildrenCount());
+                    totalCourse.setText("Courses:" + dataSnapshot.getChildrenCount());
                 }
 
                 @Override
