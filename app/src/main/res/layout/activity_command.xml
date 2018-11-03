@@ -51,6 +51,17 @@
                     android:background="@drawable/drawable_circle_dark_blue" />
             </comingoo.vone.tahae.comingoodriver.RoundedLayout>
 
+
+            <RelativeLayout
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_centerInParent="true"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:background="@drawable/dot_bg"/>
+
             <ProgressBar
                 android:id="@+id/barTimer"
                 style="?android:attr/progressBarStyleHorizontal"
@@ -69,6 +80,8 @@
         </android.support.constraint.ConstraintLayout>
 
     <!--</com.skyfishjy.library.RippleBackground>-->
+
+
 
     <TextView
         android:id="@+id/textView6"

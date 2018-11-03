@@ -90,40 +90,6 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         barTimer = (ProgressBar) findViewById(R.id.barTimer);
 
         final TextView clientLevel = (TextView) findViewById(R.id.textView6);
-
-
-//        CircleView circleView = (CircleView) findViewById(R.id.circle_view);
-//        CircleViewAnimation circleViewAnimation = new CircleViewAnimation(circleView)
-//                .setAnimationStyle(AnimationStyle.CONTINUOUS)
-//                .setDuration(circleView.getProgressValue())
-//                .setCustomAnimationListener(new Animation.AnimationListener() {
-//                    @Override
-//                    public void onAnimationStart(Animation animation) {
-//                        // Animation Starts
-//                    }
-//
-//                    @Override
-//                    public void onAnimationEnd(Animation animation) {
-//                        // Animation Ends
-//                    }
-//
-//                    @Override
-//                    public void onAnimationRepeat(Animation animation) {
-//
-//                    }
-//                }).setTimerOperationOnFinish(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        // Run when the duration reaches 0. Regardless of the AnimationLifecycle or main thread.
-//                        // Runs and triggers on background.
-//                    }
-//                })
-//                .setCustomInterpolator(new LinearInterpolator());
-
-
-        final RippleBackground rippleBackground = (RippleBackground) findViewById(R.id.content);
-        rippleBackground.startRippleAnimation();
-
         final Intent intent = getIntent();
 
         double Dist = Double.parseDouble(intent.getStringExtra("distance"));
@@ -133,32 +99,7 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
 
         double time = Double.parseDouble(intent.getStringExtra("distance")) * 1.5;
         distance.setText(intent.getStringExtra("distance") + "Km,  " + time + " min");
-//        FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).
-// addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                if(dataSnapshot.child("image").getValue(String.class) != null){
-//                    if(dataSnapshot.child("image").getValue(String.class).length() > 0){
-//                        Picasso.get().load(dataSnapshot.child("image").getValue(String.class))
-//                                .fit().centerCrop().into((CircleImageView) findViewById(R.id.centerImage));
-//                    }
-//
-//                    if(dataSnapshot.child("level").getValue(String.class).equals("2"))
-//                        clientLevel.setText("Nouveau client");
-//
-//                    if(dataSnapshot.child("level").getValue(String.class).equals("1"))
-//                        clientLevel.setText("Client potentiel");
-//
-//                    if(dataSnapshot.child("level").getValue(String.class).equals("0"))
-//                        clientLevel.setText("Bon level");
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//            }
-//        });
+
 
 
         map = ((SupportMapFragment) getSupportFragmentManager()
