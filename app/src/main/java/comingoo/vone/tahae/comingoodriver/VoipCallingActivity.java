@@ -43,7 +43,6 @@ public class VoipCallingActivity extends AppCompatActivity {
     private ImageView iv_back_voip_one;
     private TextView callState,caller_name,tv_name_voip_one;
     private CircleImageView iv_user_image_voip_one,iv_cancel_call_voip_one,iv_mute,iv_loud,iv_recv_call_voip_one;
-    private LinearLayout onGoing_call_layout;
 
     private static final String APP_KEY = "185d9822-a953-4af6-a780-b0af1fd31bf7";
     private static final String APP_SECRET = "ZiJ6FqH5UEWYbkMZd1rWbw==";
@@ -61,12 +60,14 @@ public class VoipCallingActivity extends AppCompatActivity {
         caller_name = (TextView)findViewById(R.id.callerName);
         callState = (TextView)findViewById(R.id.callState);
 
-        onGoing_call_layout = (LinearLayout)findViewById(R.id.onGoing_call_layout);
         iv_mute = (CircleImageView)findViewById(R.id.iv_mute);
         iv_loud = (CircleImageView)findViewById(R.id.iv_loud);
         tv_name_voip_one = (TextView)findViewById(R.id.tv_name_voip_one);
 
-        onGoing_call_layout.setVisibility(View.GONE);
+
+        iv_recv_call_voip_one.setVisibility(View.GONE);
+        iv_mute.setVisibility(View.GONE);
+        iv_loud.setVisibility(View.VISIBLE);
 
         driverId = getIntent().getStringExtra("driverId");
         clientId = getIntent().getStringExtra("clientId");//"RHiU2GIxm2ZIlU4GBGgKFZWxk4J3";//getIntent().getStringExtra("clientId");
@@ -155,6 +156,17 @@ public class VoipCallingActivity extends AppCompatActivity {
             }
         });
 
+        if(!clientId.isEmpty()){
+            if (call == null) {
+                call = sinchClient.getCallClient().callUser(clientId);
+                call.addCallListener(new VoipCallingActivity.SinchCallListener());
+//                        button.setText("Hang Up");
+                iv_cancel_call_voip_one.setEnabled(true);
+            } else {
+                call.hangup();
+            }
+        }
+
     }
 
     private void mute(){
@@ -175,7 +187,8 @@ public class VoipCallingActivity extends AppCompatActivity {
             call = null;
             SinchError a = endedCall.getDetails().getError();
 //            button.setText("Call");
-            onGoing_call_layout.setVisibility(View.GONE);
+            iv_mute.setVisibility(View.GONE);
+            iv_loud.setVisibility(View.GONE);
             caller_name.setVisibility(View.GONE);
             iv_cancel_call_voip_one.setEnabled(false);
             callState.setText("");
@@ -186,7 +199,8 @@ public class VoipCallingActivity extends AppCompatActivity {
         @Override
         public void onCallEstablished(Call establishedCall) {
             callState.setText("connected");
-            onGoing_call_layout.setVisibility(View.VISIBLE);
+            iv_mute.setVisibility(View.VISIBLE);
+            iv_loud.setVisibility(View.VISIBLE);
             setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
         }
 
@@ -194,7 +208,8 @@ public class VoipCallingActivity extends AppCompatActivity {
         public void onCallProgressing(Call progressingCall) {
             caller_name.setText(progressingCall.getDetails().getDuration()+"");
             caller_name.setTextSize(TypedValue.COMPLEX_UNIT_SP,20);
-            onGoing_call_layout.setVisibility(View.VISIBLE);
+            iv_mute.setVisibility(View.VISIBLE);
+            iv_loud.setVisibility(View.VISIBLE);
             caller_name.setTypeface(null, Typeface.BOLD);
             callState.setText("ringing");
         }

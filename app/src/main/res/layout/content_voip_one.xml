@@ -108,6 +108,7 @@
         android:src="@drawable/answer"
         app:civ_border_color="@android:color/holo_green_dark"
         app:civ_border_width="5dp"
+        android:visibility="gone"
         android:layout_marginBottom="@dimen/txt_size_large"
         android:layout_marginLeft="50dp"
         android:layout_alignParentBottom="true"/>
@@ -122,6 +123,6 @@
         app:civ_border_color="@android:color/holo_green_dark"
         app:civ_border_width="5dp"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"/>
+        android:layout_centerHorizontal="true"/>
 
 </RelativeLayout>
