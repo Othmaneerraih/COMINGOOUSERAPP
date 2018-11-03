@@ -258,7 +258,7 @@ public class DriverService extends Service {
                         return;
                     }
 
-                    if (commandActivity.active) {
+                    if (commandActivity.mp != null) {
                         commandActivity.countDownTimer.cancel();
                         commandActivity.mp.stop();
                         commandActivity.mp.release();
@@ -304,7 +304,7 @@ public class DriverService extends Service {
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             if (!dataSnapshot.exists()) {
                                 commandActivity.countDownTimer.cancel();
-                                if (commandActivity.mp.isPlaying()) {
+                                if (commandActivity.mp != null) {
                                     commandActivity.mp.stop();
                                     commandActivity.mp.release();
                                     commandActivity.vibrator.cancel();
@@ -351,7 +351,7 @@ public class DriverService extends Service {
 
                     };
 
-                    checkHandler.postDelayed(checkRunnable, 12000); // Optional, to repeat the task.
+                    checkHandler.postDelayed(checkRunnable, 15000); // Optional, to repeat the task.
                 }
             };
 

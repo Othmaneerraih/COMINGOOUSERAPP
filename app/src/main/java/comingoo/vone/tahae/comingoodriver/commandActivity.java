@@ -5,6 +5,8 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
@@ -334,13 +336,21 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
     @Override
     public void onMapReady(GoogleMap googleMap) {
         LatLng latLng = new LatLng(Double.parseDouble(lat), Double.parseDouble(lng));
-        BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.person_green);
+//        BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.person_green);
+        int height = 150;
+        int width = 80;
+        BitmapDrawable bitmapdraw=(BitmapDrawable)getResources().getDrawable(R.drawable.person_green);
+        Bitmap b=bitmapdraw.getBitmap();
+        Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
+
         MarkerOptions markerOptions = new MarkerOptions().position(latLng)
-                .icon(icon);
+                .icon(BitmapDescriptorFactory.fromBitmap(smallMarker));
         CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(latLng)      // Sets the center of the map to Mountain View
                 .zoom(17)                   // Sets the zoom
-                .build();                   // Creates a CameraPosition from the builder
+                .build();
+        googleMap.addMarker(markerOptions);
+        // Creates a CameraPosition from the builder
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
 
