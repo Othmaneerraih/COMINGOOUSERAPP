@@ -7,89 +7,77 @@
     android:layout_height="match_parent"
     tools:context=".commandActivity">
 
-    <com.skyfishjy.library.RippleBackground xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/content"
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:rb_color="#0099CC"
-        app:rb_duration="3000"
-        app:rb_radius="25dp"
-        app:rb_rippleAmount="4"
-        app:rb_scale="6">
+    <!--<com.skyfishjy.library.RippleBackground xmlns:android="http://schemas.android.com/apk/res/android"-->
+        <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
+       <!---->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="300dp"-->
+        <!--app:layout_constraintEnd_toEndOf="parent"-->
+        <!--app:layout_constraintHorizontal_bias="0.0"-->
+        <!--app:layout_constraintStart_toStartOf="parent"-->
+        <!--app:layout_constraintTop_toTopOf="parent"-->
+        <!--app:rb_color="#0099CC"-->
+        <!--app:rb_duration="3000"-->
+        <!--app:rb_radius="25dp"-->
+        <!--app:rb_rippleAmount="4"-->
+        <!--app:rb_scale="6">-->
 
         <android.support.constraint.ConstraintLayout
+            android:id="@+id/content"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="300dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-            <FrameLayout
-                android:id="@+id/map_container"
+
+            <comingoo.vone.tahae.comingoodriver.RoundedLayout
+                android:id="@+id/maplayout"
                 android:layout_width="150dp"
                 android:layout_height="150dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:background="@drawable/drawable_circle_dark_blue">
-
-                <!--<rjsv.circularview.CircleView-->
-                    <!--android:id="@+id/circle_view"-->
-                    <!--circleview:layout_constraintTop_toTopOf="parent"-->
-                    <!--circleview:layout_constraintBottom_toBottomOf="parent"-->
-                    <!--circleview:layout_constraintStart_toStartOf="parent"-->
-                    <!--circleview:layout_constraintEnd_toEndOf="parent"-->
-                    <!--android:layout_width="500dp"-->
-                    <!--android:layout_height="500dp"-->
-                    <!--circleview:suffixEnabled="true"-->
-                    <!--circleview:suffixValue="EUR"-->
-                    <!--circleview:arcBorderColor="@color/color_arc"-->
-                    <!--circleview:arcColor="@color/color_arc"-->
-                    <!--circleview:arcHasBorder="false"-->
-                    <!--circleview:arcWidth="15dp"-->
-                    <!--circleview:hasIndicator="false"-->
-                    <!--circleview:indicatorColor="@android:color/black"-->
-                    <!--circleview:indicatorRadius="6"-->
-                    <!--circleview:progressColor="@color/color_progress"-->
-                    <!--circleview:progressMaximumValue="10"-->
-                    <!--circleview:progressMinimumValue="0"-->
-                    <!--circleview:progressStepValue="1"-->
-                    <!--circleview:progressStepAsInteger="false"-->
-                    <!--circleview:progressWidth="15dp"-->
-                    <!--circleview:textEnabled="true"-->
-                    <!--circleview:textFont="fonts/Roboto-Bold.ttf"-->
-                    <!--circleview:textSize="36sp"/>-->
+                app:layout_constraintTop_toTopOf="parent">
 
                 <fragment
                     android:id="@+id/map_command"
                     android:name="com.google.android.gms.maps.SupportMapFragment"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:layout_margin="3dp"
-                    android:layout_gravity="center"
-                    android:background="@drawable/drawable_circle_dark_blue" />
-
-                <ImageView
                     android:layout_width="150dp"
                     android:layout_height="150dp"
+                    android:layout_margin="3dp"
+                    android:layout_centerInParent="true"
                     android:background="@drawable/drawable_circle_dark_blue" />
+            </comingoo.vone.tahae.comingoodriver.RoundedLayout>
 
-            </FrameLayout>
+            <ProgressBar
+                android:id="@+id/barTimer"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="300dp"
+                android:layout_height="300dp"
+                android:layout_centerInParent="true"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:indeterminate="false"
+                android:max="15"
+                android:progress="15"
+                android:progressDrawable="@drawable/green_circular" />
 
         </android.support.constraint.ConstraintLayout>
 
-    </com.skyfishjy.library.RippleBackground>
+    <!--</com.skyfishjy.library.RippleBackground>-->
 
     <TextView
         android:id="@+id/textView6"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Bon Client"
-        android:textColor="@color/colorPrimaryDark"
+        android:textColor="@android:color/holo_green_dark"
         android:textSize="22sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintStart_toStartOf="parent"
@@ -100,7 +88,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:textSize="18sp"
+        android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.501"
@@ -111,7 +99,8 @@
         android:id="@+id/textView9"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_margin="8dp"
+        android:textColor="@android:color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView8" />
@@ -147,7 +136,7 @@
                 android:background="@drawable/refuser_bt"
                 android:text="Refuser"
                 android:textAllCaps="false"
-                android:textColor="@android:color/white" />
+                android:textColor="@android:color/holo_red_dark" />
 
             <Button
                 android:id="@+id/accept"
@@ -157,7 +146,7 @@
                 android:background="@drawable/accepter_bt"
                 android:text="Accepter"
                 android:textAllCaps="false"
-                android:textColor="@android:color/white" />
+                android:textColor="@android:color/holo_green_dark" />
         </LinearLayout>
 
         <ImageView

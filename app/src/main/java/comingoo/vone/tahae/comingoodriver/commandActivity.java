@@ -18,6 +18,7 @@ import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -56,6 +57,8 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
     private SupportMapFragment map;
     private String lat, lng;
     private String clientID, userId;
+    private ProgressBar barTimer;
+    private CountDownTimer countDownTimer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +87,7 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         startText = (TextView) findViewById(R.id.textView9);
         decline = (Button) findViewById(R.id.decline);
         accept = (Button) findViewById(R.id.accept);
+        barTimer = (ProgressBar) findViewById(R.id.barTimer);
 
         final TextView clientLevel = (TextView) findViewById(R.id.textView6);
 
@@ -164,7 +168,7 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         lat = intent.getStringExtra("startLat");
         lng = intent.getStringExtra("startLong");
 
-        distance.setText("5 min " + dist + "km");
+        distance.setText("5 min /" + dist + "km");
         startText.setText("De : " + intent.getStringExtra("start"));
 
         decline.setOnClickListener(new View.OnClickListener() {
@@ -313,15 +317,7 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
             }
         });
 
-        new CountDownTimer(15000, 1000) {
-            public void onTick(long millisUntilFinished) {
-            }
-
-            public void onFinish() {
-                showCustomDialog(getApplicationContext());
-            }
-
-        }.start();
+        startTimer();
     }
 
     static boolean active = false;
@@ -336,6 +332,33 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
     public void onStop() {
         super.onStop();
         active = false;
+    }
+
+    private void startTimer() {
+        countDownTimer = new CountDownTimer(15000, 1000) {
+            // 500 means, onTick function will be called at every 500 milliseconds
+
+            @Override
+            public void onTick(long leftTimeInMilliseconds) {
+                long seconds = leftTimeInMilliseconds / 1000;
+                barTimer.setProgress((int)seconds);
+//                textTimer.setText(String.format("%02d", seconds/60) + ":" + String.format("%02d", seconds%60));
+                // format the textview to show the easily readable format
+
+            }
+            @Override
+            public void onFinish() {
+//                if(textTimer.getText().equals("00:00")){
+//                    textTimer.setText("STOP");
+//                }
+//                else{
+//                    textTimer.setText("2:00");
+//                    barTimer.setProgress(60*minuti);
+//                }
+                showCustomDialog(commandActivity.this);
+            }
+        }.start();
+
     }
 
     @Override
