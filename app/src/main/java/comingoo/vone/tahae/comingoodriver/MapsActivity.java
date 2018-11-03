@@ -262,6 +262,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             }
                         } catch (NullPointerException e) {
                             e.printStackTrace();
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
                     }
                 }
@@ -412,6 +414,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             new checkCourseTask().execute();
             new checkCourseFinished().execute();
 
+        } catch (NullPointerException e) {
+            e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -642,6 +646,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //                                                    Log.e("kilometer price", "onDataChange: " + price1);
                                                         price.setText(price1 + " MAD");
                                                     }
+                                                } catch (NullPointerException e) {
+                                                    e.printStackTrace();
                                                 } catch (Exception e) {
                                                     e.printStackTrace();
                                                 }
@@ -1287,6 +1293,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
                     try {
                         MapsActivity.this.recreate();
+                    } catch (NullPointerException e) {
+                        e.printStackTrace();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -1307,6 +1315,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     FirebaseDatabase.getInstance().getReference("COURSES").child(userId).
                             addChildEventListener(childEventListener);
                 }
+            } catch (NullPointerException e) {
+                e.printStackTrace();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -1616,7 +1626,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         }
                     }
                 }
-            } catch (Exception ex) {
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
 
             return "this string is passed to onPostExecute";
