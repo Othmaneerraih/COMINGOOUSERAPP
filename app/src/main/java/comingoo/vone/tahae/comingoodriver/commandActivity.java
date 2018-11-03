@@ -1,15 +1,19 @@
 package comingoo.vone.tahae.comingoodriver;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,7 +29,10 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -52,13 +59,14 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
     private TextView arrivalText;
     private Button decline;
     private Button accept;
-    private MediaPlayer mp;
-    private Vibrator vibrator;
+    public static MediaPlayer mp;
+    public static Vibrator vibrator;
     private SupportMapFragment map;
     private String lat, lng;
     private String clientID, userId;
     private ProgressBar barTimer;
-    private CountDownTimer countDownTimer;
+    public static CountDownTimer countDownTimer;
+    private String clientType = "new";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,11 +83,22 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
 
 
         vibrator = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
-// Vibrate for 1 seconds
-        vibrator.vibrate(100);
+
+        long[] pattern = { 0, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500};
+        vibrator.vibrate(pattern , 0);
+
         mp = MediaPlayer.create(this, R.raw.ring);
-        mp.setLooping(false);
         mp.start();
+
+
+        mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                mp.stop();
+                mp.release();
+                vibrator.cancel();
+            }
+        });
 
 
         // name  = (TextView) findViewById(R.id.textView10);
@@ -88,6 +107,7 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         decline = (Button) findViewById(R.id.decline);
         accept = (Button) findViewById(R.id.accept);
         barTimer = (ProgressBar) findViewById(R.id.barTimer);
+
 
         final TextView clientLevel = (TextView) findViewById(R.id.textView6);
         final Intent intent = getIntent();
@@ -100,6 +120,43 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         double time = Double.parseDouble(intent.getStringExtra("distance")) * 1.5;
         distance.setText(intent.getStringExtra("distance") + "Km,  " + time + " min");
 
+
+        FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").
+                addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.hasChild(clientID)) {
+                    FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(clientID)
+                            .addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    if (dataSnapshot.exists()) {
+                                        int size = (int) dataSnapshot.getChildrenCount();
+                                        if (size > 0) {
+                                            clientType = "bon";
+                                        } else clientType = "new";
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        if (clientType.equalsIgnoreCase("bon")) {
+            barTimer.setProgressDrawable(getResources().getDrawable(R.drawable.drawable_new_client));
+        } else {
+            barTimer.setProgressDrawable(getResources().getDrawable(R.drawable.green_circular));
+        }
 
 
         map = ((SupportMapFragment) getSupportFragmentManager()
@@ -115,8 +172,6 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         decline.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mp.stop();
-                vibrator.cancel();
                 FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
             }
         });
@@ -126,7 +181,6 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (!dataSnapshot.exists()) {
-                    finish();
                 }
             }
 
@@ -136,18 +190,12 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
             }
         });
 
+        startTimer();
         accept.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mp.stop();
-                vibrator.cancel();
-                accept.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        return;
-                    }
-                });
-                FirebaseDatabase.getInstance().getReference("COURSES").orderByChild("client").equalTo(clientID).addListenerForSingleValueEvent(new ValueEventListener() {
+                FirebaseDatabase.getInstance().getReference("COURSES").orderByChild("client").
+                        equalTo(clientID).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (!dataSnapshot.exists()) {
@@ -245,9 +293,8 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
                                     });
                                 }
                             }
-
-
                         }
+//                        commandActivity.this.finish();
                     }
 
                     @Override
@@ -258,7 +305,6 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
             }
         });
 
-        startTimer();
     }
 
     static boolean active = false;
@@ -269,34 +315,17 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         active = true;
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        active = false;
-    }
-
     private void startTimer() {
         countDownTimer = new CountDownTimer(15000, 1000) {
-            // 500 means, onTick function will be called at every 500 milliseconds
-
             @Override
             public void onTick(long leftTimeInMilliseconds) {
                 long seconds = leftTimeInMilliseconds / 1000;
-                barTimer.setProgress((int)seconds);
-//                textTimer.setText(String.format("%02d", seconds/60) + ":" + String.format("%02d", seconds%60));
-                // format the textview to show the easily readable format
-
+                barTimer.setProgress((int) seconds);
             }
+
             @Override
             public void onFinish() {
-//                if(textTimer.getText().equals("00:00")){
-//                    textTimer.setText("STOP");
-//                }
-//                else{
-//                    textTimer.setText("2:00");
-//                    barTimer.setProgress(60*minuti);
-//                }
-                showCustomDialog(commandActivity.this);
+                showCustomDialog();
             }
         }.start();
 
@@ -305,6 +334,9 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
     @Override
     public void onMapReady(GoogleMap googleMap) {
         LatLng latLng = new LatLng(Double.parseDouble(lat), Double.parseDouble(lng));
+        BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.person_green);
+        MarkerOptions markerOptions = new MarkerOptions().position(latLng)
+                .icon(icon);
         CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(latLng)      // Sets the center of the map to Mountain View
                 .zoom(17)                   // Sets the zoom
@@ -312,37 +344,41 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
 
-    public void showCustomDialog(final Context context) {
-        final Dialog dialog = new Dialog(context);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View view = inflater.inflate(R.layout.content_misses_ride_request, null, false);
-//        ((Activity) context).getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE |
-//                WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
-        dialog.setContentView(view);
-
-        Button btnOk = view.findViewById(R.id.btn_passer_hors);
+     AlertDialog.Builder dialogBuilder;
+     AlertDialog OptionDialog;
+    public void showCustomDialog() {
+         dialogBuilder = new AlertDialog.Builder(commandActivity.this);
+        LayoutInflater inflater = this.getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.content_misses_ride_request, null);
+        dialogBuilder.setView(dialogView);
+         OptionDialog = dialogBuilder.create();
+        Button btnOk = dialogView.findViewById(R.id.btn_passer_hors);
         btnOk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dialog.dismiss();
-                mp.stop();
-                vibrator.cancel();
+                OptionDialog.dismiss();
                 FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
             }
         });
 
-        Button btnCancel = view.findViewById(R.id.btn_rester_engine);
-        btnOk.setOnClickListener(new View.OnClickListener() {
+        Button btnCancel = dialogView.findViewById(R.id.btn_rester_engine);
+        btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dialog.dismiss();
+                OptionDialog.dismiss();
+                finish();
             }
         });
-
-        final Window window = dialog.getWindow();
-        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
-        window.setGravity(Gravity.CENTER);
-        dialog.show();
+        AlertDialog alertDialog = dialogBuilder.create();
+        alertDialog.show();
     }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        active = false;
+        if (OptionDialog != null)
+        OptionDialog.dismiss();
+    }
+
 }
