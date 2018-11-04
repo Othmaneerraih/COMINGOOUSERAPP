@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -120,6 +121,8 @@ public class VoipCallingActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if(call != null){
                     call.hangup();
+                    RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) iv_cancel_call_voip_one.getLayoutParams();
+                    params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
                 }
 
             }
@@ -132,7 +135,6 @@ public class VoipCallingActivity extends AppCompatActivity {
                     if (call == null) {
                         call = sinchClient.getCallClient().callUser(clientId);
                         call.addCallListener(new VoipCallingActivity.SinchCallListener());
-//                        button.setText("Hang Up");
                         iv_cancel_call_voip_one.setEnabled(true);
                     } else {
                         call.hangup();
