@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -90,8 +91,9 @@ public class VoipCallingActivity extends AppCompatActivity {
 
         caller_name.setText(callerName+ " vous appelle");
         tv_name_voip_one.setText(callerName);
-        Picasso.get().load(clientImage).fit().centerCrop().into(iv_user_image_voip_one);
-
+        if(clientImage != null ){
+            Picasso.get().load(clientImage).fit().centerCrop().into(iv_user_image_voip_one);
+        }
         sinchClient = Sinch.getSinchClientBuilder()
                 .context(this)
                 .userId(driverId)
@@ -120,6 +122,9 @@ public class VoipCallingActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if(call != null){
                     call.hangup();
+                    iv_recv_call_voip_one.setVisibility(View.VISIBLE);
+                    RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) iv_cancel_call_voip_one.getLayoutParams();
+                    params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
                 }
 
             }
@@ -132,10 +137,12 @@ public class VoipCallingActivity extends AppCompatActivity {
                     if (call == null) {
                         call = sinchClient.getCallClient().callUser(clientId);
                         call.addCallListener(new VoipCallingActivity.SinchCallListener());
-//                        button.setText("Hang Up");
                         iv_cancel_call_voip_one.setEnabled(true);
                     } else {
                         call.hangup();
+                        iv_recv_call_voip_one.setVisibility(View.VISIBLE);
+                        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) iv_cancel_call_voip_one.getLayoutParams();
+                        params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
                     }
                 }
 
@@ -165,7 +172,7 @@ public class VoipCallingActivity extends AppCompatActivity {
     }
 
     private void startTimer() {
-        countDownTimer = new CountDownTimer(1000, 1000) {
+        countDownTimer = new CountDownTimer(2000, 1000) {
             // 500 means, onTick function will be called at every 500 milliseconds
 
             @Override
@@ -183,6 +190,9 @@ public class VoipCallingActivity extends AppCompatActivity {
                             iv_cancel_call_voip_one.setEnabled(true);
                         } else {
                             call.hangup();
+                            iv_recv_call_voip_one.setVisibility(View.VISIBLE);
+                            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) iv_cancel_call_voip_one.getLayoutParams();
+                            params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
                         }
                     }
                 }
@@ -214,6 +224,9 @@ public class VoipCallingActivity extends AppCompatActivity {
             caller_name.setVisibility(View.GONE);
             iv_cancel_call_voip_one.setEnabled(false);
             callState.setText("");
+            iv_recv_call_voip_one.setVisibility(View.VISIBLE);
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) iv_cancel_call_voip_one.getLayoutParams();
+            params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
             setVolumeControlStream(AudioManager.USE_DEFAULT_STREAM_TYPE);
             mute();
         }

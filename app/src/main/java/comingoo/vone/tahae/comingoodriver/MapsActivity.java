@@ -520,8 +520,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.activity_incomming_call, null, false);
-//        ((Activity) context).getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE |
-//                WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         dialog.setContentView(view);
 
         final MediaPlayer mp;
@@ -1150,20 +1148,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
 
 
-//                sinchClient = Sinch.getSinchClientBuilder()
-//                        .context(MapsActivity.this)
-//                        .userId(number)
-//                        .applicationKey("05a626b9-33a4-4b83-b7bc-2d49062ea9ae")
-//                        .applicationSecret("gVW3Tm0140e9i17wRwUzzw==")
-//                        .environmentHost("clientapi.sinch.com")
-//                        .build();
-//                sinchClient.setSupportCalling(true);
-//                sinchClient.start();
-//                sinchClient.startListeningOnActiveConnection();
-//
-//                sinchClient.getCallClient().addCallClientListener(new SinchCallClientListener());
-
-
                 FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(number).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -1270,32 +1254,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-
-//    private class SinchCallClientListener implements CallClientListener {
-//        @Override
-//        public void onIncomingCall(final CallClient callClient, final Call incomingCall) {
-//            //Pick up the call!
-//
-//            findViewById(R.id.callLayout).setVisibility(View.VISIBLE);
-//            final Button hangup = (Button) findViewById(R.id.hangup);
-//            hangup.setText("Answer");
-//            hangup.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    incomingCall.answer();
-//                    hangup.setText("Hangup");
-//                    hangup.setOnClickListener(new View.OnClickListener() {
-//                        @Override
-//                        public void onClick(View v) {
-//                            incomingCall.hangup();
-//                            findViewById(R.id.callLayout).setVisibility(View.GONE);
-//                        }
-//                    });
-//                }
-//            });
-//
-//        }
-//    }
 
     private void logout() {
         final SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
