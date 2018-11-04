@@ -90,8 +90,9 @@ public class VoipCallingActivity extends AppCompatActivity {
 
         caller_name.setText(callerName+ " vous appelle");
         tv_name_voip_one.setText(callerName);
-        Picasso.get().load(clientImage).fit().centerCrop().into(iv_user_image_voip_one);
-
+        if(clientImage != null ){
+            Picasso.get().load(clientImage).fit().centerCrop().into(iv_user_image_voip_one);
+        }
         sinchClient = Sinch.getSinchClientBuilder()
                 .context(this)
                 .userId(driverId)
@@ -165,7 +166,7 @@ public class VoipCallingActivity extends AppCompatActivity {
     }
 
     private void startTimer() {
-        countDownTimer = new CountDownTimer(1000, 1000) {
+        countDownTimer = new CountDownTimer(2000, 1000) {
             // 500 means, onTick function will be called at every 500 milliseconds
 
             @Override
