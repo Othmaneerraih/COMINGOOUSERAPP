@@ -122,6 +122,7 @@ public class VoipCallingActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if(call != null){
                     call.hangup();
+                    iv_recv_call_voip_one.setVisibility(View.VISIBLE);
                     RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) iv_cancel_call_voip_one.getLayoutParams();
                     params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
                 }
@@ -139,6 +140,9 @@ public class VoipCallingActivity extends AppCompatActivity {
                         iv_cancel_call_voip_one.setEnabled(true);
                     } else {
                         call.hangup();
+                        iv_recv_call_voip_one.setVisibility(View.VISIBLE);
+                        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) iv_cancel_call_voip_one.getLayoutParams();
+                        params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
                     }
                 }
 
@@ -186,6 +190,9 @@ public class VoipCallingActivity extends AppCompatActivity {
                             iv_cancel_call_voip_one.setEnabled(true);
                         } else {
                             call.hangup();
+                            iv_recv_call_voip_one.setVisibility(View.VISIBLE);
+                            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) iv_cancel_call_voip_one.getLayoutParams();
+                            params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
                         }
                     }
                 }
@@ -217,6 +224,9 @@ public class VoipCallingActivity extends AppCompatActivity {
             caller_name.setVisibility(View.GONE);
             iv_cancel_call_voip_one.setEnabled(false);
             callState.setText("");
+            iv_recv_call_voip_one.setVisibility(View.VISIBLE);
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) iv_cancel_call_voip_one.getLayoutParams();
+            params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
             setVolumeControlStream(AudioManager.USE_DEFAULT_STREAM_TYPE);
             mute();
         }
