@@ -267,8 +267,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 public void onClick(View v) {
                     if (clientPhoneNumber != null) {
                         try {
+                            String callNumber = clientPhoneNumber;
+                            if(callNumber.contains("+212")){
+                                callNumber.replace("+212","");
+                            }
+
                             Intent intent = new Intent(Intent.ACTION_DIAL);
-                            intent.setData(Uri.parse("tel:"+ clientPhoneNumber));
+                            intent.setData(Uri.parse("tel:"+ callNumber));
                             startActivity(intent);
                         } catch (NullPointerException e) {
                             e.printStackTrace();
