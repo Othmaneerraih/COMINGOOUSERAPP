@@ -59,10 +59,8 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_below="@+id/image_layout"
-    android:layout_alignParentBottom="true"
     android:layout_centerHorizontal="true"
     android:layout_marginTop="20dp"
-    android:layout_marginBottom="200dp"
     android:text="" />
 
 <LinearLayout
@@ -70,9 +68,9 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:layout_marginTop="55dp"
+    android:layout_marginTop="25dp"
     android:layout_centerHorizontal="true"
-    android:layout_below="@+id/image_layout">
+    android:layout_below="@+id/callState">
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/iv_mute"
@@ -89,7 +87,6 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:src="@drawable/clicked_speaker_bt"
-        android:layout_marginBottom="@dimen/txt_size_large"
         app:civ_border_color="@android:color/darker_gray"
         app:civ_border_width="5dp" />
 </LinearLayout>

@@ -110,6 +110,7 @@
         app:civ_border_color="@android:color/holo_green_dark"
         app:civ_border_width="5dp"
         android:visibility="gone"
+        android:layout_marginBottom="20dp"
         android:layout_marginLeft="50dp"
         android:layout_alignParentBottom="true"/>
 
@@ -121,6 +122,7 @@
         android:layout_marginRight="50dp"
         app:civ_border_color="@android:color/holo_green_dark"
         app:civ_border_width="5dp"
+        android:layout_marginBottom="20dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"/>
 
