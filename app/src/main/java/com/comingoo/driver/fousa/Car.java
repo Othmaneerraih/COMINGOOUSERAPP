@@ -1,4 +1,4 @@
-package com.comingoodriver.tahae.comingoodriver;
+package com.comingoo.driver.fousa;
 
 public class Car {
     String name, description, selected, id;

@@ -1,4 +1,4 @@
-package com.comingoodriver.tahae.comingoodriver;
+package com.comingoo.driver.fousa;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -8,8 +8,6 @@ import android.support.v7.app.AppCompatDialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
-
-import comingoo.vone.tahae.comingoodriver.R;
 
 public class PhoneDialog  extends AppCompatDialogFragment {
 

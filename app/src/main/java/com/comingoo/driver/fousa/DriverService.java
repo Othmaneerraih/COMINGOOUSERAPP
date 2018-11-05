@@ -1,4 +1,4 @@
-package com.comingoodriver.tahae.comingoodriver;
+package com.comingoo.driver.fousa;
 
 import android.app.Service;
 import android.content.Context;
@@ -34,10 +34,8 @@ import java.util.List;
 
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
-public class DriverService  extends Service {
-
+public class DriverService extends Service {
     private LatLng userLoc;
-
     private DatabaseReference driverLcoationDatabase;
     private GeoFire geoFire;
 
@@ -45,7 +43,6 @@ public class DriverService  extends Service {
     private DatabaseReference driverPickupRequests;
 
     private String userId;
-
 
     private List<String> requestUsersID;
     private List<String> requestUsersLocation;
@@ -65,14 +62,15 @@ public class DriverService  extends Service {
 
     private static final long INTERVAL = 1000 * 2;
 
-    private int  counterHolder;
+
+    private int counterHolder;
 
     boolean checkStop = false;
 
     Service myService;
 
     @Override
-    public void onCreate(){
+    public void onCreate() {
         super.onCreate();
         myService = this;
         Context context = getApplicationContext();
@@ -81,7 +79,7 @@ public class DriverService  extends Service {
 
     private boolean checkIfLocationOpened() {
         String provider = Settings.Secure.getString(getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
-        if (provider.contains("gps") || provider.contains("network")){
+        if (provider.contains("gps") || provider.contains("network")) {
             return true;
         }
         // otherwise return false
@@ -89,10 +87,10 @@ public class DriverService  extends Service {
     }
 
 
-
     private class CheckDebtTask extends AsyncTask<String, Integer, String> {
         SharedPreferences prefs;
         String userId;
+
         // Runs in UI before background thread is called
         @Override
         protected void onPreExecute() {
@@ -102,22 +100,26 @@ public class DriverService  extends Service {
             // Do something like display a progress bar
         }
 
+        // This is run in a background thread
         @Override
         protected String doInBackground(String... params) {
 
+            if (userId == null) {
+                return "";
+            }
 
             FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                    if(dataSnapshot.exists()){
+                    if (dataSnapshot.exists()) {
                         final double debt = Double.parseDouble(dataSnapshot.getValue(String.class));
                         FirebaseDatabase.getInstance().getReference("PRICES").child("debtCeil").addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                if(dataSnapshot.exists()){
+                                if (dataSnapshot.exists()) {
                                     double debtCeil = Double.parseDouble(dataSnapshot.getValue(String.class));
-                                    if(debt >= debtCeil){
+                                    if (debt >= debtCeil) {
                                         SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
                                         prefs.edit().remove("online").apply();
                                         toaster("Vous devez payer votre dette pour aller en ligne.");
@@ -133,8 +135,6 @@ public class DriverService  extends Service {
                         });
 
 
-
-
                     }
 
                 }
@@ -144,8 +144,6 @@ public class DriverService  extends Service {
 
                 }
             });
-
-
 
 
             return "this string is passed to onPostExecute";
@@ -168,7 +166,7 @@ public class DriverService  extends Service {
         }
     }
 
-    private void toaster(String message){
+    private void toaster(String message) {
         Toast.makeText(myService, message, Toast.LENGTH_SHORT).show();
     }
 
@@ -186,13 +184,9 @@ public class DriverService  extends Service {
         protected String doInBackground(String... params) {
 
 
-
-
-
             mDatabase = FirebaseDatabase.getInstance().getReference().child("DRIVERUSERS");
             driverLcoationDatabase = FirebaseDatabase.getInstance().getReference().child("ONLINEDRIVERS");
             driverPickupRequests = FirebaseDatabase.getInstance().getReference().child("PICKUPREQUEST");
-
 
 
             requestUsersID = new ArrayList<>();
@@ -201,7 +195,7 @@ public class DriverService  extends Service {
             arrivalText = new ArrayList<>();
             userLevel = new ArrayList<>();
             startLat = new ArrayList<>();
-            startLong= new ArrayList<>();
+            startLong = new ArrayList<>();
             endLat = new ArrayList<>();
             endLong = new ArrayList<>();
             isFixed = new ArrayList<>();
@@ -215,15 +209,15 @@ public class DriverService  extends Service {
             if (userId == null) {
                 //User Is Logged In
                 DriverService.this.stopSelf();
-            }else {
+            } else {
                 // startLocationUpdates();
                 new LocationUpdatesTask().execute();
                 getLastLocation();
                 mDatabase.child(userId).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if(dataSnapshot.exists()){
-                            if(dataSnapshot.child("isVerified").getValue(String.class).equals("0")){
+                        if (dataSnapshot.exists()) {
+                            if (dataSnapshot.child("isVerified").getValue(String.class).equals("0")) {
                                 //Intent inte = new Intent(ComingoDriverService.this, ComingoDriverService.class);
                                 //stopService(inte);
                                 SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
@@ -246,26 +240,31 @@ public class DriverService  extends Service {
 
                 Handler checkHandler = new Handler(Looper.getMainLooper());
                 Runnable checkRunnable;
+
                 @Override
                 public void run() {
                     isRunning = true;
-                    if(counter >= requestUsersID.size()){
-                        counter =0;
+                    if (counter >= requestUsersID.size()) {
+                        counter = 0;
                         isRunning = false;
                         handler.removeCallbacks(this);
-                        return ;
+                        return;
                     }
                     counterHolder = counter;
 
-                    if(requestUsersID.get(counter).equals("-1")){
+                    if (requestUsersID.get(counter).equals("-1")) {
                         counter++;
                         handler.postDelayed(runnable, 0); // Optional, to repeat the task.
                         return;
                     }
 
-                    if(commandActivity.active){
+                    if (commandActivity.mp != null) {
+                        commandActivity.countDownTimer.cancel();
+                        commandActivity.mp.release();
+                        commandActivity.vibrator.cancel();
                         commandActivity.clientR.finish();
                     }
+
                     final Intent intent = new Intent(DriverService.this, commandActivity.class);
 
                     intent.putExtra("userId", userId);
@@ -283,10 +282,10 @@ public class DriverService  extends Service {
                     intent.putExtra("fixedPrice", "" + fixedPrice.get(counter));
 
 
-                    if(userLoc != null){
+                    if (userLoc != null) {
                         intent.putExtra("driverPosLat", "" + userLoc.latitude);
                         intent.putExtra("driverPosLong", "" + userLoc.longitude);
-                    }else{
+                    } else {
                         intent.putExtra("driverPosLat", "");
                         intent.putExtra("driverPosLong", "");
                     }
@@ -297,11 +296,17 @@ public class DriverService  extends Service {
                     startActivity(intent);
 
 
-                    final DatabaseReference clientRequetFollow = FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(requestUsersID.get(counter));
+                    final DatabaseReference clientRequetFollow = FirebaseDatabase.getInstance()
+                            .getReference("PICKUPREQUEST").child(userId).child(requestUsersID.get(counter));
                     clientRequetFollow.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            if(!dataSnapshot.exists()){
+                            if (!dataSnapshot.exists()) {
+                                commandActivity.countDownTimer.cancel();
+                                if (commandActivity.mp != null) {
+                                    commandActivity.mp.release();
+                                    commandActivity.vibrator.cancel();
+                                }
                                 commandActivity.clientR.finish();
                                 counter++;
                                 checkStop = true;
@@ -317,17 +322,16 @@ public class DriverService  extends Service {
                     });
 
 
-
                     checkRunnable = new Runnable() {
                         @Override
                         public void run() {
-                            if(counter < requestUsersID.size()){
+                            if (counter < requestUsersID.size()) {
                                 final DatabaseReference clientRequetFollow = FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(requestUsersID.get(counter));
                                 clientRequetFollow.addValueEventListener(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                        if(dataSnapshot.exists() && !requestUsersID.get(counter).equals("-1") && requestUsersID.get(counter).equals(requestUsersID.get(counter))){
-                                            if(requestUsersID.size() > 1)
+                                        if (dataSnapshot.exists() && !requestUsersID.get(counter).equals("-1") && requestUsersID.get(counter).equals(requestUsersID.get(counter))) {
+                                            if (requestUsersID.size() > 1)
                                                 requestUsersID.set(counter, "-1");
 
                                             clientRequetFollow.removeValue();
@@ -345,17 +349,17 @@ public class DriverService  extends Service {
 
                     };
 
-
-                    checkHandler.postDelayed(checkRunnable, 12000); // Optional, to repeat the task.
+                    checkHandler.postDelayed(checkRunnable, 15000); // Optional, to repeat the task.
                 }
             };
 
-
+            if (userId == null)
+                return "";
             DatabaseReference PickupDatabase = FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId);
             PickupDatabase.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(final @NonNull DataSnapshot dataSnapshot) {
-                    if(!isRunning){
+                    if (!isRunning) {
                         requestUsersID.clear();
                         requestUsersLocation.clear();
                         startingText.clear();
@@ -364,9 +368,9 @@ public class DriverService  extends Service {
                     }
                     List<String> holder = new ArrayList<>();
 
-                    for(DataSnapshot data : dataSnapshot.getChildren()){
-                        if(dataSnapshot.exists()) {
-                            if(!isRunning){
+                    for (DataSnapshot data : dataSnapshot.getChildren()) {
+                        if (dataSnapshot.exists()) {
+                            if (!isRunning) {
                                 requestUsersID.add(data.getKey());
                                 requestUsersLocation.add(data.child("distance").getValue().toString());
                                 startingText.add(data.child("start").getValue().toString());
@@ -379,9 +383,9 @@ public class DriverService  extends Service {
                                 isFixed.add(data.child("destFix").getValue().toString());
                                 fixedPrice.add(data.child("fixedPrice").getValue().toString());
 
-                            } else{
+                            } else {
                                 holder.add(data.getKey());
-                                if(!idInList(data.getKey(), requestUsersID)){
+                                if (!idInList(data.getKey(), requestUsersID)) {
                                     requestUsersID.add(data.getKey());
                                     requestUsersLocation.add(data.child("distance").getValue().toString());
                                     startingText.add(data.child("start").getValue().toString());
@@ -399,16 +403,16 @@ public class DriverService  extends Service {
                             }
                         }
                     }
-                    if(isRunning){
-                        for(int i=0;i<requestUsersID.size();i++){
-                            if(!idInList(requestUsersID.get(i), holder)){
+                    if (isRunning) {
+                        for (int i = 0; i < requestUsersID.size(); i++) {
+                            if (!idInList(requestUsersID.get(i), holder)) {
                                 requestUsersID.set(i, "-1");
                             }
 
                         }
                     }
                     //handler.removeCallbacks(runnable);
-                    if(requestUsersID.size() > 0 && !isRunning){
+                    if (requestUsersID.size() > 0 && !isRunning) {
                         runnable.run();
                     }
 
@@ -419,8 +423,6 @@ public class DriverService  extends Service {
 
                 }
             });
-
-
 
 
             return "this string is passed to onPostExecute";
@@ -444,11 +446,8 @@ public class DriverService  extends Service {
     }
 
 
-
-
     @Override
     public int onStartCommand(final Intent intent, int flags, int startId) {
-
 
 
         new CheckDebtTask().execute();
@@ -468,9 +467,9 @@ public class DriverService  extends Service {
     }
 
 
-    public boolean idInList(String ID, List<String> idList){
-        for(String userId : idList){
-            if(ID.equals(userId)){
+    public boolean idInList(String ID, List<String> idList) {
+        for (String userId : idList) {
+            if (ID.equals(userId)) {
                 return true;
             }
         }
@@ -479,7 +478,8 @@ public class DriverService  extends Service {
 
     @Override
     public void onDestroy() {
-        driverLcoationDatabase.child(userId).removeValue();
+        if (userId != null)
+            driverLcoationDatabase.child(userId).removeValue();
         super.onDestroy();
     }
 
@@ -498,13 +498,10 @@ public class DriverService  extends Service {
     }
 
 
-
-
-
-
     private class LocationUpdatesTask extends AsyncTask<String, Integer, String> {
 
         private static final long FASTEST_INTERVAL = 1000 * 1;
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -536,8 +533,6 @@ public class DriverService  extends Service {
     }
 
 
-
-
     public double GetDistanceFromLatLonInKm(double lat1, double lon1, double lat2, double lon2) {
         final int R = 6371;
         // Radius of the earth in km
@@ -550,16 +545,16 @@ public class DriverService  extends Service {
         // Distance in km
         return d;
     }
-    private double deg2rad(double deg)
-    {
+
+    private double deg2rad(double deg) {
         return deg * (Math.PI / 180);
     }
-
 
 
     private class LocationChangedTask extends AsyncTask<Location, Integer, String> {
         SharedPreferences prefs;
         String userId;
+
         // Runs in UI before background thread is called
         @Override
         protected void onPreExecute() {
@@ -569,22 +564,20 @@ public class DriverService  extends Service {
             // Do something like display a progress bar
         }
 
-
         // This is run in a background thread
         @Override
         protected String doInBackground(Location... params) {
             Location location = params[0];
-            if(userLoc != null) {
-                double distance = GetDistanceFromLatLonInKm(userLoc.latitude, userLoc.longitude,
-                        location.getLatitude(), location.getLongitude());
-                if(distance < 0.1)
+            if (userLoc != null) {
+                double distance = GetDistanceFromLatLonInKm(userLoc.latitude, userLoc.longitude, location.getLatitude(), location.getLongitude());
+                if (distance < 0.1)
                     return "";
             }
 
             userLoc = new LatLng(location.getLatitude(), location.getLongitude());
             final SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
             String online = prefs.getString("online", "0");
-            if(userId != null && online.equals("1")) {
+            if (userId != null && online.equals("1")) {
                 geoFire.setLocation(userId, new GeoLocation(userLoc.latitude, userLoc.longitude), new GeoFire.CompletionListener() {
                     @Override
                     public void onComplete(String key, DatabaseError error) {
@@ -593,8 +586,9 @@ public class DriverService  extends Service {
                 });
                 driverPickupRequests.child(userId).onDisconnect().removeValue();
                 driverLcoationDatabase.child(userId).onDisconnect().removeValue();
-            }else{
-                driverLcoationDatabase.child(userId).removeValue();
+            } else {
+                if (userId != null)
+                    driverLcoationDatabase.child(userId).removeValue();
             }
 
             return "this string is passed to onPostExecute";
@@ -618,12 +612,12 @@ public class DriverService  extends Service {
     }
 
 
-
     public void getLastLocation() {
         // Get last known recent location using new Google Play Services SDK (v11+)
         FusedLocationProviderClient locationClient = getFusedLocationProviderClient(this);
 
-        if(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED) {
             locationClient.getLastLocation()
                     .addOnSuccessListener(new OnSuccessListener<Location>() {
                         @Override
@@ -643,8 +637,6 @@ public class DriverService  extends Service {
                     });
         }
     }
-
-
 
 
 }

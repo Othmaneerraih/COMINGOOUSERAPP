@@ -1,4 +1,4 @@
-package com.comingoodriver.tahae.comingoodriver;
+package com.comingoo.driver.fousa;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;

@@ -1,4 +1,4 @@
-    package comingoo.vone.tahae.comingoodriver;
+    package com.comingoo.driver.fousa;
 
     import android.content.Intent;
     import android.net.Uri;
@@ -22,7 +22,7 @@
     import com.google.firebase.database.DatabaseReference;
     import com.google.firebase.database.FirebaseDatabase;
     import com.google.firebase.database.ValueEventListener;
-    import com.crashlytics.android.Crashlytics;
+
     import io.fabric.sdk.android.Fabric;
 
     import java.util.HashMap;

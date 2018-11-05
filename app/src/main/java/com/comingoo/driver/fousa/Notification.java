@@ -1,4 +1,4 @@
-package comingoo.vone.tahae.comingoodriver;
+package com.comingoo.driver.fousa;
 
 public class Notification {
     String title, content;

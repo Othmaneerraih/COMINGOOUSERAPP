@@ -1,4 +1,4 @@
-package comingoo.vone.tahae.comingoodriver;
+package com.comingoo.driver.fousa;
 
 import android.content.Intent;
 import android.content.SharedPreferences;

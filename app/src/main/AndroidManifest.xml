@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="comingoo.vone.tahae.comingoodriver">
+    package="com.comingoo.driver.fousa">
 
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
@@ -38,10 +38,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
         <service
-            android:name=".DriverService"
+            android:name="com.comingoo.driver.fousa.DriverService"
             android:exported="false" />
         <service
-            android:name=".CourseService"
+            android:name="com.comingoo.driver.fousa.CourseService"
             android:exported="false" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -62,7 +62,7 @@
 
 
         <activity
-            android:name=".MapsActivity"
+            android:name="com.comingoo.driver.fousa.MapsActivity"
             android:label="@string/title_activity_maps">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -71,37 +71,37 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".commandActivity"
+            android:name="com.comingoo.driver.fousa.commandActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait" >
 
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name="com.comingoo.driver.fousa.MainActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".loginActivity"
+            android:name="com.comingoo.driver.fousa.loginActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".historiqueActivity"
+            android:name="com.comingoo.driver.fousa.historiqueActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".notificationActivity"
+            android:name="com.comingoo.driver.fousa.notificationActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".aideActivity"
+            android:name="com.comingoo.driver.fousa.aideActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".comingoonuActivity"
+            android:name="com.comingoo.driver.fousa.comingoonuActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
-        <activity android:name=".VoipCallingActivity"
+        <activity android:name="com.comingoo.driver.fousa.VoipCallingActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait"></activity>
     </application>
