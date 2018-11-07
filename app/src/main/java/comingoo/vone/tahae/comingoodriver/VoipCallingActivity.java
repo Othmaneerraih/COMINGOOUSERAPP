@@ -246,7 +246,12 @@ public class VoipCallingActivity extends AppCompatActivity {
             callState.setText("connected");
             iv_mute.setVisibility(View.VISIBLE);
             iv_loud.setVisibility(View.VISIBLE);
+            iv_recv_call_voip_one.setVisibility(View.GONE);
             setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
+
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) iv_cancel_call_voip_one.getLayoutParams();
+            params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+
         }
 
         @Override
@@ -256,6 +261,11 @@ public class VoipCallingActivity extends AppCompatActivity {
             iv_mute.setVisibility(View.VISIBLE);
             iv_loud.setVisibility(View.VISIBLE);
             caller_name.setTypeface(null, Typeface.BOLD);
+            iv_recv_call_voip_one.setVisibility(View.GONE);
+
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) iv_cancel_call_voip_one.getLayoutParams();
+            params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+
             callState.setText("ringing");
         }
 
