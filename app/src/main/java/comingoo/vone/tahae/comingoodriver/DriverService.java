@@ -260,7 +260,6 @@ public class DriverService extends Service {
 
                     if (commandActivity.mp != null) {
                         commandActivity.countDownTimer.cancel();
-                        commandActivity.mp.stop();
                         commandActivity.mp.release();
                         commandActivity.vibrator.cancel();
                         commandActivity.clientR.finish();
@@ -305,7 +304,6 @@ public class DriverService extends Service {
                             if (!dataSnapshot.exists()) {
                                 commandActivity.countDownTimer.cancel();
                                 if (commandActivity.mp != null) {
-                                    commandActivity.mp.stop();
                                     commandActivity.mp.release();
                                     commandActivity.vibrator.cancel();
                                 }

@@ -267,8 +267,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 public void onClick(View v) {
                     if (clientPhoneNumber != null) {
                         try {
+                            String callNumber = clientPhoneNumber;
+                            if(callNumber.contains("+212")){
+                                callNumber.replace("+212","");
+                            }
+
                             Intent intent = new Intent(Intent.ACTION_DIAL);
-                            intent.setData(Uri.parse("tel:"+ clientPhoneNumber));
+                            intent.setData(Uri.parse("tel:"+ callNumber));
                             startActivity(intent);
                         } catch (NullPointerException e) {
                             e.printStackTrace();
@@ -596,6 +601,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     callState.setText("connected");
                     iv_mute.setVisibility(View.VISIBLE);
                     iv_loud.setVisibility(View.VISIBLE);
+                    iv_recv_call_voip_one.setVisibility(View.GONE);
+
+                    RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) iv_cancel_call_voip_one.getLayoutParams();
+                    params.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
+                    params.setMargins(0,0,250,60);
                     mp.stop();
                 }
 
@@ -609,6 +619,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     iv_loud.setVisibility(View.VISIBLE);
                     caller_name.setTypeface(null, Typeface.BOLD);
                     callState.setText("ringing");
+                    iv_recv_call_voip_one.setVisibility(View.GONE);
+
+                    RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) iv_cancel_call_voip_one.getLayoutParams();
+                    params.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
+                    params.setMargins(0,0,250,60);
                     mp.stop();
                 }
 
