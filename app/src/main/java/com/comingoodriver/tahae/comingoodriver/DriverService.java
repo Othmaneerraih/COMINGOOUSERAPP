@@ -47,7 +47,6 @@ public class DriverService  extends Service {
     private String userId;
 
 
-
     private List<String> requestUsersID;
     private List<String> requestUsersLocation;
     private List<String> startingText;
@@ -61,12 +60,10 @@ public class DriverService  extends Service {
     private List<String> fixedPrice;
 
 
-
     private boolean isRunning = false;
     private Runnable runnable;
 
     private static final long INTERVAL = 1000 * 2;
-
 
     private int  counterHolder;
 
@@ -105,7 +102,6 @@ public class DriverService  extends Service {
             // Do something like display a progress bar
         }
 
-        // This is run in a background thread
         @Override
         protected String doInBackground(String... params) {
 
@@ -188,8 +184,6 @@ public class DriverService  extends Service {
         // This is run in a background thread
         @Override
         protected String doInBackground(String... params) {
-
-
 
 
 
@@ -581,7 +575,8 @@ public class DriverService  extends Service {
         protected String doInBackground(Location... params) {
             Location location = params[0];
             if(userLoc != null) {
-                double distance = GetDistanceFromLatLonInKm(userLoc.latitude, userLoc.longitude, location.getLatitude(), location.getLongitude());
+                double distance = GetDistanceFromLatLonInKm(userLoc.latitude, userLoc.longitude,
+                        location.getLatitude(), location.getLongitude());
                 if(distance < 0.1)
                     return "";
             }
