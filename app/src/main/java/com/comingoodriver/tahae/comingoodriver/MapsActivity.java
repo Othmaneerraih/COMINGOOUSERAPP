@@ -264,6 +264,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 switchOnlineUI();
             }
         });
+
         onlineButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
