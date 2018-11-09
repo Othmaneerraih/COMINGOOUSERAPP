@@ -73,7 +73,6 @@
         android:text="" />
 
    <LinearLayout
-       android:id="@+id/onGoing_call_layout"
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
        android:orientation="horizontal"

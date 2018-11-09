@@ -8,6 +8,37 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:110092112807:android:db8ee609a4660a74",
+        "android_client_info": {
+          "package_name": "com.comingoo.driver.fousa"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "110092112807-ta91f895d1blett3cck3olf12cfrt14q.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB0PttyPj3rIaKkYN7YhNhmYjQod-8Joj0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:110092112807:android:ac9a3d95952d6ca5",
         "android_client_info": {
           "package_name": "com.comingoodriver.tahae.comingoodrivertwo"
@@ -42,6 +73,13 @@
             {
               "client_id": "110092112807-ta91f895d1blett3cck3olf12cfrt14q.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "110092112807-jtn8cpmq3n5g88ei1417dm4d56b272bp.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.comingoo.comingoouser"
+              }
             }
           ]
         },
@@ -86,6 +124,13 @@
             {
               "client_id": "110092112807-ta91f895d1blett3cck3olf12cfrt14q.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "110092112807-jtn8cpmq3n5g88ei1417dm4d56b272bp.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.comingoo.comingoouser"
+              }
             }
           ]
         },
@@ -119,55 +164,27 @@
           }
         },
         {
-          "client_id": "110092112807-ta91f895d1blett3cck3olf12cfrt14q.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyB0PttyPj3rIaKkYN7YhNhmYjQod-8Joj0"
-        }
-      ],
-      "services": {
-        "analytics_service": {
-          "status": 1
-        },
-        "appinvite_service": {
-          "status": 2,
-          "other_platform_oauth_client": [
-            {
-              "client_id": "110092112807-ta91f895d1blett3cck3olf12cfrt14q.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        },
-        "ads_service": {
-          "status": 2
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:110092112807:android:2c2a1a439167cf9c",
-        "android_client_info": {
-          "package_name": "comingoo.vone.tahae.comingoodriver"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "110092112807-k19r0sud48vt9iqi8c6andpi8s2pa2vr.apps.googleusercontent.com",
+          "client_id": "110092112807-m5p5f9tdtqf6isq76q4e70f65qgvg8sr.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "comingoo.vone.tahae.comingoodriver",
-            "certificate_hash": "fb990c43a3f790df0f0a6ca946a6db0dbd71d488"
+            "package_name": "comingoo.one.user.comingoouser",
+            "certificate_hash": "b51264dd565f104b85a63bd20e7559962afc82dc"
           }
         },
         {
-          "client_id": "110092112807-35l3m7n9am8cllpu7r0i7vvu02lpugga.apps.googleusercontent.com",
+          "client_id": "110092112807-0ba3o8lgejecrm63mrc8a6bnjleea98u.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "comingoo.vone.tahae.comingoodriver",
-            "certificate_hash": "0472d8667b27f76f01008238e8d72c4de075831c"
+            "package_name": "comingoo.one.user.comingoouser",
+            "certificate_hash": "998c32bdc15115dc3bb658c051b5eb611d17707f"
+          }
+        },
+        {
+          "client_id": "110092112807-o6lvggft15j4bkgl5vklt80up9h8pr5r.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "comingoo.one.user.comingoouser",
+            "certificate_hash": "b5b09259426b0446a13335b727ce9f0d258d00fc"
           }
         },
         {
@@ -190,6 +207,13 @@
             {
               "client_id": "110092112807-ta91f895d1blett3cck3olf12cfrt14q.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "110092112807-jtn8cpmq3n5g88ei1417dm4d56b272bp.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.comingoo.comingoouser"
+              }
             }
           ]
         },

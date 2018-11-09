@@ -171,7 +171,6 @@
             app:layout_constraintTop_toBottomOf="@+id/constraintLayout14" />
 
         <android.support.constraint.ConstraintLayout
-            android:id="@+id/constraintLayout8"
             android:layout_width="fill_parent"
             android:layout_height="100dp"
             android:layout_marginBottom="20dp"
