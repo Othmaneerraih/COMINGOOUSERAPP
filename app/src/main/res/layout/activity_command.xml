@@ -33,7 +33,6 @@
 
 
             <com.comingoo.driver.fousa.RoundedLayout
-                android:id="@+id/maplayout"
                 android:layout_width="150dp"
                 android:layout_height="150dp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -163,7 +162,6 @@
         </LinearLayout>
 
         <ImageView
-            android:id="@+id/imageView"
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:layout_marginStart="8dp"

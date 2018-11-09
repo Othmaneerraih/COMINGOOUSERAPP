@@ -11,7 +11,6 @@
     app:edPosition="1">
 
     <android.support.constraint.ConstraintLayout
-        android:id="@+id/contentLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="visible">
@@ -30,7 +29,6 @@
             tools:context=".MapsActivity" />
 
         <android.support.constraint.ConstraintLayout
-            android:id="@+id/topFade"
             android:layout_width="match_parent"
             android:layout_height="64dp"
             android:background="@drawable/transp_fade_inverse"
@@ -42,7 +40,6 @@
         </android.support.constraint.ConstraintLayout>
 
         <android.support.constraint.ConstraintLayout
-            android:id="@+id/bottomFade"
             android:layout_width="fill_parent"
             android:layout_height="100dp"
             android:background="@drawable/transp_fade"
@@ -521,12 +518,10 @@
 
     <!--menu-->
     <com.mxn.soul.flowingdrawer_core.FlowingMenuLayout
-        android:id="@+id/menulayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <FrameLayout
-            android:id="@+id/id_container_menu"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
@@ -612,7 +607,6 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
-                    android:id="@+id/textView7"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="20dp"
@@ -760,7 +754,6 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
-                    android:id="@+id/textView12"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="20dp"
