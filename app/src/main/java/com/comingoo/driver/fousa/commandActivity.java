@@ -160,6 +160,7 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
             @Override
             public void onClick(View view) {
                 FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
+                commandActivity.this.finish();
             }
         });
 
@@ -281,7 +282,7 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
                                 }
                             }
                         }
-//                        commandActivity.this.finish();
+                        commandActivity.this.finish();
                     }
 
                     @Override
