@@ -473,7 +473,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     if (!VoipCallingActivity.activity.isFinishing())
                         VoipCallingActivity.activity.finish();
                 showDialog(MapsActivity.this, call);
-            } catch (Exception e) {
+            }catch (NullPointerException e){
+                e.printStackTrace();
+            } catch(Exception e) {
                 e.printStackTrace();
             }
         }
