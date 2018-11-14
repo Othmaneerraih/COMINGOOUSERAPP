@@ -258,13 +258,6 @@ public class DriverService extends Service {
                         return;
                     }
 
-                    if (commandActivity.mp != null) {
-                        commandActivity.countDownTimer.cancel();
-                        commandActivity.mp.release();
-                        commandActivity.vibrator.cancel();
-                        commandActivity.clientR.finish();
-                    }
-
                     final Intent intent = new Intent(DriverService.this, commandActivity.class);
 
                     intent.putExtra("userId", userId);
@@ -307,7 +300,7 @@ public class DriverService extends Service {
                                     commandActivity.mp.release();
                                     commandActivity.vibrator.cancel();
                                 }
-                                commandActivity.clientR.finish();
+//                                commandActivity.clientR.finish();
                                 counter++;
                                 checkStop = true;
                                 checkHandler.removeCallbacks(checkRunnable);
@@ -321,12 +314,20 @@ public class DriverService extends Service {
                         }
                     });
 
+                    if (commandActivity.mp != null) {
+                        commandActivity.countDownTimer.cancel();
+                        commandActivity.mp.release();
+                        commandActivity.vibrator.cancel();
+                        commandActivity.clientR.finish();
+                    }
 
                     checkRunnable = new Runnable() {
                         @Override
                         public void run() {
                             if (counter < requestUsersID.size()) {
-                                final DatabaseReference clientRequetFollow = FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(requestUsersID.get(counter));
+                                final DatabaseReference clientRequetFollow =
+                                        FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").
+                                                child(userId).child(requestUsersID.get(counter));
                                 clientRequetFollow.addValueEventListener(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
