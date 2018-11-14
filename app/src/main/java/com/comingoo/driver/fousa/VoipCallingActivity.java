@@ -89,7 +89,8 @@ public class VoipCallingActivity extends AppCompatActivity {
         caller_name.setText(callerName+ " vous appelle");
         tv_name_voip_one.setText(callerName);
         if(clientImage != null ){
-            Picasso.get().load(clientImage).fit().centerCrop().into(iv_user_image_voip_one);
+            if (!clientImage.isEmpty())
+            Picasso.get().load(clientImage).into(iv_user_image_voip_one);
         }
         sinchClient = Sinch.getSinchClientBuilder()
                 .context(this)
@@ -172,8 +173,6 @@ public class VoipCallingActivity extends AppCompatActivity {
         });
 
         startTimer();
-
-
     }
 
     private void startTimer() {

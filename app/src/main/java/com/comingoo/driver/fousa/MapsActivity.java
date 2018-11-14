@@ -513,7 +513,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         public void onIncomingCall(CallClient callClient, Call incomingCall) {
             call = incomingCall;
             Toast.makeText(MapsActivity.this, "incoming call", Toast.LENGTH_SHORT).show();
-            showDialog(MapsActivity.this,call);
+            try {
+                showDialog(MapsActivity.this, call);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
     }
 
@@ -573,7 +577,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
         iv_recv_call_voip_one.setOnClickListener(new View.OnClickListener() {
-
 
             class SinchCallListener implements CallListener {
                 @Override
@@ -666,12 +669,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
 
-
         final Window window = dialog.getWindow();
         window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
         window.setGravity(Gravity.CENTER);
         dialog.show();
-
 
     }
 
