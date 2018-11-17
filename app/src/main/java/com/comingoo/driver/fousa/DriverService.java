@@ -295,11 +295,11 @@ public class DriverService extends Service {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             if (!dataSnapshot.exists()) {
-                                commandActivity.countDownTimer.cancel();
-                                if (commandActivity.mp != null) {
-                                    commandActivity.mp.release();
-                                    commandActivity.vibrator.cancel();
-                                }
+//                                commandActivity.countDownTimer.cancel();
+//                                if (commandActivity.mp != null) {
+//                                    commandActivity.mp.release();
+//                                    commandActivity.vibrator.cancel();
+//                                }
 //                                commandActivity.clientR.finish();
                                 counter++;
                                 checkStop = true;
@@ -314,12 +314,12 @@ public class DriverService extends Service {
                         }
                     });
 
-                    if (commandActivity.mp != null) {
-                        commandActivity.countDownTimer.cancel();
-                        commandActivity.mp.release();
-                        commandActivity.vibrator.cancel();
-                        commandActivity.clientR.finish();
-                    }
+//                    if (commandActivity.mp != null) {
+////                        commandActivity.countDownTimer.cancel();
+//                        commandActivity.mp.release();
+//                        commandActivity.vibrator.cancel();
+////                        commandActivity.clientR.finish();
+//                    }
 
                     checkRunnable = new Runnable() {
                         @Override

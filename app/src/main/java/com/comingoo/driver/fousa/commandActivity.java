@@ -2,6 +2,7 @@ package com.comingoo.driver.fousa;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -12,6 +13,8 @@ import android.os.CountDownTimer;
 import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
@@ -71,8 +74,8 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
 
         vibrator = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
 
-        long[] pattern = { 0, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500};
-        vibrator.vibrate(pattern , 0);
+        long[] pattern = {0, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500};
+        vibrator.vibrate(pattern, 0);
 
         mp = MediaPlayer.create(this, R.raw.ring);
         mp.start();
@@ -110,34 +113,34 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
 
         FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").
                 addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.hasChild(clientID)) {
-                    FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(clientID)
-                            .addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                    if (dataSnapshot.exists()) {
-                                        int size = (int) dataSnapshot.getChildrenCount();
-                                        if (size > 0) {
-                                            clientType = "bon";
-                                        } else clientType = "new";
-                                    }
-                                }
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.hasChild(clientID)) {
+                            FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(clientID)
+                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                            if (dataSnapshot.exists()) {
+                                                int size = (int) dataSnapshot.getChildrenCount();
+                                                if (size > 0) {
+                                                    clientType = "bon";
+                                                } else clientType = "new";
+                                            }
+                                        }
 
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError databaseError) {
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                                }
-                            });
-                }
-            }
+                                        }
+                                    });
+                        }
+                    }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
 
-            }
-        });
+                    }
+                });
 
         if (clientType.equalsIgnoreCase("bon")) {
             barTimer.setProgressDrawable(getResources().getDrawable(R.drawable.drawable_new_client));
@@ -309,11 +312,14 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
             public void onTick(long leftTimeInMilliseconds) {
                 long seconds = leftTimeInMilliseconds / 1000;
                 barTimer.setProgress((int) seconds);
+                if (seconds == 0) {
+                    showCustomDialog();
+                }
             }
 
             @Override
             public void onFinish() {
-                showCustomDialog();
+//                showCustomDialog(getApplicationContext());
             }
         }.start();
 
@@ -325,8 +331,8 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
 //        BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.person_green);
         int height = 150;
         int width = 80;
-        BitmapDrawable bitmapdraw=(BitmapDrawable)getResources().getDrawable(R.drawable.person_green);
-        Bitmap b=bitmapdraw.getBitmap();
+        BitmapDrawable bitmapdraw = (BitmapDrawable) getResources().getDrawable(R.drawable.person_green);
+        Bitmap b = bitmapdraw.getBitmap();
         Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
 
         MarkerOptions markerOptions = new MarkerOptions().position(latLng)
@@ -340,14 +346,15 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
 
-     AlertDialog.Builder dialogBuilder;
-     AlertDialog OptionDialog;
+    AlertDialog.Builder dialogBuilder;
+    AlertDialog OptionDialog;
+
     public void showCustomDialog() {
-         dialogBuilder = new AlertDialog.Builder(commandActivity.this);
+        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(commandActivity.this);
         LayoutInflater inflater = this.getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.content_misses_ride_request, null);
         dialogBuilder.setView(dialogView);
-         OptionDialog = dialogBuilder.create();
+        final AlertDialog OptionDialog = dialogBuilder.create();
         Button btnOk = dialogView.findViewById(R.id.btn_passer_hors);
         btnOk.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -365,16 +372,48 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
                 finish();
             }
         });
-        AlertDialog alertDialog = dialogBuilder.create();
-        alertDialog.show();
+
+        OptionDialog.show();
+        dialogBuilder.show();
     }
+
+//    public void showCustomDialog(final Context context) {
+//        final Dialog dialog = new Dialog(context);
+//        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+//        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//        View dialogView = inflater.inflate(R.layout.content_misses_ride_request, null, false);
+//        Button btnOk = dialogView.findViewById(R.id.btn_passer_hors);
+//        btnOk.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                dialog.dismiss();
+//                FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
+//            }
+//        });
+//
+//        Button btnCancel = dialogView.findViewById(R.id.btn_rester_engine);
+//        btnCancel.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                dialog.dismiss();
+//                finish();
+//            }
+//        });
+//
+//        dialog.setContentView(dialogView);
+////        final Window window = dialog.getWindow();
+////        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+////        window.setBackgroundDrawableResource(R.color.colorTransparent);
+////        window.setGravity(Gravity.CENTER);
+//        dialog.show();
+//    }
 
     @Override
     public void onStop() {
         super.onStop();
         active = false;
-        if (OptionDialog != null)
-        OptionDialog.dismiss();
+//        if (OptionDialog != null)
+//            OptionDialog.dismiss();
     }
 
 }
