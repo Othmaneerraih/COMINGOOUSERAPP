@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -76,6 +77,14 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
 
         mp = MediaPlayer.create(this, R.raw.ring);
         mp.start();
+
+        AudioManager am = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+
+        switch (am.getRingerMode()) {
+            case AudioManager.RINGER_MODE_SILENT:
+                vibrator.cancel();
+                break;
+        }
 
 
         mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
