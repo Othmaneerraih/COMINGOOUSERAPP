@@ -168,6 +168,23 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         distance.setText("5 min /" + dist + "km");
         startText.setText("De : " + intent.getStringExtra("start"));
 
+//        final DatabaseReference pickupRequest = FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId)/*.child(clientID)*/;
+//
+//        pickupRequest.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                if (!dataSnapshot.exists()) {
+//                    commandActivity.this.finish();
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//            }
+//        });
+
+
         decline.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -177,10 +194,11 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         });
 
         FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").
-                child(userId).addValueEventListener(new ValueEventListener() {
+                child(userId).child(clientID).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (!dataSnapshot.exists()) {
+                    commandActivity.this.finish();
                 }
             }
 
@@ -294,6 +312,7 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
                                 }
                             }
                         }
+                        MapsActivity.wazeButton.setVisibility(View.VISIBLE);
                         commandActivity.this.finish();
                     }
 
@@ -322,7 +341,11 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
                 long seconds = leftTimeInMilliseconds / 1000;
                 barTimer.setProgress((int) seconds);
                 if (seconds == 0) {
-                    showCustomDialog();
+                    try {
+                        showCustomDialog(commandActivity.this);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
                 }
             }
 
@@ -355,47 +378,20 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
 
-    AlertDialog.Builder dialogBuilder;
-    AlertDialog OptionDialog;
-
-    public void showCustomDialog() {
-        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(commandActivity.this);
-        LayoutInflater inflater = this.getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.content_misses_ride_request, null);
-        dialogBuilder.setView(dialogView);
-        final AlertDialog OptionDialog = dialogBuilder.create();
-        Button btnOk = dialogView.findViewById(R.id.btn_passer_hors);
-        btnOk.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                OptionDialog.dismiss();
-                FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
-            }
-        });
-
-        Button btnCancel = dialogView.findViewById(R.id.btn_rester_engine);
-        btnCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                OptionDialog.dismiss();
-                finish();
-            }
-        });
-
-        OptionDialog.show();
-        dialogBuilder.show();
-    }
-
-//    public void showCustomDialog(final Context context) {
-//        final Dialog dialog = new Dialog(context);
-//        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-//        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//        View dialogView = inflater.inflate(R.layout.content_misses_ride_request, null, false);
+//    AlertDialog.Builder dialogBuilder;
+//    AlertDialog OptionDialog;
+//
+//    public void showCustomDialog() {
+//        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(commandActivity.this);
+//        LayoutInflater inflater = this.getLayoutInflater();
+//        View dialogView = inflater.inflate(R.layout.content_misses_ride_request, null);
+//        dialogBuilder.setView(dialogView);
+//        final AlertDialog OptionDialog = dialogBuilder.create();
 //        Button btnOk = dialogView.findViewById(R.id.btn_passer_hors);
 //        btnOk.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View view) {
-//                dialog.dismiss();
+//                OptionDialog.dismiss();
 //                FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
 //            }
 //        });
@@ -404,18 +400,45 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
 //        btnCancel.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View view) {
-//                dialog.dismiss();
+//                OptionDialog.dismiss();
 //                finish();
 //            }
 //        });
 //
-//        dialog.setContentView(dialogView);
-////        final Window window = dialog.getWindow();
-////        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
-////        window.setBackgroundDrawableResource(R.color.colorTransparent);
-////        window.setGravity(Gravity.CENTER);
-//        dialog.show();
+//        OptionDialog.show();
+//        dialogBuilder.show();
 //    }
+
+    public void showCustomDialog(final Context context) {
+        final Dialog dialog = new Dialog(context);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View dialogView = inflater.inflate(R.layout.content_misses_ride_request, null, false);
+        Button btnOk = dialogView.findViewById(R.id.btn_passer_hors);
+        btnOk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+                FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
+            }
+        });
+
+        Button btnCancel = dialogView.findViewById(R.id.btn_rester_engine);
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+                finish();
+            }
+        });
+
+        dialog.setContentView(dialogView);
+//        final Window window = dialog.getWindow();
+//        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+//        window.setBackgroundDrawableResource(R.color.colorTransparent);
+//        window.setGravity(Gravity.CENTER);
+        dialog.show();
+    }
 
     @Override
     public void onStop() {

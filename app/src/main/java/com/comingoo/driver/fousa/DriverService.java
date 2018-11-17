@@ -295,12 +295,12 @@ public class DriverService extends Service {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             if (!dataSnapshot.exists()) {
-//                                commandActivity.countDownTimer.cancel();
-//                                if (commandActivity.mp != null) {
-//                                    commandActivity.mp.release();
-//                                    commandActivity.vibrator.cancel();
-//                                }
-//                                commandActivity.clientR.finish();
+                                commandActivity.countDownTimer.cancel();
+                                commandActivity.clientR.finish();
+                                if (commandActivity.mp != null) {
+                                    commandActivity.mp.release();
+                                    commandActivity.vibrator.cancel();
+                                }
                                 counter++;
                                 checkStop = true;
                                 checkHandler.removeCallbacks(checkRunnable);
@@ -313,13 +313,6 @@ public class DriverService extends Service {
                         public void onCancelled(@NonNull DatabaseError databaseError) {
                         }
                     });
-
-//                    if (commandActivity.mp != null) {
-////                        commandActivity.countDownTimer.cancel();
-//                        commandActivity.mp.release();
-//                        commandActivity.vibrator.cancel();
-////                        commandActivity.clientR.finish();
-//                    }
 
                     checkRunnable = new Runnable() {
                         @Override
@@ -337,6 +330,7 @@ public class DriverService extends Service {
 
                                             clientRequetFollow.removeValue();
                                             clientRequetFollow.removeEventListener(this);
+
                                         }
                                     }
 
@@ -350,7 +344,7 @@ public class DriverService extends Service {
 
                     };
 
-                    checkHandler.postDelayed(checkRunnable, 15000); // Optional, to repeat the task.
+                    checkHandler.postDelayed(checkRunnable, 17000); // Optional, to repeat the task.
                 }
             };
 
