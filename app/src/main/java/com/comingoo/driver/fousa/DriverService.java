@@ -176,7 +176,6 @@ public class DriverService extends Service {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-
         }
 
         // This is run in a background thread
@@ -321,12 +320,24 @@ public class DriverService extends Service {
                                 final DatabaseReference clientRequetFollow =
                                         FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").
                                                 child(userId).child(requestUsersID.get(counter));
+
                                 clientRequetFollow.addValueEventListener(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                        if (dataSnapshot.exists() && !requestUsersID.get(counter).equals("-1") && requestUsersID.get(counter).equals(requestUsersID.get(counter))) {
-                                            if (requestUsersID.size() > 1)
+                                        if (dataSnapshot.exists() && !requestUsersID.get(counter).equals("-1")
+                                                && requestUsersID.get(counter).equals(requestUsersID.get(counter))) {
+
+                                            if (requestUsersID.size() > 1) {
                                                 requestUsersID.set(counter, "-1");
+                                            }
+                                            if (commandActivity.active) {
+                                                commandActivity.countDownTimer.cancel();
+                                                if (commandActivity.mp != null) {
+                                                    commandActivity.mp.release();
+                                                    commandActivity.vibrator.cancel();
+                                                }
+                                                commandActivity.clientR.finish();
+                                            }
 
                                             clientRequetFollow.removeValue();
                                             clientRequetFollow.removeEventListener(this);
@@ -339,6 +350,15 @@ public class DriverService extends Service {
 
                                     }
                                 });
+                            } else {
+                                if (commandActivity.active) {
+                                    commandActivity.countDownTimer.cancel();
+                                    commandActivity.clientR.finish();
+                                    if (commandActivity.mp != null) {
+                                        commandActivity.mp.release();
+                                        commandActivity.vibrator.cancel();
+                                    }
+                                }
                             }
                         }
 
@@ -350,6 +370,7 @@ public class DriverService extends Service {
 
             if (userId == null)
                 return "";
+
             DatabaseReference PickupDatabase = FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId);
             PickupDatabase.addValueEventListener(new ValueEventListener() {
                 @Override
@@ -361,6 +382,7 @@ public class DriverService extends Service {
                         arrivalText.clear();
                         userLevel.clear();
                     }
+
                     List<String> holder = new ArrayList<>();
 
                     for (DataSnapshot data : dataSnapshot.getChildren()) {
@@ -398,6 +420,7 @@ public class DriverService extends Service {
                             }
                         }
                     }
+
                     if (isRunning) {
                         for (int i = 0; i < requestUsersID.size(); i++) {
                             if (!idInList(requestUsersID.get(i), holder)) {
@@ -405,7 +428,17 @@ public class DriverService extends Service {
                             }
 
                         }
+                    } else {
+                        if (commandActivity.active) {
+                            commandActivity.countDownTimer.cancel();
+                            commandActivity.clientR.finish();
+                            if (commandActivity.mp != null) {
+                                commandActivity.mp.release();
+                                commandActivity.vibrator.cancel();
+                            }
+                        }
                     }
+
                     //handler.removeCallbacks(runnable);
                     if (requestUsersID.size() > 0 && !isRunning) {
                         runnable.run();
@@ -443,8 +476,6 @@ public class DriverService extends Service {
 
     @Override
     public int onStartCommand(final Intent intent, int flags, int startId) {
-
-
         new CheckDebtTask().execute();
         new DriverServiceTask().execute();
 

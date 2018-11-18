@@ -209,6 +209,7 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         });
 
         startTimer();
+
         accept.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
