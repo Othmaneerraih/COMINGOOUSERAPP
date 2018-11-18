@@ -86,6 +86,7 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         switch (am.getRingerMode()) {
             case AudioManager.RINGER_MODE_SILENT:
                 vibrator.cancel();
+                mp.stop();
                 break;
         }
 
