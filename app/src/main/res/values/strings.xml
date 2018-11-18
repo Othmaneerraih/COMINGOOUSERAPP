@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Fousa</string>
     <string name="title_activity_maps">Fousa</string>
+    <string name="txt_not_enough_money">Not enough money to recharge</string>
 </resources>
