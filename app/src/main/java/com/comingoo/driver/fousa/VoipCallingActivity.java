@@ -3,6 +3,7 @@ package com.comingoo.driver.fousa;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.media.AudioManager;
 import android.os.CountDownTimer;
@@ -69,6 +70,10 @@ public class VoipCallingActivity extends AppCompatActivity {
         iv_loud = (CircleImageView)findViewById(R.id.iv_loud);
         tv_name_voip_one = (TextView)findViewById(R.id.tv_name_voip_one);
 
+        iv_loud.setBackgroundColor(Color.WHITE);
+        iv_loud.setCircleBackgroundColor(Color.WHITE);
+        iv_mute.setBackgroundColor(Color.WHITE);
+        iv_mute.setCircleBackgroundColor(Color.WHITE);
 
         iv_recv_call_voip_one.setVisibility(View.GONE);
         iv_mute.setVisibility(View.GONE);

@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
+    android:background="@android:color/white"
     android:layout_height="match_parent">
 
     <ImageView
@@ -52,7 +53,7 @@
                 android:layout_width="70dp"
                 android:layout_height="70dp"
                 android:layout_centerInParent="true"
-                android:background="@drawable/round_outline"
+                android:background="@android:color/transparent"
                 android:src="@drawable/name_cnu"
                 app:civ_border_color="#85050c61"
                 app:civ_border_width="10dp" />
@@ -74,11 +75,13 @@
         android:visibility="gone" />
 
     <LinearLayout
+        android:id="@+id/onGoing_call_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/image_layout"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="15dp"
+        android:background="@android:color/transparent"
+        android:layout_marginTop="55dp"
         android:orientation="horizontal">
 
         <de.hdodenhof.circleimageview.CircleImageView
@@ -87,15 +90,16 @@
             android:layout_height="50dp"
             android:layout_alignParentBottom="true"
             android:layout_marginRight="20dp"
+            android:background="@android:color/transparent"
             android:src="@drawable/mute_bt"
             app:civ_border_color="@android:color/darker_gray"
             app:civ_border_width="5dp" />
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/iv_loud"
+            android:background="@android:color/transparent"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:layout_marginBottom="@dimen/txt_size_large"
             android:src="@drawable/speaker_bt"
             app:civ_border_color="@android:color/darker_gray"
             app:civ_border_width="5dp" />

@@ -122,22 +122,18 @@ public class CourseService extends Service implements GoogleApiClient.Connection
         protected void onPreExecute() {
             super.onPreExecute();
             isFixed = false;
-
         }
 
         // This is run in a background thread
         @Override
         protected String doInBackground(String... params) {
 
-
             SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
             userId = prefs.getString("userId", null);
             courseID = prefs.getString("courseID", null);
-            ;
 
             if (userId == null)
                 thisService.stopSelf();
-
 
             startPos = null;
             endPos = null;
