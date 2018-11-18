@@ -1660,14 +1660,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 new DrawRouteTask().execute(userLatLng, drawRouteStart);
 
                 wazeButton.setVisibility(View.VISIBLE);
-                wazeButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        openWaze(drawRouteStart);
-                    }
-                });
+
 
             }
+            wazeButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    openWaze(drawRouteStart);
+                }
+            });
         }
 
         if (courseState.equals("1")) {
@@ -1697,17 +1698,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             if (drawRouteArrival != null && drawRouteStart != null) {
                 new DrawRouteTask().execute(drawRouteStart, drawRouteArrival);
-
                 wazeButton.setVisibility(View.VISIBLE);
-                wazeButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        openWaze(drawRouteArrival);
-                    }
-                });
-
             }
 
+            wazeButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    openWaze(drawRouteArrival);
+                }
+            });
         }
 
         userInfoLayout.setBackgroundColor(Color.WHITE);
