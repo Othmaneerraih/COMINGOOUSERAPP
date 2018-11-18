@@ -2,16 +2,20 @@ package com.comingoo.driver.fousa;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
@@ -71,11 +75,19 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
 
         vibrator = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
 
-        long[] pattern = { 0, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500};
-        vibrator.vibrate(pattern , 0);
+        long[] pattern = {0, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500};
+        vibrator.vibrate(pattern, 0);
 
         mp = MediaPlayer.create(this, R.raw.ring);
         mp.start();
+
+        AudioManager am = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+
+        switch (am.getRingerMode()) {
+            case AudioManager.RINGER_MODE_SILENT:
+                vibrator.cancel();
+                break;
+        }
 
 
         mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -110,34 +122,34 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
 
         FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").
                 addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.hasChild(clientID)) {
-                    FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(clientID)
-                            .addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                    if (dataSnapshot.exists()) {
-                                        int size = (int) dataSnapshot.getChildrenCount();
-                                        if (size > 0) {
-                                            clientType = "bon";
-                                        } else clientType = "new";
-                                    }
-                                }
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.hasChild(clientID)) {
+                            FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(clientID)
+                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                            if (dataSnapshot.exists()) {
+                                                int size = (int) dataSnapshot.getChildrenCount();
+                                                if (size > 0) {
+                                                    clientType = "bon";
+                                                } else clientType = "new";
+                                            }
+                                        }
 
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError databaseError) {
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                                }
-                            });
-                }
-            }
+                                        }
+                                    });
+                        }
+                    }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
 
-            }
-        });
+                    }
+                });
 
         if (clientType.equalsIgnoreCase("bon")) {
             barTimer.setProgressDrawable(getResources().getDrawable(R.drawable.drawable_new_client));
@@ -156,6 +168,23 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         distance.setText("5 min /" + dist + "km");
         startText.setText("De : " + intent.getStringExtra("start"));
 
+//        final DatabaseReference pickupRequest = FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId)/*.child(clientID)*/;
+//
+//        pickupRequest.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                if (!dataSnapshot.exists()) {
+//                    commandActivity.this.finish();
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//            }
+//        });
+
+
         decline.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -165,10 +194,11 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         });
 
         FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").
-                child(userId).addValueEventListener(new ValueEventListener() {
+                child(userId).child(clientID).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (!dataSnapshot.exists()) {
+                    commandActivity.this.finish();
                 }
             }
 
@@ -179,6 +209,7 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         });
 
         startTimer();
+
         accept.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -282,6 +313,7 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
                                 }
                             }
                         }
+                        MapsActivity.wazeButton.setVisibility(View.VISIBLE);
                         commandActivity.this.finish();
                     }
 
@@ -309,11 +341,18 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
             public void onTick(long leftTimeInMilliseconds) {
                 long seconds = leftTimeInMilliseconds / 1000;
                 barTimer.setProgress((int) seconds);
+                if (seconds == 0) {
+                    try {
+                        showCustomDialog(commandActivity.this);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
             }
 
             @Override
             public void onFinish() {
-                showCustomDialog();
+//                showCustomDialog(getApplicationContext());
             }
         }.start();
 
@@ -325,8 +364,8 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
 //        BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.person_green);
         int height = 150;
         int width = 80;
-        BitmapDrawable bitmapdraw=(BitmapDrawable)getResources().getDrawable(R.drawable.person_green);
-        Bitmap b=bitmapdraw.getBitmap();
+        BitmapDrawable bitmapdraw = (BitmapDrawable) getResources().getDrawable(R.drawable.person_green);
+        Bitmap b = bitmapdraw.getBitmap();
         Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
 
         MarkerOptions markerOptions = new MarkerOptions().position(latLng)
@@ -340,19 +379,47 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
 
-     AlertDialog.Builder dialogBuilder;
-     AlertDialog OptionDialog;
-    public void showCustomDialog() {
-         dialogBuilder = new AlertDialog.Builder(commandActivity.this);
-        LayoutInflater inflater = this.getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.content_misses_ride_request, null);
-        dialogBuilder.setView(dialogView);
-         OptionDialog = dialogBuilder.create();
+//    AlertDialog.Builder dialogBuilder;
+//    AlertDialog OptionDialog;
+//
+//    public void showCustomDialog() {
+//        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(commandActivity.this);
+//        LayoutInflater inflater = this.getLayoutInflater();
+//        View dialogView = inflater.inflate(R.layout.content_misses_ride_request, null);
+//        dialogBuilder.setView(dialogView);
+//        final AlertDialog OptionDialog = dialogBuilder.create();
+//        Button btnOk = dialogView.findViewById(R.id.btn_passer_hors);
+//        btnOk.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                OptionDialog.dismiss();
+//                FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
+//            }
+//        });
+//
+//        Button btnCancel = dialogView.findViewById(R.id.btn_rester_engine);
+//        btnCancel.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                OptionDialog.dismiss();
+//                finish();
+//            }
+//        });
+//
+//        OptionDialog.show();
+//        dialogBuilder.show();
+//    }
+
+    public void showCustomDialog(final Context context) {
+        final Dialog dialog = new Dialog(context);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View dialogView = inflater.inflate(R.layout.content_misses_ride_request, null, false);
         Button btnOk = dialogView.findViewById(R.id.btn_passer_hors);
         btnOk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                OptionDialog.dismiss();
+                dialog.dismiss();
                 FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
             }
         });
@@ -361,20 +428,25 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                OptionDialog.dismiss();
+                dialog.dismiss();
                 finish();
             }
         });
-        AlertDialog alertDialog = dialogBuilder.create();
-        alertDialog.show();
+
+        dialog.setContentView(dialogView);
+//        final Window window = dialog.getWindow();
+//        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+//        window.setBackgroundDrawableResource(R.color.colorTransparent);
+//        window.setGravity(Gravity.CENTER);
+        dialog.show();
     }
 
     @Override
     public void onStop() {
         super.onStop();
         active = false;
-        if (OptionDialog != null)
-        OptionDialog.dismiss();
+//        if (OptionDialog != null)
+//            OptionDialog.dismiss();
     }
 
 }
