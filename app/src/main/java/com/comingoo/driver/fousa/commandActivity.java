@@ -83,10 +83,18 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
 
         AudioManager am = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
 
-        switch (am.getRingerMode()) {
-            case AudioManager.RINGER_MODE_SILENT:
+        switch( am.getRingerMode() ){
+            case 0:
                 vibrator.cancel();
                 mp.stop();
+                break;
+            case 1:
+                vibrator.vibrate(pattern, 0);
+                mp.stop();
+                break;
+            case 2:
+                vibrator.vibrate(pattern, 0);
+                mp.start();
                 break;
         }
 
