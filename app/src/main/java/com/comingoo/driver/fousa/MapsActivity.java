@@ -265,12 +265,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     if (clientPhoneNumber != null) {
                         try {
                             String callNumber = clientPhoneNumber;
-                            if(callNumber.contains("+212")){
-                                callNumber.replace("+212","");
+                            if (callNumber.contains("+212")) {
+                                callNumber.replace("+212", "");
                             }
 
                             Intent intent = new Intent(Intent.ACTION_DIAL);
-                            intent.setData(Uri.parse("tel:"+ callNumber));
+                            intent.setData(Uri.parse("tel:" + callNumber));
                             startActivity(intent);
                         } catch (NullPointerException e) {
                             e.printStackTrace();
@@ -513,7 +513,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         public void onIncomingCall(CallClient callClient, Call incomingCall) {
             call = incomingCall;
             Toast.makeText(MapsActivity.this, "incoming call", Toast.LENGTH_SHORT).show();
-            showDialog(MapsActivity.this,call);
+            showDialog(MapsActivity.this, call);
         }
     }
 
@@ -525,18 +525,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         dialog.setContentView(view);
 
         final MediaPlayer mp;
-        final TextView callState,caller_name,tv_name_voip_one;
-        final CircleImageView iv_user_image_voip_one,iv_cancel_call_voip_one,iv_mute,iv_loud,iv_recv_call_voip_one;
+        final TextView callState, caller_name, tv_name_voip_one;
+        final CircleImageView iv_user_image_voip_one, iv_cancel_call_voip_one, iv_mute, iv_loud, iv_recv_call_voip_one;
 
-        iv_user_image_voip_one = (CircleImageView)dialog.findViewById(R.id.iv_user_image_voip_one);
-        iv_cancel_call_voip_one = (CircleImageView)dialog.findViewById(R.id.iv_cancel_call_voip_one);
-        iv_recv_call_voip_one = (CircleImageView)dialog.findViewById(R.id.iv_recv_call_voip_one);
-        caller_name = (TextView)dialog.findViewById(R.id.callerName);
-        callState = (TextView)dialog.findViewById(R.id.callState);
+        iv_user_image_voip_one = (CircleImageView) dialog.findViewById(R.id.iv_user_image_voip_one);
+        iv_cancel_call_voip_one = (CircleImageView) dialog.findViewById(R.id.iv_cancel_call_voip_one);
+        iv_recv_call_voip_one = (CircleImageView) dialog.findViewById(R.id.iv_recv_call_voip_one);
+        caller_name = (TextView) dialog.findViewById(R.id.callerName);
+        callState = (TextView) dialog.findViewById(R.id.callState);
 
-        iv_mute = (CircleImageView)dialog.findViewById(R.id.iv_mute);
-        iv_loud = (CircleImageView)dialog.findViewById(R.id.iv_loud);
-        tv_name_voip_one = (TextView)dialog.findViewById(R.id.tv_name_voip_one);
+        iv_mute = (CircleImageView) dialog.findViewById(R.id.iv_mute);
+        iv_loud = (CircleImageView) dialog.findViewById(R.id.iv_loud);
+        tv_name_voip_one = (TextView) dialog.findViewById(R.id.tv_name_voip_one);
 
 
         iv_mute.setVisibility(View.GONE);
@@ -553,12 +553,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         caller_name.setVisibility(View.VISIBLE);
-        caller_name.setTextSize(TypedValue.COMPLEX_UNIT_SP,16);
+        caller_name.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         caller_name.setTypeface(null, Typeface.NORMAL);      // for Normal Text
 
-        caller_name.setText(clientName+ " vous appelle");
+        caller_name.setText(clientName + " vous appelle");
         tv_name_voip_one.setText(clientName);
-        if(clientImageUri != null){
+        if (clientImageUri != null) {
             Picasso.get().load(clientImageUri).fit().centerCrop().into(iv_user_image_voip_one);
         }
 
@@ -602,7 +602,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) iv_cancel_call_voip_one.getLayoutParams();
                     params.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
-                    params.setMargins(0,0,250,60);
+                    params.setMargins(0, 0, 250, 60);
                     mp.stop();
                 }
 
@@ -610,8 +610,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 public void onCallProgressing(Call progressingCall) {
                     //call is ringing
                     dialog.findViewById(R.id.incoming_call_view).setVisibility(View.VISIBLE);
-                    caller_name.setText(progressingCall.getDetails().getDuration()+"");
-                    caller_name.setTextSize(TypedValue.COMPLEX_UNIT_SP,20);
+                    caller_name.setText(progressingCall.getDetails().getDuration() + "");
+                    caller_name.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
                     iv_mute.setVisibility(View.VISIBLE);
                     iv_loud.setVisibility(View.VISIBLE);
                     caller_name.setTypeface(null, Typeface.BOLD);
@@ -620,7 +620,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) iv_cancel_call_voip_one.getLayoutParams();
                     params.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
-                    params.setMargins(0,0,250,60);
+                    params.setMargins(0, 0, 250, 60);
                     mp.stop();
                 }
 
@@ -633,7 +633,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             @Override
             public void onClick(View v) {
-                if(call !=null){
+                if (call != null) {
                     mp.stop();
                     call.answer();
                     call.addCallListener(new SinchCallListener());
@@ -644,7 +644,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         iv_loud.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AudioManager audioManager =  (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+                AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
                 audioManager.setMode(AudioManager.MODE_IN_CALL);
                 audioManager.setSpeakerphoneOn(true);
             }
@@ -664,7 +664,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             }
         });
-
 
 
         final Window window = dialog.getWindow();
@@ -1509,9 +1508,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             }
 
-
-            startCourseService(courseID);
-            checkCourseState();
+            try {
+                startCourseService(courseID);
+                checkCourseState();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
 
@@ -1557,15 +1559,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (clientId != null || !clientId.isEmpty()) {
             FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(clientId).
                     addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    totalCourse.setText("Courses:" + dataSnapshot.getChildrenCount());
-                }
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            totalCourse.setText("Courses:" + dataSnapshot.getChildrenCount());
+                        }
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                }
-            });
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                        }
+                    });
         }
 
         if (clientImageUri != null) {
