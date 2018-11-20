@@ -1,7 +1,6 @@
 package com.comingoo.driver.fousa;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -14,8 +13,6 @@ import android.os.CountDownTimer;
 import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
@@ -44,7 +41,7 @@ import java.util.Map;
 
 public class commandActivity extends AppCompatActivity implements OnMapReadyCallback {
     public static Activity clientR;
-    private TextView name;
+    private TextView tvUserRating;
     private TextView distance;
     private TextView startText;
     private TextView arrivalText;
@@ -81,9 +78,9 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         mp = MediaPlayer.create(this, R.raw.ring);
         mp.start();
 
-        AudioManager am = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+        AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
-        switch( am.getRingerMode() ){
+        switch (am.getRingerMode()) {
             case 0:
                 vibrator.cancel();
                 mp.stop();
@@ -109,7 +106,7 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         });
 
 
-        // name  = (TextView) findViewById(R.id.textView10);
+        tvUserRating = (TextView) findViewById(R.id.textView10);
         distance = (TextView) findViewById(R.id.textView8);
         startText = (TextView) findViewById(R.id.textView9);
         decline = (Button) findViewById(R.id.decline);
@@ -122,7 +119,7 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
 
         double Dist = Double.parseDouble(intent.getStringExtra("distance"));
         int dist = (int) Dist;
-        clientID = intent.getStringExtra("name");
+        clientID = intent.getStringExtra("tvUserRating");
         userId = intent.getStringExtra("userId");
 
         double time = Double.parseDouble(intent.getStringExtra("distance")) * 1.5;
@@ -353,7 +350,7 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
                 if (seconds == 0) {
                     try {
                         showCustomDialog(commandActivity.this);
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
