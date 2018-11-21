@@ -119,7 +119,7 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
 
         double Dist = Double.parseDouble(intent.getStringExtra("distance"));
         int dist = (int) Dist;
-        clientID = intent.getStringExtra("tvUserRating");
+        clientID = intent.getStringExtra("name");
         userId = intent.getStringExtra("userId");
 
         double time = Double.parseDouble(intent.getStringExtra("distance")) * 1.5;
@@ -199,21 +199,24 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
             }
         });
 
-        FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").
-                child(userId).child(clientID).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (!dataSnapshot.exists()) {
-                    commandActivity.this.finish();
-                }
+        if (userId != null && clientID != null) {
+            if (!userId.isEmpty() && !clientID.isEmpty()) {
+                FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").
+                        child(userId).child(clientID).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (!dataSnapshot.exists()) {
+                            commandActivity.this.finish();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
             }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
+        }
         startTimer();
 
         accept.setOnClickListener(new View.OnClickListener() {
