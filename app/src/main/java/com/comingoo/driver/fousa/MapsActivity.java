@@ -763,7 +763,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-    int RATE = 0;
+    int RATE = 4;
     int cM = 0;
     boolean rideMorethanThree = false;
 
