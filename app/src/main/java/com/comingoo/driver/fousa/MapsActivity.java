@@ -91,8 +91,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -770,7 +772,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-    int RATE = 0;
+    int RATE = 4;
     int cM = 0;
     boolean rideMorethanThree = false;
 
@@ -809,6 +811,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         final Button star3 = (Button) dialog.findViewById(R.id.star3);
                                         final Button star4 = (Button) dialog.findViewById(R.id.star4);
                                         final Button star5 = (Button) dialog.findViewById(R.id.star5);
+
 
                                         final Button price = (Button) dialog.findViewById(R.id.button3);
 
@@ -874,30 +877,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                     }
                                                 });
 
-
-//                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").addListenerForSingleValueEvent(new ValueEventListener() {
-//                                    @Override
-//                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                                        if(dataSnapshot.exists()){
-//                                            if(dataSnapshot.getValue(String.class).equals("0")) {
-//                                                price.setText(dataSnapshott.child("price").getValue(String.class) + " MAD");
-//                                            }else{
-//                                                price.setText("0 MAD");
-//                                                charge.setVisibility(View.GONE);
-//                                                moneyAmount.setVisibility(View.GONE);
-//                                            }
-//                                        }else{
-//                                            price.setText(dataSnapshott.child("price").getValue(String.class) + " MAD");
-//                                        }
-//                                    }
-//
-//                                    @Override
-//                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//                                    }
-//                                });
-
-
                                         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                                             @Override
                                             public void onDismiss(DialogInterface dialog) {
@@ -908,10 +887,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         gotMoney.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View v) {
-                                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").removeValue();
-                                                dialog.dismiss();
+//                                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("rating").setValue(RATE);
+//                                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").removeValue();
+//                                        dialog.dismiss();
+
+
+                                                if (RATE > 0) {
+                                                    dialog.dismiss();
+                                                    FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("rating").child(Integer.toString(RATE)).addListenerForSingleValueEvent(new ValueEventListener() {
+                                                        @Override
+                                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                            int rating = Integer.parseInt(dataSnapshot.getValue(String.class)) + 1;
+                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("rating").child(Integer.toString(RATE)).setValue("" + rating);
+                                                        }
+
+                                                        @Override
+                                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                        }
+                                                    });
+                                                    FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").removeValue();
+                                                }
                                             }
                                         });
+
 
 //                                moneyAmount.addTextChangedListener(new TextWatcher() {
 //                                    @Override

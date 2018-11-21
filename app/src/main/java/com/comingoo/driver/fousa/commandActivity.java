@@ -38,10 +38,14 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+
+import static java.util.Objects.*;
 
 public class commandActivity extends AppCompatActivity implements OnMapReadyCallback {
     public static Activity clientR;
     private TextView tvUserRating;
+    private TextView ratingShow;
     private TextView distance;
     private TextView startText;
     private TextView arrivalText;
@@ -107,6 +111,7 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
 
 
         tvUserRating = (TextView) findViewById(R.id.textView10);
+        ratingShow  = (TextView) findViewById(R.id.rating_txt);
         distance = (TextView) findViewById(R.id.textView8);
         startText = (TextView) findViewById(R.id.textView9);
         decline = (Button) findViewById(R.id.decline);
@@ -124,6 +129,38 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
 
         double time = Double.parseDouble(intent.getStringExtra("distance")) * 1.5;
         distance.setText(intent.getStringExtra("distance") + "Km,  " + time + " min");
+
+        FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("rating").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(!dataSnapshot.getKey().isEmpty()){
+                    int oneStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("1").getValue(String.class)));
+                    int one = Integer.parseInt(requireNonNull(dataSnapshot.child("1").getValue(String.class)));
+                    int twoStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("2").getValue(String.class)));
+                    int two = Integer.parseInt(requireNonNull(dataSnapshot.child("2").getValue(String.class)))*2;
+                    int threeStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("3").getValue(String.class)));
+                    int three = Integer.parseInt(requireNonNull(dataSnapshot.child("3").getValue(String.class)))*3;
+                    int fourStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("4").getValue(String.class)));
+                    int four = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("4").getValue(String.class)))*4;
+                    int fiveStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("5").getValue(String.class)));
+                    int five = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("5").getValue(String.class)))*5;
+
+                    int totalRating = one+two+three+four+five;
+                    int totalRatingPerson = oneStarPerson+twoStarPerson+threeStarPerson+fourStarPerson+fiveStarPerson;
+
+                    int avgRating = totalRating/totalRatingPerson;
+                    ratingShow.setText(avgRating+"");
+                }else{
+                    ratingShow.setText(4.5+"");
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                ratingShow.setText(4.5+"");
+            }
+        });
 
 
         FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").
