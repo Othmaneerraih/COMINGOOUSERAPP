@@ -91,8 +91,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -900,9 +902,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 gotMoney.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("rating").setValue(RATE);
-                                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").removeValue();
-                                        dialog.dismiss();
+//                                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("rating").setValue(RATE);
+//                                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").removeValue();
+//                                        dialog.dismiss();
+
+
+                                        if (RATE > 0) {
+                                            dialog.dismiss();
+                                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("rating").child(Integer.toString(RATE)).addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                    int rating = Integer.parseInt(dataSnapshot.getValue(String.class)) + 1;
+                                                    FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("rating").child(Integer.toString(RATE)).setValue("" + rating);
+                                                }
+
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                }
+                                            });
+                                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").removeValue();
+                                        }
                                     }
                                 });
 
