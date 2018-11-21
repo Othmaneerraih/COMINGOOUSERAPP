@@ -44,7 +44,7 @@ import java.util.Map;
 
 public class commandActivity extends AppCompatActivity implements OnMapReadyCallback {
     public static Activity clientR;
-    private TextView name;
+    private TextView ratingShow;
     private TextView distance;
     private TextView startText;
     private TextView arrivalText;
@@ -109,7 +109,7 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         });
 
 
-        // name  = (TextView) findViewById(R.id.textView10);
+        ratingShow  = (TextView) findViewById(R.id.rating_txt);
         distance = (TextView) findViewById(R.id.textView8);
         startText = (TextView) findViewById(R.id.textView9);
         decline = (Button) findViewById(R.id.decline);
@@ -127,6 +127,21 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
 
         double time = Double.parseDouble(intent.getStringExtra("distance")) * 1.5;
         distance.setText(intent.getStringExtra("distance") + "Km,  " + time + " min");
+
+        FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).
+                addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.hasChild("rating")) {
+                            ratingShow.setText(""+dataSnapshot.child("rating").getValue(Long.class));
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
 
 
         FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").

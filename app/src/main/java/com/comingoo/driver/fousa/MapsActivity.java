@@ -795,7 +795,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 final Dialog dialog = new Dialog(MapsActivity.this);
                                 dialog.setContentView(R.layout.finished_course);
 
-                                Button dialogButton = (Button) dialog.findViewById(R.id.button);
+//                                Button dialogButton = (Button) dialog.findViewById(R.id.button);
                                 final Button star1 = (Button) dialog.findViewById(R.id.star1);
                                 final Button star2 = (Button) dialog.findViewById(R.id.star2);
                                 final Button star3 = (Button) dialog.findViewById(R.id.star3);
@@ -900,6 +900,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 gotMoney.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
+                                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("rating").setValue(RATE);
                                         FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").removeValue();
                                         dialog.dismiss();
                                     }
