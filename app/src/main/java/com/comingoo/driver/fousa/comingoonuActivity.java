@@ -50,10 +50,11 @@ public class comingoonuActivity extends AppCompatActivity {
 
     private ImageButton backAddCar;
 
-    private TextView todayEarnings, debt, courses, userName, phoneNumber;
+    private TextView tvTarrif, todayEarnings, debt, courses, userName, phoneNumber;
 
     private Button changePassBtn;
 
+    private ImageView ivTarifBack;
 
 
     private RecyclerView mLocationView;
@@ -66,7 +67,6 @@ public class comingoonuActivity extends AppCompatActivity {
 
     private ConstraintLayout tarifs;
     private ConstraintLayout tarifsLayout;
-
 
 
     @Override
@@ -89,6 +89,8 @@ public class comingoonuActivity extends AppCompatActivity {
         pA = (ConstraintLayout) findViewById(R.id.paLayout);
         pR = (ConstraintLayout) findViewById(R.id.prLayout);
         pO = (ConstraintLayout) findViewById(R.id.poLayout);
+
+        tvTarrif = findViewById(R.id.tv_tarrif);
 
         changePasswordButton = (ConstraintLayout) findViewById(R.id.change_password_button);
         backChangePassword = (ImageButton) findViewById(R.id.back_select_password);
@@ -122,15 +124,26 @@ public class comingoonuActivity extends AppCompatActivity {
 
         tarifs = (ConstraintLayout) findViewById(R.id.tarifs);
         tarifsLayout = (ConstraintLayout) findViewById(R.id.tarifsLayout);
+        ivTarifBack = findViewById(R.id.iv_back_tarifs);
 
         selectedScreen = 0;
         updateUI();
 
-
+        ivTarifBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                tarifsLayout.setVisibility(View.GONE);
+                ivTarifBack.setVisibility(View.GONE);
+                tvTarrif.setVisibility(View.GONE);
+                parametreLayout.setVisibility(View.VISIBLE);
+            }
+        });
 
         tarifs.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                tvTarrif.setVisibility(View.VISIBLE);
+                ivTarifBack.setVisibility(View.VISIBLE);
                 selectedScreen = 6;
                 updateUI();
             }
@@ -143,16 +156,14 @@ public class comingoonuActivity extends AppCompatActivity {
             }
         });
 
-
         SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
         String userId = prefs.getString("userId", null);
-
 
 
         mLocation = FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("CARS");
         mLocation.keepSynced(true);
 
-        carsData  = new ArrayList<>();
+        carsData = new ArrayList<>();
         mLocationView = (RecyclerView) findViewById(R.id.RecyclerView);
         mLocationView.setHasFixedSize(true);
         mLocationView.setLayoutManager(new LinearLayoutManager(this));
@@ -163,25 +174,22 @@ public class comingoonuActivity extends AppCompatActivity {
         new CheckUserTask().execute();
 
 
-
-
-
         String Month;
         String day;
         Month = getDateMonth(GetUnixTime());
-        day =  getDateDay(GetUnixTime());
-        if(Month.equals("01")) Month = "Janvier";
-        if(Month.equals("02")) Month = "Février";
-        if(Month.equals("03")) Month = "Mars";
-        if(Month.equals("04")) Month = "Avril";
-        if(Month.equals("05")) Month = "Mai";
-        if(Month.equals("06")) Month = "Juin";
-        if(Month.equals("07")) Month = "Juillet";
-        if(Month.equals("08")) Month = "Aout";
-        if(Month.equals("09")) Month = "Septembre";
-        if(Month.equals("10")) Month = "Octobre";
-        if(Month.equals("11")) Month = "Novembre";
-        if(Month.equals("12")) Month = "Décembre";
+        day = getDateDay(GetUnixTime());
+        if (Month.equals("01")) Month = "Janvier";
+        if (Month.equals("02")) Month = "Février";
+        if (Month.equals("03")) Month = "Mars";
+        if (Month.equals("04")) Month = "Avril";
+        if (Month.equals("05")) Month = "Mai";
+        if (Month.equals("06")) Month = "Juin";
+        if (Month.equals("07")) Month = "Juillet";
+        if (Month.equals("08")) Month = "Aout";
+        if (Month.equals("09")) Month = "Septembre";
+        if (Month.equals("10")) Month = "Octobre";
+        if (Month.equals("11")) Month = "Novembre";
+        if (Month.equals("12")) Month = "Décembre";
 
         TextView d = (TextView) findViewById(R.id.date);
         d.setText(Month + " " + day);
@@ -243,24 +251,24 @@ public class comingoonuActivity extends AppCompatActivity {
         pA.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                    selectedScreen = 0;
-                    updateUI();
+                selectedScreen = 0;
+                updateUI();
             }
         });
 
         pR.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                    selectedScreen = 1;
-                    updateUI();
+                selectedScreen = 1;
+                updateUI();
             }
         });
 
         pO.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                    selectedScreen = 5;
-                    updateUI();
+                selectedScreen = 5;
+                updateUI();
             }
         });
 
@@ -273,8 +281,8 @@ public class comingoonuActivity extends AppCompatActivity {
 
     }
 
-    private void addNewCar(String marque, String modele, String imm ,String colorCar){
-        if(marque.length() >= 3 && modele.length() >= 3 && imm.length() >= 3 && colorCar.length() >= 3 ){
+    private void addNewCar(String marque, String modele, String imm, String colorCar) {
+        if (marque.length() >= 3 && modele.length() >= 3 && imm.length() >= 3 && colorCar.length() >= 3) {
 
             String name = marque + " " + modele;
             String description = imm + " " + colorCar;
@@ -290,7 +298,7 @@ public class comingoonuActivity extends AppCompatActivity {
 
             selectedScreen = 4;
             updateUI();
-        }else{
+        } else {
             Toast.makeText(comingoonuActivity.this, "Tous les champs doivent étres remplis!!", Toast.LENGTH_SHORT).show();
         }
     }
@@ -298,6 +306,7 @@ public class comingoonuActivity extends AppCompatActivity {
     private class CheckUserTask extends AsyncTask<String, Integer, String> {
         SharedPreferences prefs;
         String userId;
+
         // Runs in UI before background thread is called
         @Override
         protected void onPreExecute() {
@@ -315,14 +324,14 @@ public class comingoonuActivity extends AppCompatActivity {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     carsData.clear();
-                    for(DataSnapshot data : dataSnapshot.getChildren()){
-                            Car newCar = new Car(
-                                    data.child("name").getValue(String.class),
-                                    data.child("description").getValue(String.class),
-                                    data.child("selected").getValue(String.class),
-                                    data.child("id").getValue(String.class)
-                            );
-                            carsData.add(newCar);
+                    for (DataSnapshot data : dataSnapshot.getChildren()) {
+                        Car newCar = new Car(
+                                data.child("name").getValue(String.class),
+                                data.child("description").getValue(String.class),
+                                data.child("selected").getValue(String.class),
+                                data.child("id").getValue(String.class)
+                        );
+                        carsData.add(newCar);
                     }
                     cAdapter.notifyDataSetChanged();
                 }
@@ -353,7 +362,7 @@ public class comingoonuActivity extends AppCompatActivity {
         }
     }
 
-    private void hideEverything(){
+    private void hideEverything() {
         parametreLayout.setVisibility(View.GONE);
         profileLayout.setVisibility(View.GONE);
         addCarLayout.setVisibility(View.GONE);
@@ -362,47 +371,49 @@ public class comingoonuActivity extends AppCompatActivity {
         portFeuilleLayout.setVisibility(View.GONE);
         tarifsLayout.setVisibility(View.GONE);
     }
-    private void toolBarUI(){
 
-        if(selectedScreen == 0 || selectedScreen == 6){
+    private void toolBarUI() {
+
+        if (selectedScreen == 0 || selectedScreen == 6) {
             paramsImage.setBackgroundResource(R.drawable.parametres_selected);
             profilImage.setBackgroundResource(R.drawable.profil_cnu);
             portFImage.setBackgroundResource(R.drawable.porte_feuille_unselected);
 
-        }else if(selectedScreen == 1 || selectedScreen == 2 ||selectedScreen == 3 || selectedScreen == 4){
+        } else if (selectedScreen == 1 || selectedScreen == 2 || selectedScreen == 3 || selectedScreen == 4) {
             paramsImage.setBackgroundResource(R.drawable.parametre_cnu);
             profilImage.setBackgroundResource(R.drawable.profil_selected);
             portFImage.setBackgroundResource(R.drawable.porte_feuille_unselected);
-        }else{
+        } else {
             paramsImage.setBackgroundResource(R.drawable.parametre_cnu);
             profilImage.setBackgroundResource(R.drawable.profil_cnu);
             portFImage.setBackgroundResource(R.drawable.porte_feuille_selected);
         }
 
     }
-    private void updateUI(){
+
+    private void updateUI() {
         hideEverything();
         toolBarUI();
-        switch(selectedScreen){
-            case 0 :
+        switch (selectedScreen) {
+            case 0:
                 CustomAnimation.fadeIn(comingoonuActivity.this, parametreLayout, 500, 10);
                 break;
-            case 1 :
+            case 1:
                 CustomAnimation.fadeIn(comingoonuActivity.this, profileLayout, 500, 10);
                 break;
-            case 2 :
+            case 2:
                 CustomAnimation.fadeIn(comingoonuActivity.this, addCarLayout, 500, 10);
                 break;
-            case 3 :
+            case 3:
                 CustomAnimation.fadeIn(comingoonuActivity.this, changePasswordLayout, 500, 10);
                 break;
-            case 4 :
+            case 4:
                 CustomAnimation.fadeIn(comingoonuActivity.this, carsLayout, 500, 10);
                 break;
-            case 5 :
+            case 5:
                 CustomAnimation.fadeIn(comingoonuActivity.this, portFeuilleLayout, 500, 10);
                 break;
-            case 6 :
+            case 6:
                 CustomAnimation.fadeIn(comingoonuActivity.this, tarifsLayout, 500, 10);
                 break;
         }
@@ -410,26 +421,26 @@ public class comingoonuActivity extends AppCompatActivity {
     }
 
 
-    private void updatePassword(final String oldPassword,final String newPassword,final String confirmPassword){
+    private void updatePassword(final String oldPassword, final String newPassword, final String confirmPassword) {
         changePassBtn.setVisibility(View.GONE);
         findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
-        if(newPassword.length() != 0 && confirmPassword.length() != 0){
+        if (newPassword.length() != 0 && confirmPassword.length() != 0) {
             SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
             final String userId = prefs.getString("userId", null);
             FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                    if(dataSnapshot.exists()){
+                    if (dataSnapshot.exists()) {
 
-                        if(oldPassword.equals(dataSnapshot.child("password").getValue(String.class))){
+                        if (oldPassword.equals(dataSnapshot.child("password").getValue(String.class))) {
                             Toast.makeText(comingoonuActivity.this, "Mot de passe changé!", Toast.LENGTH_SHORT).show();
                             FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("password").setValue(newPassword);
                             changePassBtn.setVisibility(View.VISIBLE);
                             findViewById(R.id.progressBar).setVisibility(View.GONE);
                             selectedScreen = 1;
                             updateUI();
-                        }else{
+                        } else {
                             Toast.makeText(comingoonuActivity.this, "Mot de passe erroné", Toast.LENGTH_SHORT).show();
                             changePassBtn.setVisibility(View.VISIBLE);
                             findViewById(R.id.progressBar).setVisibility(View.GONE);
@@ -444,7 +455,7 @@ public class comingoonuActivity extends AppCompatActivity {
             });
 
 
-        }else{
+        } else {
             Toast.makeText(comingoonuActivity.this, "Tous les champs doivent étres remplis!!", Toast.LENGTH_SHORT).show();
             changePassBtn.setVisibility(View.VISIBLE);
             findViewById(R.id.progressBar).setVisibility(View.GONE);
@@ -458,16 +469,18 @@ public class comingoonuActivity extends AppCompatActivity {
         String date = DateFormat.format("MM", cal).toString();
         return date;
     }
+
     private String getDateDay(long time) {
         Calendar cal = Calendar.getInstance(Locale.ENGLISH);
         cal.setTimeInMillis(time * 1000L);
         String date = DateFormat.format("dd", cal).toString();
         return date;
     }
-    public int GetUnixTime(){
+
+    public int GetUnixTime() {
         Calendar calendar = Calendar.getInstance();
         long now = calendar.getTimeInMillis();
-        int utc = (int)(now / 1000);
+        int utc = (int) (now / 1000);
         return (utc);
 
     }
@@ -505,7 +518,7 @@ public class comingoonuActivity extends AppCompatActivity {
         // Create new views (invoked by the layout manager)
         @Override
         public MyAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
-                                                                          int viewType) {
+                                                       int viewType) {
             // create a new view
             View v = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.cars_rows, parent, false);
@@ -522,9 +535,9 @@ public class comingoonuActivity extends AppCompatActivity {
 
             holder.carName.setText(newCar.getName());
             holder.carDesc.setText(newCar.getDescription());
-            if(newCar.getSelected().equals("1")){
+            if (newCar.getSelected().equals("1")) {
                 holder.selected.setBackgroundResource(R.drawable.selected_icon);
-            }else{
+            } else {
                 holder.selected.setBackgroundResource(R.drawable.unselected_icon);
             }
 
@@ -534,7 +547,7 @@ public class comingoonuActivity extends AppCompatActivity {
                     mLocation.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            for(DataSnapshot data : dataSnapshot.getChildren()){
+                            for (DataSnapshot data : dataSnapshot.getChildren()) {
                                 mLocation.child(data.getKey()).child("selected").setValue("0");
                             }
                             mLocation.child(newCar.getId()).child("selected").setValue("1");
@@ -556,8 +569,6 @@ public class comingoonuActivity extends AppCompatActivity {
             return mDataset.size();
         }
     }
-
-
 
 
 }

@@ -1,7 +1,6 @@
 package com.comingoo.driver.fousa;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -14,8 +13,6 @@ import android.os.CountDownTimer;
 import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
@@ -47,6 +44,7 @@ import static java.util.Objects.*;
 
 public class commandActivity extends AppCompatActivity implements OnMapReadyCallback {
     public static Activity clientR;
+    private TextView tvUserRating;
     private TextView ratingShow;
     private TextView distance;
     private TextView startText;
@@ -84,9 +82,9 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         mp = MediaPlayer.create(this, R.raw.ring);
         mp.start();
 
-        AudioManager am = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+        AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
-        switch( am.getRingerMode() ){
+        switch (am.getRingerMode()) {
             case 0:
                 vibrator.cancel();
                 mp.stop();
@@ -112,6 +110,7 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         });
 
 
+        tvUserRating = (TextView) findViewById(R.id.textView10);
         ratingShow  = (TextView) findViewById(R.id.rating_txt);
         distance = (TextView) findViewById(R.id.textView8);
         startText = (TextView) findViewById(R.id.textView9);
@@ -237,21 +236,24 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
             }
         });
 
-        FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").
-                child(userId).child(clientID).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (!dataSnapshot.exists()) {
-                    commandActivity.this.finish();
-                }
+        if (userId != null && clientID != null) {
+            if (!userId.isEmpty() && !clientID.isEmpty()) {
+                FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").
+                        child(userId).child(clientID).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (!dataSnapshot.exists()) {
+                            commandActivity.this.finish();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
             }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
+        }
         startTimer();
 
         accept.setOnClickListener(new View.OnClickListener() {
@@ -388,7 +390,7 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
                 if (seconds == 0) {
                     try {
                         showCustomDialog(commandActivity.this);
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
