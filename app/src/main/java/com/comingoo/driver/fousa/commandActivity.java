@@ -1,7 +1,6 @@
 package com.comingoo.driver.fousa;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -14,8 +13,6 @@ import android.os.CountDownTimer;
 import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
@@ -41,10 +38,14 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+
+import static java.util.Objects.*;
 
 public class commandActivity extends AppCompatActivity implements OnMapReadyCallback {
     public static Activity clientR;
-    private TextView name;
+    private TextView tvUserRating;
+    private TextView ratingShow;
     private TextView distance;
     private TextView startText;
     private TextView arrivalText;
@@ -79,18 +80,22 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         vibrator.vibrate(pattern, 0);
 
         mp = MediaPlayer.create(this, R.raw.ring);
+        mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
         mp.start();
 
-        AudioManager am = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+        final AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
-        switch( am.getRingerMode() ){
+        final int origionalVolume = am.getStreamVolume(AudioManager.STREAM_MUSIC);
+        am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
+
+        switch (am.getRingerMode()) {
             case 0:
                 vibrator.cancel();
-                mp.stop();
+                mp.start();
                 break;
             case 1:
                 vibrator.vibrate(pattern, 0);
-                mp.stop();
+                mp.start();
                 break;
             case 2:
                 vibrator.vibrate(pattern, 0);
@@ -105,11 +110,14 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
                 mp.stop();
                 mp.release();
                 vibrator.cancel();
+                am.setStreamVolume(AudioManager.STREAM_MUSIC, origionalVolume, 0);
+
             }
         });
 
 
-        // name  = (TextView) findViewById(R.id.textView10);
+        tvUserRating = (TextView) findViewById(R.id.textView10);
+        ratingShow = (TextView) findViewById(R.id.rating_txt);
         distance = (TextView) findViewById(R.id.textView8);
         startText = (TextView) findViewById(R.id.textView9);
         decline = (Button) findViewById(R.id.decline);
@@ -128,37 +136,86 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         double time = Double.parseDouble(intent.getStringExtra("distance")) * 1.5;
         distance.setText(intent.getStringExtra("distance") + "Km,  " + time + " min");
 
+        try {
+            FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("rating").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if (!dataSnapshot.getKey().isEmpty()) {
 
-        FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").
-                addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.hasChild(clientID)) {
-                            FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(clientID)
-                                    .addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                            if (dataSnapshot.exists()) {
-                                                int size = (int) dataSnapshot.getChildrenCount();
-                                                if (size > 0) {
-                                                    clientType = "bon";
-                                                } else clientType = "new";
-                                            }
-                                        }
+                        int oneStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("1").getValue(String.class)));
+                        int one = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("1").getValue(String.class)));
+                        int twoStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("2").getValue(String.class)));
+                        int two = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("2").getValue(String.class))) * 2;
+                        int threeStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("3").getValue(String.class)));
+                        int three = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("3").getValue(String.class))) * 3;
+                        int fourStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("4").getValue(String.class)));
+                        int four = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("4").getValue(String.class))) * 4;
+                        int fiveStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("5").getValue(String.class)));
+                        int five = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("5").getValue(String.class))) * 5;
 
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                        }
-                                    });
+                        double totalRating = one + two + three + four + five;
+                        double totalRatingPerson = oneStarPerson + twoStarPerson + threeStarPerson + fourStarPerson + fiveStarPerson;
+                    
+                        try {
+                            double avgRating = totalRating / totalRatingPerson;
+                            String avg = String.format("%.2f", avgRating);
+                            String newString = avg.replace(",", ".");
+                            ratingShow.setText(newString);
+                        } catch (ArithmeticException e) {
+                            e.printStackTrace();
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
+                    } else {
+                        ratingShow.setText(4.5 + "");
                     }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                }
 
-                    }
-                });
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    ratingShow.setText(4.5 + "");
+                }
+            });
+
+
+            FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").
+                    addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.hasChild(clientID)) {
+                                FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(clientID)
+                                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                if (dataSnapshot.exists()) {
+                                                    int size = (int) dataSnapshot.getChildrenCount();
+                                                    if (size > 0) {
+                                                        clientType = "bon";
+                                                    } else clientType = "new";
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                            }
+                                        });
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+        } catch (ArithmeticException e) {
+            e.printStackTrace();
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         if (clientType.equalsIgnoreCase("bon")) {
             barTimer.setProgressDrawable(getResources().getDrawable(R.drawable.drawable_new_client));
@@ -197,26 +254,30 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         decline.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                vibrator.cancel();
                 FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
                 commandActivity.this.finish();
             }
         });
 
-        FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").
-                child(userId).child(clientID).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (!dataSnapshot.exists()) {
-                    commandActivity.this.finish();
-                }
+        if (userId != null && clientID != null) {
+            if (!userId.isEmpty() && !clientID.isEmpty()) {
+                FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").
+                        child(userId).child(clientID).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (!dataSnapshot.exists()) {
+                            commandActivity.this.finish();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
             }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
+        }
         startTimer();
 
         accept.setOnClickListener(new View.OnClickListener() {
@@ -353,7 +414,7 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
                 if (seconds == 0) {
                     try {
                         showCustomDialog(commandActivity.this);
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }

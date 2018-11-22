@@ -166,7 +166,8 @@ public class VoipCallingActivity extends AppCompatActivity {
                     try{
 //                        if (call == null) {
                             call = sinchClient.getCallClient().callUser(clientId);
-                            call.addCallListener(new SinchCallListener());
+//                            call.addCallListener(new SinchCallListener());
+                        if (call != null) call.answer();
 //                        } else {
 //                            call.hangup();
 //                            iv_recv_call_voip_one.setVisibility(View.VISIBLE);
@@ -288,6 +289,7 @@ public class VoipCallingActivity extends AppCompatActivity {
         @Override
         public void onCallEstablished(Call establishedCall) {
             callState.setText("connected");
+            caller_name.setVisibility(View.VISIBLE);
             iv_mute.setVisibility(View.VISIBLE);
             iv_loud.setVisibility(View.VISIBLE);
             iv_recv_call_voip_one.setVisibility(View.GONE);
@@ -304,18 +306,19 @@ public class VoipCallingActivity extends AppCompatActivity {
 
         @Override
         public void onCallProgressing(Call progressingCall) {
-            caller_name.setText("0 : "+progressingCall.getDetails().getDuration()+"");
-            caller_name.setTextSize(TypedValue.COMPLEX_UNIT_SP,20);
-            iv_mute.setVisibility(View.VISIBLE);
-            iv_loud.setVisibility(View.VISIBLE);
-            caller_name.setTypeface(null, Typeface.BOLD);
-            iv_recv_call_voip_one.setVisibility(View.GONE);
+//            caller_name.setText("0 : "+progressingCall.getDetails().getDuration()+"");
+//            caller_name.setTextSize(TypedValue.COMPLEX_UNIT_SP,20);
+//            iv_mute.setVisibility(View.VISIBLE);
+//            iv_loud.setVisibility(View.VISIBLE);
+//            caller_name.setTypeface(null, Typeface.BOLD);
+//            iv_recv_call_voip_one.setVisibility(View.GONE);
 
-            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) iv_cancel_call_voip_one.getLayoutParams();
-            params.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
-            params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-            params.setMargins(0,0,450,60);
+//            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) iv_cancel_call_voip_one.getLayoutParams();
+//            params.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
+//            params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+//            params.setMargins(0,0,450,60);
 
+caller_name.setVisibility(View.GONE);
             callState.setText("ringing");
         }
 
@@ -329,7 +332,7 @@ public class VoipCallingActivity extends AppCompatActivity {
         public void onIncomingCall(CallClient callClient, Call incomingCall) {
             call = incomingCall;
             Toast.makeText(VoipCallingActivity.this, "incoming call", Toast.LENGTH_SHORT).show();
-            call.answer();
+//            call.answer();
             call.addCallListener(new SinchCallListener());
         }
     }
