@@ -136,73 +136,86 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         double time = Double.parseDouble(intent.getStringExtra("distance")) * 1.5;
         distance.setText(intent.getStringExtra("distance") + "Km,  " + time + " min");
 
-        FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("rating").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(!dataSnapshot.getKey().isEmpty()){
+        try {
+            FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("rating").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if (!dataSnapshot.getKey().isEmpty()) {
 
-                    int oneStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("1").getValue(String.class)));
-                    int one = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("1").getValue(String.class)));
-                    int twoStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("2").getValue(String.class)));
-                    int two = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("2").getValue(String.class))) * 2;
-                    int threeStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("3").getValue(String.class)));
-                    int three = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("3").getValue(String.class))) * 3;
-                    int fourStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("4").getValue(String.class)));
-                    int four = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("4").getValue(String.class))) * 4;
-                    int fiveStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("5").getValue(String.class)));
-                    int five = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("5").getValue(String.class))) * 5;
+                        int oneStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("1").getValue(String.class)));
+                        int one = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("1").getValue(String.class)));
+                        int twoStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("2").getValue(String.class)));
+                        int two = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("2").getValue(String.class))) * 2;
+                        int threeStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("3").getValue(String.class)));
+                        int three = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("3").getValue(String.class))) * 3;
+                        int fourStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("4").getValue(String.class)));
+                        int four = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("4").getValue(String.class))) * 4;
+                        int fiveStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("5").getValue(String.class)));
+                        int five = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("5").getValue(String.class))) * 5;
 
-                    double totalRating = one + two + three + four + five;
-                    double totalRatingPerson = oneStarPerson + twoStarPerson + threeStarPerson + fourStarPerson + fiveStarPerson;
+                        double totalRating = one + two + three + four + five;
+                        double totalRatingPerson = oneStarPerson + twoStarPerson + threeStarPerson + fourStarPerson + fiveStarPerson;
+                    
+                        try {
+                            double avgRating = totalRating / totalRatingPerson;
+                            String avg = String.format("%.2f", avgRating);
+                            String newString = avg.replace(",", ".");
+                            ratingShow.setText(newString);
+                        } catch (ArithmeticException e) {
+                            e.printStackTrace();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        ratingShow.setText(4.5 + "");
+                    }
 
-                    double avgRating = totalRating / totalRatingPerson;
-                    String avg = String.format("%.2f", avgRating);
-
-                    String newString = avg.replace(",", ".");
-                    ratingShow.setText(newString);
-                }else{
-                    ratingShow.setText(4.5+"");
                 }
 
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                ratingShow.setText(4.5+"");
-            }
-        });
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    ratingShow.setText(4.5 + "");
+                }
+            });
 
 
-        FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").
-                addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.hasChild(clientID)) {
-                            FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(clientID)
-                                    .addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                            if (dataSnapshot.exists()) {
-                                                int size = (int) dataSnapshot.getChildrenCount();
-                                                if (size > 0) {
-                                                    clientType = "bon";
-                                                } else clientType = "new";
+            FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").
+                    addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.hasChild(clientID)) {
+                                FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(clientID)
+                                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                if (dataSnapshot.exists()) {
+                                                    int size = (int) dataSnapshot.getChildrenCount();
+                                                    if (size > 0) {
+                                                        clientType = "bon";
+                                                    } else clientType = "new";
+                                                }
                                             }
-                                        }
 
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                                        }
-                                    });
+                                            }
+                                        });
+                            }
                         }
-                    }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                    }
-                });
+                        }
+                    });
+        } catch (ArithmeticException e) {
+            e.printStackTrace();
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         if (clientType.equalsIgnoreCase("bon")) {
             barTimer.setProgressDrawable(getResources().getDrawable(R.drawable.drawable_new_client));
