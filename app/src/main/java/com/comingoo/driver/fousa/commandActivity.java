@@ -117,7 +117,7 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
 
 
         tvUserRating = (TextView) findViewById(R.id.textView10);
-        ratingShow  = (TextView) findViewById(R.id.rating_txt);
+        ratingShow = (TextView) findViewById(R.id.rating_txt);
         distance = (TextView) findViewById(R.id.textView8);
         startText = (TextView) findViewById(R.id.textView9);
         decline = (Button) findViewById(R.id.decline);
