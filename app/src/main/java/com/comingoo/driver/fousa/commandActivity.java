@@ -87,11 +87,11 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         switch (am.getRingerMode()) {
             case 0:
                 vibrator.cancel();
-                mp.stop();
+                mp.start();
                 break;
             case 1:
                 vibrator.vibrate(pattern, 0);
-                mp.stop();
+                mp.start();
                 break;
             case 2:
                 vibrator.vibrate(pattern, 0);
