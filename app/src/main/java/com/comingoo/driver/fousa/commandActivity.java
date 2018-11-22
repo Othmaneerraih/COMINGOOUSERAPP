@@ -1,11 +1,12 @@
 package com.comingoo.driver.fousa;
 
 import android.app.Activity;
-import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -37,10 +38,14 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+
+import static java.util.Objects.*;
 
 public class commandActivity extends AppCompatActivity implements OnMapReadyCallback {
     public static Activity clientR;
-    private TextView name;
+    private TextView tvUserRating;
+    private TextView ratingShow;
     private TextView distance;
     private TextView startText;
     private TextView arrivalText;
@@ -71,11 +76,28 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
 
         vibrator = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
 
-        long[] pattern = { 0, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500};
-        vibrator.vibrate(pattern , 0);
+        long[] pattern = {0, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500};
+        vibrator.vibrate(pattern, 0);
 
         mp = MediaPlayer.create(this, R.raw.ring);
         mp.start();
+
+        AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+
+        switch (am.getRingerMode()) {
+            case 0:
+                vibrator.cancel();
+                mp.start();
+                break;
+            case 1:
+                vibrator.vibrate(pattern, 0);
+                mp.start();
+                break;
+            case 2:
+                vibrator.vibrate(pattern, 0);
+                mp.start();
+                break;
+        }
 
 
         mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -88,7 +110,8 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         });
 
 
-        // name  = (TextView) findViewById(R.id.textView10);
+        tvUserRating = (TextView) findViewById(R.id.textView10);
+        ratingShow = (TextView) findViewById(R.id.rating_txt);
         distance = (TextView) findViewById(R.id.textView8);
         startText = (TextView) findViewById(R.id.textView9);
         decline = (Button) findViewById(R.id.decline);
@@ -107,38 +130,82 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         double time = Double.parseDouble(intent.getStringExtra("distance")) * 1.5;
         distance.setText(intent.getStringExtra("distance") + "Km,  " + time + " min");
 
+        try {
+            FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("rating").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if (!dataSnapshot.getKey().isEmpty()) {
+                        int oneStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("1").getValue(String.class)));
+                        int one = Integer.parseInt(requireNonNull(dataSnapshot.child("1").getValue(String.class)));
+                        int twoStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("2").getValue(String.class)));
+                        int two = Integer.parseInt(requireNonNull(dataSnapshot.child("2").getValue(String.class))) * 2;
+                        int threeStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("3").getValue(String.class)));
+                        int three = Integer.parseInt(requireNonNull(dataSnapshot.child("3").getValue(String.class))) * 3;
+                        int fourStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("4").getValue(String.class)));
+                        int four = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("4").getValue(String.class))) * 4;
+                        int fiveStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("5").getValue(String.class)));
+                        int five = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("5").getValue(String.class))) * 5;
 
-        FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").
-                addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.hasChild(clientID)) {
-                    FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(clientID)
-                            .addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                    if (dataSnapshot.exists()) {
-                                        int size = (int) dataSnapshot.getChildrenCount();
-                                        if (size > 0) {
-                                            clientType = "bon";
-                                        } else clientType = "new";
-                                    }
-                                }
+                        int totalRating = one + two + three + four + five;
+                        int totalRatingPerson = oneStarPerson + twoStarPerson + threeStarPerson + fourStarPerson + fiveStarPerson;
+                        try {
+                            int avgRating = (totalRating / totalRatingPerson);
+                            ratingShow.setText(avgRating + "");
+                        } catch (ArithmeticException e) {
+                            e.printStackTrace();
+                        } catch (Exception e) {
+                            e.printStackTrace();♠
+                        }
+                    } else {
+                        ratingShow.setText(4.5 + "");
+                    }
 
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                }
-                            });
                 }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    ratingShow.setText(4.5 + "");
+                }
+            });
 
-            }
-        });
+            FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").
+                    addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.hasChild(clientID)) {
+                                FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(clientID)
+                                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                if (dataSnapshot.exists()) {
+                                                    int size = (int) dataSnapshot.getChildrenCount();
+                                                    if (size > 0) {
+                                                        clientType = "bon";
+                                                    } else clientType = "new";
+                                                }
+                                            }
 
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                            }
+                                        });
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+
+        } catch (ArithmeticException e) {
+            e.printStackTrace();
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         if (clientType.equalsIgnoreCase("bon")) {
             barTimer.setProgressDrawable(getResources().getDrawable(R.drawable.drawable_new_client));
         } else {
@@ -156,28 +223,51 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         distance.setText("5 min /" + dist + "km");
         startText.setText("De : " + intent.getStringExtra("start"));
 
+//        final DatabaseReference pickupRequest = FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId)/*.child(clientID)*/;
+//
+//        pickupRequest.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                if (!dataSnapshot.exists()) {
+//                    commandActivity.this.finish();
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//            }
+//        });
+
+
         decline.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
+                commandActivity.this.finish();
             }
         });
 
-        FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").
-                child(userId).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (!dataSnapshot.exists()) {
-                }
+        if (userId != null && clientID != null) {
+            if (!userId.isEmpty() && !clientID.isEmpty()) {
+                FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").
+                        child(userId).child(clientID).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (!dataSnapshot.exists()) {
+                            commandActivity.this.finish();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
             }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
+        }
         startTimer();
+
         accept.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -281,7 +371,8 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
                                 }
                             }
                         }
-//                        commandActivity.this.finish();
+                        MapsActivity.wazeButton.setVisibility(View.VISIBLE);
+                        commandActivity.this.finish();
                     }
 
                     @Override
@@ -308,11 +399,18 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
             public void onTick(long leftTimeInMilliseconds) {
                 long seconds = leftTimeInMilliseconds / 1000;
                 barTimer.setProgress((int) seconds);
+                if (seconds == 0) {
+                    try {
+                        showCustomDialog(commandActivity.this);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
             }
 
             @Override
             public void onFinish() {
-                showCustomDialog();
+//                showCustomDialog(getApplicationContext());
             }
         }.start();
 
@@ -324,8 +422,8 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
 //        BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.person_green);
         int height = 150;
         int width = 80;
-        BitmapDrawable bitmapdraw=(BitmapDrawable)getResources().getDrawable(R.drawable.person_green);
-        Bitmap b=bitmapdraw.getBitmap();
+        BitmapDrawable bitmapdraw = (BitmapDrawable) getResources().getDrawable(R.drawable.person_green);
+        Bitmap b = bitmapdraw.getBitmap();
         Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
 
         MarkerOptions markerOptions = new MarkerOptions().position(latLng)
@@ -339,19 +437,47 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
 
-     AlertDialog.Builder dialogBuilder;
-     AlertDialog OptionDialog;
-    public void showCustomDialog() {
-         dialogBuilder = new AlertDialog.Builder(commandActivity.this);
-        LayoutInflater inflater = this.getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.content_misses_ride_request, null);
-        dialogBuilder.setView(dialogView);
-         OptionDialog = dialogBuilder.create();
+//    AlertDialog.Builder dialogBuilder;
+//    AlertDialog OptionDialog;
+//
+//    public void showCustomDialog() {
+//        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(commandActivity.this);
+//        LayoutInflater inflater = this.getLayoutInflater();
+//        View dialogView = inflater.inflate(R.layout.content_misses_ride_request, null);
+//        dialogBuilder.setView(dialogView);
+//        final AlertDialog OptionDialog = dialogBuilder.create();
+//        Button btnOk = dialogView.findViewById(R.id.btn_passer_hors);
+//        btnOk.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                OptionDialog.dismiss();
+//                FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
+//            }
+//        });
+//
+//        Button btnCancel = dialogView.findViewById(R.id.btn_rester_engine);
+//        btnCancel.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                OptionDialog.dismiss();
+//                finish();
+//            }
+//        });
+//
+//        OptionDialog.show();
+//        dialogBuilder.show();
+//    }
+
+    public void showCustomDialog(final Context context) {
+        final Dialog dialog = new Dialog(context);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View dialogView = inflater.inflate(R.layout.content_misses_ride_request, null, false);
         Button btnOk = dialogView.findViewById(R.id.btn_passer_hors);
         btnOk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                OptionDialog.dismiss();
+                dialog.dismiss();
                 FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
             }
         });
@@ -360,20 +486,25 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                OptionDialog.dismiss();
+                dialog.dismiss();
                 finish();
             }
         });
-        AlertDialog alertDialog = dialogBuilder.create();
-        alertDialog.show();
+
+        dialog.setContentView(dialogView);
+//        final Window window = dialog.getWindow();
+//        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+//        window.setBackgroundDrawableResource(R.color.colorTransparent);
+//        window.setGravity(Gravity.CENTER);
+        dialog.show();
     }
 
     @Override
     public void onStop() {
         super.onStop();
         active = false;
-        if (OptionDialog != null)
-        OptionDialog.dismiss();
+//        if (OptionDialog != null)
+//            OptionDialog.dismiss();
     }
 
 }

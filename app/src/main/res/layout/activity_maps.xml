@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.mxn.soul.flowingdrawer_core.FlowingDrawer xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:com.github.rjsvieira="http://schemas.android.com/tools"
     android:id="@+id/drawerlayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -235,18 +236,17 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
 
-
             <android.support.constraint.ConstraintLayout
+                android:id="@+id/constraint_user_info"
                 android:layout_width="match_parent"
-                android:layout_height="170dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
                 android:layout_marginStart="8dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginRight="8dp"
-                android:layout_marginBottom="8dp"
-                android:layout_alignParentBottom="true"
+                android:layout_marginBottom="28dp"
                 android:visibility="visible"
-                android:background="@android:color/white"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent">
@@ -254,26 +254,38 @@
                 <android.support.constraint.ConstraintLayout
                     android:id="@+id/constraintLayout"
                     android:layout_width="match_parent"
-                    android:layout_height="120dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:layout_marginLeft="8dp"
+                    android:padding="10dp"
                     android:layout_marginTop="8dp"
-                    android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
-                    android:elevation="10dp"
                     android:background="@android:color/white"
+                    android:elevation="10dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent">
 
-                    <de.hdodenhof.circleimageview.CircleImageView
+                    <!--<com.github.rjsvieira:circularView-->
+                    <!--android:id="@+id/clientImage"-->
+                    <!--android:layout_width="70dp"-->
+                    <!--android:layout_height="70dp"-->
+                    <!--android:layout_marginStart="8dp"-->
+                    <!--android:layout_marginLeft="8dp"-->
+                    <!--android:layout_marginTop="8dp"-->
+                    <!--android:layout_marginBottom="8dp"-->
+                    <!--android:src="@color/colorPrimary"-->
+                    <!--app:layout_constraintBottom_toBottomOf="parent"-->
+                    <!--app:layout_constraintStart_toStartOf="parent"-->
+                    <!--app:layout_constraintTop_toTopOf="parent" />-->
+
+                    <com.mikhaellopez.circularimageview.CircularImageView
                         android:id="@+id/clientImage"
-                        android:layout_width="70dp"
-                        android:layout_height="70dp"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginBottom="8dp"
+                        android:layout_width="90dp"
+                        android:layout_height="90dp"
                         android:src="@color/colorPrimary"
+                        app:civ_border_width="1dp"
+                        app:civ_shadow="true"
+                        app:civ_shadow_radius="2"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
@@ -306,8 +318,8 @@
                         android:layout_marginStart="16dp"
                         android:layout_marginLeft="16dp"
                         android:layout_marginTop="4dp"
-                        android:textStyle="bold"
                         android:text="Derniére course :"
+                        android:textStyle="bold"
                         app:layout_constraintStart_toEndOf="@+id/clientImage"
                         app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
@@ -364,8 +376,8 @@
                         android:layout_marginTop="32dp"
                         android:layout_marginEnd="16dp"
                         android:layout_marginRight="16dp"
-                        android:src="@drawable/cancel_x"
                         android:background="@drawable/rectangle_blue"
+                        android:src="@drawable/cancel_x"
                         android:visibility="gone"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
@@ -389,7 +401,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/online_button"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginBottom="8dp"
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/constraintLayout">
@@ -398,20 +413,20 @@
                         android:id="@+id/iv_course_action"
                         android:layout_width="30dp"
                         android:layout_height="30dp"
-                        android:clickable="false"
                         android:layout_centerVertical="true"
                         android:layout_marginLeft="15dp"
-                        android:src="@drawable/cancel_x"
-                        android:background="@drawable/online_button"/>
+                        android:background="@drawable/online_button"
+                        android:clickable="false"
+                        android:src="@drawable/cancel_x" />
 
                     <View
                         android:id="@+id/view"
                         android:layout_width="1dp"
                         android:layout_height="35dp"
                         android:layout_centerVertical="true"
-                        android:background="@android:color/white"
+                        android:layout_marginLeft="20dp"
                         android:layout_toRightOf="@+id/iv_course_action"
-                        android:layout_marginLeft="20dp"/>
+                        android:background="@android:color/white" />
 
                     <Button
                         android:id="@+id/course_action_button"
@@ -420,18 +435,17 @@
                         android:layout_marginStart="40dp"
                         android:layout_marginLeft="40dp"
                         android:layout_marginEnd="8dp"
-                        android:clickable="false"
                         android:layout_marginRight="8dp"
                         android:layout_toRightOf="@+id/view"
-                        android:elevation="10dp"
                         android:background="@color/transp"
+                        android:clickable="false"
+                        android:elevation="10dp"
                         android:gravity="left|center_vertical"
                         android:text="Appuyez pour arriver"
                         android:textAllCaps="false"
                         android:textColor="@android:color/white" />
                 </RelativeLayout>
             </android.support.constraint.ConstraintLayout>
-
 
             <LinearLayout
                 android:id="@+id/voip_view"
@@ -463,7 +477,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:background="@android:color/black" />
-
 
                 <TextView
                     android:id="@+id/tv_appelle_voip"
@@ -515,8 +528,6 @@
 
     </android.support.constraint.ConstraintLayout>
 
-
-    <!--menu-->
     <com.mxn.soul.flowingdrawer_core.FlowingMenuLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
