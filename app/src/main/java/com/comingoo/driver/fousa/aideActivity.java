@@ -51,7 +51,7 @@ public class aideActivity extends AppCompatActivity {
         message = (EditText) findViewById(R.id.message);
         selectImage = (TextView) findViewById(R.id.image_text);
 
-        Q1 = (ConstraintLayout) findViewById(R.id.Q1);
+        Q1 =  findViewById(R.id.Q1);
         A1 = (ConstraintLayout) findViewById(R.id.A1);
         Q2 = (ConstraintLayout) findViewById(R.id.Q2);
         A2 = (ConstraintLayout) findViewById(R.id.A2);

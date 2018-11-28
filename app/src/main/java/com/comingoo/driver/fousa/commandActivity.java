@@ -154,7 +154,7 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
                         } catch (ArithmeticException e) {
                             e.printStackTrace();
                         } catch (Exception e) {
-                            e.printStackTrace();♠
+                            e.printStackTrace();
                         }
                     } else {
                         ratingShow.setText(4.5 + "");
