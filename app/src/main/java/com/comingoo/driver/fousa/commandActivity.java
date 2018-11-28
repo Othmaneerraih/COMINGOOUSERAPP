@@ -80,9 +80,13 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         vibrator.vibrate(pattern, 0);
 
         mp = MediaPlayer.create(this, R.raw.ring);
+        mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
         mp.start();
 
-        AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        final AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+
+        final int origionalVolume = am.getStreamVolume(AudioManager.STREAM_MUSIC);
+        am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
 
         switch (am.getRingerMode()) {
             case 0:
@@ -106,6 +110,8 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
                 mp.stop();
                 mp.release();
                 vibrator.cancel();
+                am.setStreamVolume(AudioManager.STREAM_MUSIC, origionalVolume, 0);
+
             }
         });
 
@@ -135,22 +141,26 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if (!dataSnapshot.getKey().isEmpty()) {
+
                         int oneStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("1").getValue(String.class)));
-                        int one = Integer.parseInt(requireNonNull(dataSnapshot.child("1").getValue(String.class)));
+                        int one = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("1").getValue(String.class)));
                         int twoStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("2").getValue(String.class)));
-                        int two = Integer.parseInt(requireNonNull(dataSnapshot.child("2").getValue(String.class))) * 2;
+                        int two = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("2").getValue(String.class))) * 2;
                         int threeStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("3").getValue(String.class)));
-                        int three = Integer.parseInt(requireNonNull(dataSnapshot.child("3").getValue(String.class))) * 3;
+                        int three = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("3").getValue(String.class))) * 3;
                         int fourStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("4").getValue(String.class)));
                         int four = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("4").getValue(String.class))) * 4;
                         int fiveStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("5").getValue(String.class)));
                         int five = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("5").getValue(String.class))) * 5;
 
-                        int totalRating = one + two + three + four + five;
-                        int totalRatingPerson = oneStarPerson + twoStarPerson + threeStarPerson + fourStarPerson + fiveStarPerson;
+                        double totalRating = one + two + three + four + five;
+                        double totalRatingPerson = oneStarPerson + twoStarPerson + threeStarPerson + fourStarPerson + fiveStarPerson;
+                    
                         try {
-                            int avgRating = (totalRating / totalRatingPerson);
-                            ratingShow.setText(avgRating + "");
+                            double avgRating = totalRating / totalRatingPerson;
+                            String avg = String.format("%.2f", avgRating);
+                            String newString = avg.replace(",", ".");
+                            ratingShow.setText(newString);
                         } catch (ArithmeticException e) {
                             e.printStackTrace();
                         } catch (Exception e) {
@@ -167,6 +177,7 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
                     ratingShow.setText(4.5 + "");
                 }
             });
+
 
             FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").
                     addListenerForSingleValueEvent(new ValueEventListener() {
@@ -198,7 +209,6 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
 
                         }
                     });
-
         } catch (ArithmeticException e) {
             e.printStackTrace();
         } catch (NullPointerException e) {
@@ -206,6 +216,7 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         if (clientType.equalsIgnoreCase("bon")) {
             barTimer.setProgressDrawable(getResources().getDrawable(R.drawable.drawable_new_client));
         } else {
@@ -243,6 +254,7 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         decline.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                vibrator.cancel();
                 FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
                 commandActivity.this.finish();
             }
