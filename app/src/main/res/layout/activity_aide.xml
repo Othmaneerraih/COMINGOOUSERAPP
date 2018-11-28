@@ -62,12 +62,13 @@
             android:layout_marginLeft="28dp"
             android:layout_marginStart="28dp"
             android:layout_marginTop="8dp"
-            android:text="Comment puis-je obtenir l'estimation du prix d'une course?"
+            android:text="@string/Q1"
             android:textColor="@android:color/white"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
+            android:id="@+id/iv_aide_expn_one"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_marginTop="8dp"
@@ -80,7 +81,7 @@
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/A1"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="2dp"
         android:layout_marginTop="8dp"
         android:background="@drawable/bottom_border"
@@ -97,7 +98,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="12dp"
             
-            android:text="Sur le page d'acceuil, précisez le lieu de départ et la destination, vous aurez ensuite l'estimation du tarif* de la course en bas de l'écran à droite.\n\n*Le tarif peut varier selon le trafic routier."
+            android:text="@string/A1"
             android:textColor="@android:color/white"
             android:textSize="12sp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -120,12 +121,13 @@
             android:layout_marginStart="28dp"
             android:layout_marginTop="12dp"
             
-            android:text="Ou puis-je trouver les tarifs pour COMINGOO?"
+            android:text="@string/Q2"
             android:textColor="@android:color/white"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
+            android:id="@+id/iv_aide_expn_two"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_marginTop="8dp"
@@ -154,7 +156,7 @@
             android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="12dp"
-            android:text="Les tarifs sont indiqué dans la section 'Comingoo and you' dans le volet 'paramétres'"
+            android:text="@string/A2"
             android:textColor="@android:color/white"
             android:textSize="12sp"
             app:layout_constraintEnd_toEndOf="parent"

@@ -995,10 +995,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                     });
                                                 } catch (NumberFormatException e) {
                                                     e.printStackTrace();
+                                                    dialog.dismiss();
 
                                                 } catch (Exception e) {
                                                     e.printStackTrace();
+                                                    dialog.dismiss();
                                                 }
+
                                             }
                                         });
 
