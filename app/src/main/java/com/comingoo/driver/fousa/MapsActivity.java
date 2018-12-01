@@ -19,6 +19,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
 import android.support.annotation.NonNull;
@@ -534,7 +535,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         iv_loud.setVisibility(View.GONE);
 
         mp = MediaPlayer.create(this, R.raw.ring);
-        audioManager.setMode(AudioManager.MODE_IN_CALL);
+//        audioManager.setMode(AudioManager.MODE_IN_CALL);
         mp.setLooping(false);
         mp.start();
 
@@ -600,9 +601,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         iv_cancel_call_voip_one.setLayoutParams(params);
 
 
-        setMaximumVoluem();
-
-
         iv_recv_call_voip_one.setOnClickListener(new View.OnClickListener() {
 
             class SinchCallListener implements CallListener {
@@ -630,11 +628,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     iv_loud.setVisibility(View.VISIBLE);
                     iv_recv_call_voip_one.setVisibility(View.GONE);
 
-                    params.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                        params.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                    }
                     params.addRule(RelativeLayout.CENTER_HORIZONTAL);
                     iv_cancel_call_voip_one.setLayoutParams(params);
 
-                    mp.stop();
+//                    mp.stop();
                 }
 
                 @Override
@@ -710,11 +710,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         window.setGravity(Gravity.CENTER);
         dialog.show();
 
-    }
-
-    private void setMaximumVoluem() {
-        int origionalVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
     }
 
     private void mute() {
