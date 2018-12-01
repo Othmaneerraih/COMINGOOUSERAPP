@@ -563,7 +563,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
-                mp.stop();
+                if(mp.isPlaying()){
+                    mp.stop();
+                }
                 mp.release();
                 am.setStreamVolume(AudioManager.STREAM_MUSIC, origionalVolume, 0);
 
@@ -592,7 +594,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View v) {
                 call.hangup();
-                mp.stop();
+                if(mp.isPlaying()){
+                    mp.stop();
+                }
                 dialog.dismiss();
             }
         });
@@ -610,7 +614,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     dialog.findViewById(R.id.incoming_call_view).setVisibility(View.GONE);
                     setVolumeControlStream(AudioManager.USE_DEFAULT_STREAM_TYPE);
 
-                    mp.stop();
+                    if(mp.isPlaying()){
+                        mp.stop();
+                    }
                     iv_mute.setVisibility(View.GONE);
                     iv_loud.setVisibility(View.GONE);
                     caller_name.setVisibility(View.GONE);
@@ -634,7 +640,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     params.addRule(RelativeLayout.CENTER_HORIZONTAL);
                     iv_cancel_call_voip_one.setLayoutParams(params);
 
-//                    mp.stop();
+                    if(mp.isPlaying()){
+                        mp.stop();
+                    }
                 }
 
                 @Override
@@ -652,7 +660,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) iv_cancel_call_voip_one.getLayoutParams();
                     params.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
                     params.setMargins(0, 0, 250, 60);
-                    mp.stop();
+                    if(mp.isPlaying()){
+                        mp.stop();
+                    }
                 }
 
                 @Override
@@ -665,7 +675,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View v) {
                 if (call != null) {
-                    mp.stop();
+                    if(mp.isPlaying()){
+                        mp.stop();
+                    }
                     call.answer();
                     call.addCallListener(new SinchCallListener());
                 }
