@@ -51,8 +51,8 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
     private TextView arrivalText;
     private Button decline;
     private Button accept;
-    public static MediaPlayer mp;
-    public static Vibrator vibrator;
+    private MediaPlayer mp;
+    private Vibrator vibrator;
     private SupportMapFragment map;
     private String lat, lng;
     private String clientID, userId;
@@ -107,7 +107,9 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
-                mp.stop();
+                if(mp.isPlaying()){
+                    mp.stop();
+                }
                 mp.release();
                 vibrator.cancel();
                 am.setStreamVolume(AudioManager.STREAM_MUSIC, origionalVolume, 0);
@@ -254,6 +256,9 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         decline.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(mp.isPlaying()){
+                    mp.stop();
+                }
                 vibrator.cancel();
                 FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
                 commandActivity.this.finish();
@@ -283,6 +288,9 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         accept.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(mp.isPlaying()){
+                    mp.stop();
+                }
                 FirebaseDatabase.getInstance().getReference("COURSES").orderByChild("client").
                         equalTo(clientID).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
