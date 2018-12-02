@@ -7,13 +7,16 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,7 +26,9 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class aideActivity extends AppCompatActivity {
@@ -31,6 +36,7 @@ public class aideActivity extends AppCompatActivity {
     private ConstraintLayout Q1, Q2, A1, A2;
     private boolean a1 = false, a2 = false;
     public ConstraintLayout fc, content;
+    private ImageView ivArrawOne, ivArrawTwo;
 
     private ConstraintLayout image;
     private Uri imageUri = null;
@@ -51,27 +57,41 @@ public class aideActivity extends AppCompatActivity {
         message = (EditText) findViewById(R.id.message);
         selectImage = (TextView) findViewById(R.id.image_text);
 
-        Q1 = (ConstraintLayout) findViewById(R.id.Q1);
+        Q1 =  findViewById(R.id.Q1);
         A1 = (ConstraintLayout) findViewById(R.id.A1);
         Q2 = (ConstraintLayout) findViewById(R.id.Q2);
         A2 = (ConstraintLayout) findViewById(R.id.A2);
 
+        ivArrawOne = findViewById(R.id.iv_aide_expn_one);
+        ivArrawTwo = findViewById(R.id.iv_aide_expn_two);
         fc = (ConstraintLayout) findViewById(R.id.fc);
         content = (ConstraintLayout) findViewById(R.id.content);
 
         image = (ConstraintLayout) findViewById(R.id.add_image);
 
-        fc.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                CustomAnimation.animate(aideActivity.this, content, 250, 1, 500);
-            }
-        });
+        CustomAnimation.animate(aideActivity.this, content, 250, 1, 0);
+
+//        fc.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                CustomAnimation.animate(aideActivity.this, content, 70, 1, 500);
+//            }
+//        });
 
         findViewById(R.id.add_voice).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(aideActivity.this, "This feature is not yet available!", Toast.LENGTH_SHORT).show();
+
+                Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+
+                if (intent.resolveActivity(getPackageManager()) != null) {
+                    startActivityForResult(intent, 10);
+                } else {
+                    Toast.makeText(aideActivity.this, "Your Device Don't Support Speech Input", Toast.LENGTH_SHORT).show();
+                }
+
             }
         });
 
@@ -105,21 +125,26 @@ public class aideActivity extends AppCompatActivity {
                 if(!a1) {
                     CustomAnimation.animate(aideActivity.this, A1, 100, 2, 500);
                     a1 = true;
+                    ivArrawOne.setImageResource(R.drawable.ic_arraw_up);
                 }else{
                     CustomAnimation.animate(aideActivity.this, A1, 2, 100, 500);
                     a1 = false;
+                    ivArrawOne.setImageResource(R.drawable.expand);
                 }
             }
         });
+
         Q2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(!a2) {
                     CustomAnimation.animate(aideActivity.this, A2, 70, 2, 500);
                     a2 = true;
+                    ivArrawTwo.setImageResource(R.drawable.ic_arraw_up);
                 }else{
                     CustomAnimation.animate(aideActivity.this, A2, 2, 70, 500);
                     a2 = false;
+                    ivArrawTwo.setImageResource(R.drawable.expand);
                 }
 
             }
@@ -222,8 +247,12 @@ public class aideActivity extends AppCompatActivity {
             imageUri = data.getData();
             //image.setBackgroundResource();
             selectImage.setText("image choisi");
+        }
 
-
+        if(requestCode ==10 && resultCode == RESULT_OK){
+            ArrayList<String> result = data
+                    .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            message.setText(result.get(0));
         }
     }
 

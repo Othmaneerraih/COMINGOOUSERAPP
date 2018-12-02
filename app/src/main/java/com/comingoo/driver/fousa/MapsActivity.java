@@ -19,6 +19,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
 import android.support.annotation.NonNull;
@@ -634,7 +635,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     iv_loud.setVisibility(View.VISIBLE);
                     iv_recv_call_voip_one.setVisibility(View.GONE);
 
-                    params.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                        params.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                    }
                     params.addRule(RelativeLayout.CENTER_HORIZONTAL);
                     iv_cancel_call_voip_one.setLayoutParams(params);
 
@@ -655,7 +658,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) iv_cancel_call_voip_one.getLayoutParams();
                     params.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
                     params.setMargins(0, 0, 250, 60);
-                    mp.stop();
+                    if(mp.isPlaying()){
+                        mp.stop();
+                    }
                 }
 
                 @Override
@@ -995,10 +1000,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                     });
                                                 } catch (NumberFormatException e) {
                                                     e.printStackTrace();
+                                                    dialog.dismiss();
 
                                                 } catch (Exception e) {
                                                     e.printStackTrace();
+                                                    dialog.dismiss();
                                                 }
+
                                             }
                                         });
 
