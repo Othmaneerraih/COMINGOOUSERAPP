@@ -23,6 +23,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
@@ -505,7 +506,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-    private AudioManager audioManager;
+//    private AudioManager audioManager;
     boolean isLoud = false;
     private MediaPlayer mp;
     TextView callState, caller_name, tv_name_voip_one;
@@ -539,13 +540,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
         mp.start();
 
-        audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        final AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
-        final int origionalVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
+        final int origionalVolume = am.getStreamVolume(AudioManager.STREAM_MUSIC);
+        am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
 
 
-        switch (audioManager.getRingerMode()) {
+        switch (am.getRingerMode()) {
             case 0:
 
                 mp.start();
@@ -568,7 +569,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     mp.stop();
                 }
                 mp.release();
-                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, origionalVolume, 0);
+                am.setStreamVolume(AudioManager.STREAM_MUSIC, origionalVolume, 0);
 
             }
         });
@@ -691,7 +692,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         iv_mute.setBackgroundColor(Color.WHITE);
         iv_mute.setCircleBackgroundColor(Color.WHITE);
 
-//        audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+        final AudioManager audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
         audioManager.setMode(AudioManager.MODE_IN_CALL);
         audioManager.setSpeakerphoneOn(false);
         audioManager.setMicrophoneMute(false);
@@ -715,7 +716,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         iv_mute.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mute();
+                mute(audioManager);
             }
         });
 
@@ -726,7 +727,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-    private void mute() {
+    private void mute(AudioManager audioManager) {
         if (audioManager.isMicrophoneMute() == false) {
             audioManager.setMicrophoneMute(true);
             iv_mute.setImageResource(R.drawable.clicked_mute);
