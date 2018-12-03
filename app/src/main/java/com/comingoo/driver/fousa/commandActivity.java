@@ -132,11 +132,12 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         int dist = 0;
         try {
             double Dist = Double.parseDouble(intent.getStringExtra("distance"));
-            dist = (int) Dist;
+            dist = (int) Math.round(Dist);
         } catch (NumberFormatException e) {
             e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
+            dist = 0;
         }
         clientID = intent.getStringExtra("name");
         userId = intent.getStringExtra("userId");

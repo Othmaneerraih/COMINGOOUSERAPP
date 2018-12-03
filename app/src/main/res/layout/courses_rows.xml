@@ -14,8 +14,10 @@
 
     <com.ramotion.foldingcell.FoldingCell
         xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:folding-cell="http://schemas.android.com/apk/res-auto"
         android:id="@+id/folding_cell"
         android:layout_width="match_parent"
+        folding-cell:backSideColor="@color/back_part"
         android:layout_height="wrap_content">
 
 
