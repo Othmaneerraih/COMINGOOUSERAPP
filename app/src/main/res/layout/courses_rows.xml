@@ -295,9 +295,10 @@
 
                     <android.support.constraint.ConstraintLayout
                         android:id="@+id/constraintLayout6"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="57dp"
                         android:layout_marginStart="8dp"
+                        android:layout_marginTop="@dimen/margin_large"
                         android:layout_marginEnd="8dp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_bias="0.0"
@@ -310,8 +311,6 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="56dp"
                             android:layout_marginLeft="56dp"
-                            android:layout_marginTop="10dp"
-                            android:layout_marginBottom="@dimen/margin_large"
                             android:text="Destination"
                             android:textAllCaps="false"
                             android:textSize="10sp"
@@ -325,14 +324,16 @@
                             android:id="@+id/end_text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="56dp"
-                            android:layout_marginLeft="56dp"
-                            android:layout_marginBottom="16dp"
-                            android:layout_marginTop="@dimen/margin_xxlarge"
+                            android:layout_marginStart="48dp"
+                            android:layout_marginLeft="48dp"
+                            android:layout_marginBottom="4dp"
+                            android:text="asdfasdfasfd"
                             android:textColor="@android:color/black"
                             android:textSize="14sp"
                             app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintStart_toStartOf="parent" />
+                            app:layout_constraintStart_toStartOf="parent"
+                            folding-cell:layout_constraintTop_toTopOf="parent"
+                            folding-cell:layout_constraintVertical_bias="0.647" />
 
                     </android.support.constraint.ConstraintLayout>
 
@@ -376,16 +377,13 @@
 
                     <ImageView
                         android:layout_width="29dp"
-                        android:layout_height="79dp"
+                        android:layout_height="100dp"
                         android:layout_marginStart="28dp"
                         android:layout_marginLeft="28dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginBottom="8dp"
                         android:background="@drawable/icon_address"
                         app:layout_constraintBottom_toBottomOf="@+id/constraintLayout6"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="@+id/constraintLayout4"
-                        app:layout_constraintVertical_bias="0.923" />
+                        app:layout_constraintTop_toTopOf="@+id/constraintLayout4" />
 
 
                 </android.support.constraint.ConstraintLayout>
@@ -407,9 +405,9 @@
                 <android.support.constraint.ConstraintLayout
                     android:id="@+id/constraintLayout2"
                     android:layout_width="110dp"
-                    android:layout_height="0dp"
-                    android:visibility="visible"
+                    android:layout_height="182dp"
                     android:background="@color/colorPrimary"
+                    android:visibility="visible"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"

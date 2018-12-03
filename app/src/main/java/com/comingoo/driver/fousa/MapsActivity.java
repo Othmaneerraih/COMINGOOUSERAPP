@@ -1015,8 +1015,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                     FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("rating").child(Integer.toString(RATE)).addListenerForSingleValueEvent(new ValueEventListener() {
                                                         @Override
                                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                            int Rating = Integer.parseInt(dataSnapshot.getValue(String.class)) + 1;
-                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("rating").child(Integer.toString(RATE)).setValue("" + Rating);
+                                                            if (dataSnapshot.exists()) {
+                                                                int Rating = Integer.parseInt(dataSnapshot.getValue(String.class)) + 1;
+                                                                FirebaseDatabase.getInstance().getReference("clientUSERS").
+                                                                        child(clientId).child("rating").child(Integer.toString(RATE)).setValue("" + Rating);
+                                                            }
                                                             dialog.dismiss();
                                                         }
 
