@@ -107,7 +107,9 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
-                mp.stop();
+                if(mp.isPlaying()){
+                    mp.stop();
+                }
                 mp.release();
                 vibrator.cancel();
                 am.setStreamVolume(AudioManager.STREAM_MUSIC, origionalVolume, 0);
@@ -142,34 +144,38 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if (!dataSnapshot.getKey().isEmpty()) {
 
-                        int oneStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("1").getValue(String.class)));
-                        int one = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("1").getValue(String.class)));
-                        int twoStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("2").getValue(String.class)));
-                        int two = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("2").getValue(String.class))) * 2;
-                        int threeStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("3").getValue(String.class)));
-                        int three = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("3").getValue(String.class))) * 3;
-                        int fourStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("4").getValue(String.class)));
-                        int four = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("4").getValue(String.class))) * 4;
-                        int fiveStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("5").getValue(String.class)));
-                        int five = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("5").getValue(String.class))) * 5;
+                        if(dataSnapshot.getValue() == null){
+                            ratingShow.setText("0");
+                        }else{
+                            int oneStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("1").getValue(String.class)));
+                            int one = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("1").getValue(String.class)));
+                            int twoStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("2").getValue(String.class)));
+                            int two = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("2").getValue(String.class))) * 2;
+                            int threeStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("3").getValue(String.class)));
+                            int three = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("3").getValue(String.class))) * 3;
+                            int fourStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("4").getValue(String.class)));
+                            int four = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("4").getValue(String.class))) * 4;
+                            int fiveStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("5").getValue(String.class)));
+                            int five = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("5").getValue(String.class))) * 5;
 
-                        double totalRating = one + two + three + four + five;
-                        double totalRatingPerson = oneStarPerson + twoStarPerson + threeStarPerson + fourStarPerson + fiveStarPerson;
-                    
-                        try {
-                            double avgRating = totalRating / totalRatingPerson;
-                            String avg = String.format("%.2f", avgRating);
-                            String newString = avg.replace(",", ".");
-                            ratingShow.setText(newString);
-                        } catch (ArithmeticException e) {
-                            e.printStackTrace();
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                            double totalRating = one + two + three + four + five;
+                            double totalRatingPerson = oneStarPerson + twoStarPerson + threeStarPerson + fourStarPerson + fiveStarPerson;
+
+                            try {
+                                double avgRating = totalRating / totalRatingPerson;
+                                String avg = String.format("%.2f", avgRating);
+                                String newString = avg.replace(",", ".");
+                                ratingShow.setText(newString);
+                            } catch (ArithmeticException e) {
+                                e.printStackTrace();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
+
                     } else {
                         ratingShow.setText(4.5 + "");
                     }
-
                 }
 
                 @Override
@@ -254,6 +260,9 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         decline.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(mp.isPlaying()){
+                    mp.stop();
+                }
                 vibrator.cancel();
                 FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
                 commandActivity.this.finish();
@@ -283,6 +292,9 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         accept.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(mp.isPlaying()){
+                    mp.stop();
+                }
                 FirebaseDatabase.getInstance().getReference("COURSES").orderByChild("client").
                         equalTo(clientID).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
