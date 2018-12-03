@@ -107,7 +107,7 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
-                if(mp.isPlaying()){
+                if (mp.isPlaying()) {
                     mp.stop();
                 }
                 mp.release();
@@ -129,9 +129,15 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
 
         final TextView clientLevel = (TextView) findViewById(R.id.textView6);
         final Intent intent = getIntent();
-
-        double Dist = Double.parseDouble(intent.getStringExtra("distance"));
-        int dist = (int) Dist;
+        int dist = 0;
+        try {
+            double Dist = Double.parseDouble(intent.getStringExtra("distance"));
+            dist = (int) Dist;
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         clientID = intent.getStringExtra("name");
         userId = intent.getStringExtra("userId");
 
@@ -144,9 +150,9 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if (!dataSnapshot.getKey().isEmpty()) {
 
-                        if(dataSnapshot.getValue() == null){
+                        if (dataSnapshot.getValue() == null) {
                             ratingShow.setText("0");
-                        }else{
+                        } else {
                             int oneStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("1").getValue(String.class)));
                             int one = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("1").getValue(String.class)));
                             int twoStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("2").getValue(String.class)));
@@ -260,7 +266,7 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         decline.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(mp.isPlaying()){
+                if (mp.isPlaying()) {
                     mp.stop();
                 }
                 vibrator.cancel();
@@ -292,7 +298,7 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         accept.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(mp.isPlaying()){
+                if (mp.isPlaying()) {
                     mp.stop();
                 }
                 FirebaseDatabase.getInstance().getReference("COURSES").orderByChild("client").
