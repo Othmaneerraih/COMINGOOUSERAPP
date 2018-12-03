@@ -21,6 +21,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -929,11 +930,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         gotMoney.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View v) {
-//                                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("rating").setValue(RATE);
-//                                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").removeValue();
-//                                        dialog.dismiss();
-
-
                                                 if (RATE > 0) {
                                                     dialog.dismiss();
                                                     FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("rating").child(Integer.toString(RATE)).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -948,7 +944,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                                         }
                                                     });
-                                                    FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").removeValue();
+
+                                                    final Handler handler = new Handler();
+                                                    handler.postDelayed(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            //Do something after 3000ms
+                                                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").removeValue();
+                                                        }
+                                                    }, 3000);
+
+
                                                 }
                                             }
                                         });
@@ -1037,14 +1043,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                 cM += Integer.parseInt(dataSnapshot.getValue(String.class));
                                                                             }
 
-//                                                                    FirebaseDatabase.getInstance().getReference("DRIVERFINISHEDCOURSES").
-//                                                                            child(userId).child(dataSnapshot.getValue(String.class)).addListenerForSingleValueEvent(new ValueEventListener() {
-//                                                                        @Override
-//                                                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                                                                            if (dataSnapshot.exists()) {
-//                                                                                String riderId = dataSnapshot.child("client").getValue(String.class);
-
-
                                                                             FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(riderId).addValueEventListener(new ValueEventListener() {
                                                                                 @Override
                                                                                 public void onDataChange(DataSnapshot dataSnapshot) {
@@ -1070,29 +1068,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                                                                 @Override
                                                                                 public void onCancelled(DatabaseError databaseError) {
-
                                                                                     dialog.dismiss();
                                                                                 }
                                                                             });
-
-
-//                                                                            } else
-//                                                                                Log.e(TAG, "onDataChange: rider id not found" );
-//                                                                        }
-//
-//                                                                        @Override
-//                                                                        public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//                                                                            dialog.dismiss();
-//                                                                        }
-//                                                                    });
-
 
                                                                         }
 
                                                                         @Override
                                                                         public void onCancelled(@NonNull DatabaseError databaseError) {
-
                                                                             dialog.dismiss();
                                                                         }
                                                                     });
@@ -1103,7 +1086,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                     } else
                                                         Toast.makeText(MapsActivity.this, "Vous ne pouvez pas dépasser 100 MAD de recharge pour ce client.", Toast.LENGTH_LONG).show();
 
-                                                    FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").removeValue();
+                                                    final Handler handler = new Handler();
+                                                    handler.postDelayed(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            //Do something after 3000ms
+                                                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").removeValue();
+                                                        }
+                                                    }, 3000);
+
                                                 }
                                             }
                                         });
