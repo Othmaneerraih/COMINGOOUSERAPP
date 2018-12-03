@@ -510,10 +510,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     boolean isLoud = false;
     private MediaPlayer mp;
     TextView callState, caller_name, tv_name_voip_one;
+    private Handler mHandler = new Handler();
     CircleImageView iv_user_image_voip_one, iv_cancel_call_voip_one, iv_mute, iv_loud, iv_recv_call_voip_one;
 
     RelativeLayout relativeLayout;
     RelativeLayout.LayoutParams params;
+
+    private int mHour, mMinute; // variables holding the hour and minute
+    private Runnable mUpdate = new Runnable() {
+
+        @Override
+        public void run() {
+            mMinute += 1;
+            // just some checks to keep everything in order
+            if (mMinute >= 60) {
+                mMinute = 0;
+                mHour += 1;
+            }
+            if (mHour >= 24) {
+                mHour = 0;
+            }
+            // or call your method
+            caller_name.setText(mHour + ":" + mMinute);
+            mHandler.postDelayed(this, 1000);
+        }
+    };
 
     public void showDialog(final Context context, final Call call) {
         final Dialog dialog = new Dialog(context);
@@ -539,6 +560,68 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mp = MediaPlayer.create(this, R.raw.ring);
         mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
         mp.start();
+
+        call.addCallListener(new CallListener() {
+            @Override
+            public void onCallEnded(Call endedCall) {
+                //call ended by either party
+                dialog.findViewById(R.id.incoming_call_view).setVisibility(View.GONE);
+                setVolumeControlStream(AudioManager.USE_DEFAULT_STREAM_TYPE);
+
+                mp.stop();
+                iv_mute.setVisibility(View.GONE);
+                iv_loud.setVisibility(View.GONE);
+                caller_name.setVisibility(View.GONE);
+                callState.setText("");
+                mHandler.removeCallbacks(mUpdate);// we need to remove our updates if the activity isn't focused(or even destroyed) or we could get in trouble
+                dialog.dismiss();
+            }
+
+            @Override
+            public void onCallEstablished(final Call establishedCall) {
+                //incoming call was picked up
+                dialog.findViewById(R.id.incoming_call_view).setVisibility(View.VISIBLE);
+                setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
+                callState.setText("connected");
+                iv_mute.setVisibility(View.VISIBLE);
+                iv_loud.setVisibility(View.VISIBLE);
+
+                iv_recv_call_voip_one.setVisibility(View.GONE);
+
+                params.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                params.addRule(RelativeLayout.CENTER_HORIZONTAL);
+                iv_cancel_call_voip_one.setLayoutParams(params);
+                mp.stop();
+
+//                    Calendar c = Calendar.getInstance();
+                mHour = 00;//c.get(Calendar.HOUR_OF_DAY);
+                mMinute = 00;//c.get(Calendar.MINUTE);
+                caller_name.setText(mHour + ":" + mMinute);
+                mHandler.postDelayed(mUpdate, 1000); // 60000 a minute
+            }
+
+            @Override
+            public void onCallProgressing(Call progressingCall) {
+                //call is ringing
+                dialog.findViewById(R.id.incoming_call_view).setVisibility(View.VISIBLE);
+                caller_name.setText(progressingCall.getDetails().getDuration() + "");
+                caller_name.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+                iv_mute.setVisibility(View.VISIBLE);
+                iv_loud.setVisibility(View.VISIBLE);
+                caller_name.setTypeface(null, Typeface.BOLD);
+                callState.setText("ringing");
+                iv_recv_call_voip_one.setVisibility(View.GONE);
+                params.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                params.addRule(RelativeLayout.CENTER_HORIZONTAL);
+                iv_cancel_call_voip_one.setLayoutParams(params);
+                mp.stop();
+            }
+
+            @Override
+            public void onShouldSendPushNotification(Call call, List<PushPair> pushPairs) {
+                //don't worry about this right now
+            }
+        });
 
         final AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
@@ -609,72 +692,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         iv_recv_call_voip_one.setOnClickListener(new View.OnClickListener() {
 
-            class SinchCallListener implements CallListener {
-                @Override
-                public void onCallEnded(Call endedCall) {
-                    //call ended by either party
-                    dialog.findViewById(R.id.incoming_call_view).setVisibility(View.GONE);
-                    setVolumeControlStream(AudioManager.USE_DEFAULT_STREAM_TYPE);
-
-                    if(mp.isPlaying()){
-                        mp.stop();
-                    }
-                    iv_mute.setVisibility(View.GONE);
-                    iv_loud.setVisibility(View.GONE);
-                    caller_name.setVisibility(View.GONE);
-                    callState.setText("");
-                    dialog.dismiss();
-                }
-
-                @Override
-                public void onCallEstablished(final Call establishedCall) {
-                    //incoming call was picked up
-                    dialog.findViewById(R.id.incoming_call_view).setVisibility(View.VISIBLE);
-                    setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
-                    if(mp.isPlaying()){
-                        mp.stop();
-                    }
-                    callState.setText("connected");
-                    iv_mute.setVisibility(View.VISIBLE);
-                    iv_loud.setVisibility(View.VISIBLE);
-                    iv_recv_call_voip_one.setVisibility(View.GONE);
-
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                        params.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-                    }
-
-                    params.addRule(RelativeLayout.CENTER_HORIZONTAL);
-                    iv_cancel_call_voip_one.setLayoutParams(params);
-
-                }
-
-                @Override
-                public void onCallProgressing(Call progressingCall) {
-                    //call is ringing
-                    dialog.findViewById(R.id.incoming_call_view).setVisibility(View.VISIBLE);
-                    caller_name.setText(progressingCall.getDetails().getDuration() + "");
-                    caller_name.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
-                    iv_mute.setVisibility(View.VISIBLE);
-                    iv_loud.setVisibility(View.VISIBLE);
-                    caller_name.setTypeface(null, Typeface.BOLD);
-                    callState.setText("ringing");
-                    iv_recv_call_voip_one.setVisibility(View.GONE);
-
-                    RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) iv_cancel_call_voip_one.getLayoutParams();
-                    params.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
-                    params.setMargins(0, 0, 250, 60);
-                    if(mp.isPlaying()){
-                        mp.stop();
-                    }
-                }
-
-                @Override
-                public void onShouldSendPushNotification(Call call, List<PushPair> pushPairs) {
-                    //don't worry about this right now
-                }
-            }
-
-
             @Override
             public void onClick(View v) {
                 if (call != null) {
@@ -682,7 +699,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         mp.stop();
                     }
                     call.answer();
-                    call.addCallListener(new SinchCallListener());
+//                    call.addCallListener(new SinchCallListener());
                 }
             }
         });
