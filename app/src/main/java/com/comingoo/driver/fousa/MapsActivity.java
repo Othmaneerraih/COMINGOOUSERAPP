@@ -628,18 +628,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         final int origionalVolume = am.getStreamVolume(AudioManager.STREAM_MUSIC);
         am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
 
-
         switch (am.getRingerMode()) {
             case 0:
-
                 mp.start();
                 break;
             case 1:
-
                 mp.start();
                 break;
             case 2:
-
                 mp.start();
                 break;
         }
