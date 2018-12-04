@@ -279,23 +279,6 @@ public class CourseService extends Service implements GoogleApiClient.Connection
         @Override
         protected String doInBackground(String... params) {
 
-            ///////////////////////////////////////////////////////////////////////////
-            ///////////////////////////////////////////////////////////////////////////
-            // FINDING USER STATE
-
-
-            if (state == 0) {
-
-            }
-
-            ///////////////////////////////////////////////////////////////////////////
-            ///////////////////////////////////////////////////////////////////////////
-
-            ///////////////////////////////////////////////////////////////////////////
-            ///////////////////////////////////////////////////////////////////////////
-            // WAITING CLIENT STATE
-
-
             final Handler handler = new Handler(Looper.getMainLooper());
             final Runnable runnable = new Runnable() {
                 @Override
@@ -351,14 +334,6 @@ public class CourseService extends Service implements GoogleApiClient.Connection
                 }
             }
 
-            ///////////////////////////////////////////////////////////////////////////
-            ///////////////////////////////////////////////////////////////////////////
-
-            ///////////////////////////////////////////////////////////////////////////
-            ///////////////////////////////////////////////////////////////////////////
-            // COURSE ENDED
-
-
             if (state == 3 && !checkedState) {
                 getLastLocation();
                 checkedState = true;
@@ -380,8 +355,6 @@ public class CourseService extends Service implements GoogleApiClient.Connection
                             startPos = new LatLng(Double.parseDouble(dataSnapshot.child("startLat").getValue(String.class)), Double.parseDouble(dataSnapshot.child("startLong").getValue(String.class)));
                             if (dataSnapshot.child("endLat").getValue(String.class).length() > 0)
                                 endPos = new LatLng(Double.parseDouble(dataSnapshot.child("endLat").getValue(String.class)), Double.parseDouble(dataSnapshot.child("endLong").getValue(String.class)));
-
-                            //  new GeoCoderTask().execute();
 
 
                             FirebaseDatabase.getInstance().getReference("PRICES").addListenerForSingleValueEvent(new ValueEventListener() {
