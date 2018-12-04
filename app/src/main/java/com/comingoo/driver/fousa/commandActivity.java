@@ -13,6 +13,7 @@ import android.os.CountDownTimer;
 import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
@@ -59,6 +60,7 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
     private ProgressBar barTimer;
     public static CountDownTimer countDownTimer;
     private String clientType = "new";
+    private Double driverPosLat, driverPosLong;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,7 +109,9 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
-                mp.stop();
+                if (mp.isPlaying()) {
+                    mp.stop();
+                }
                 mp.release();
                 vibrator.cancel();
                 am.setStreamVolume(AudioManager.STREAM_MUSIC, origionalVolume, 0);
@@ -116,7 +120,7 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         });
 
 
-        tvUserRating = (TextView) findViewById(R.id.textView10);
+        tvUserRating =  findViewById(R.id.textView10);
         ratingShow = (TextView) findViewById(R.id.rating_txt);
         distance = (TextView) findViewById(R.id.textView8);
         startText = (TextView) findViewById(R.id.textView9);
@@ -127,49 +131,93 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
 
         final TextView clientLevel = (TextView) findViewById(R.id.textView6);
         final Intent intent = getIntent();
+        int dist = 0;
+        double Dist;
+        int time = 0;
 
-        double Dist = Double.parseDouble(intent.getStringExtra("distance"));
-        int dist = (int) Dist;
+        lat = intent.getStringExtra("startLat");
+        lng = intent.getStringExtra("startLong");
+
+        driverPosLat = intent.getDoubleExtra("driverPosLat", 0.0);
+        driverPosLong = intent.getDoubleExtra("driverPosLong", 0.0);
+
+
+        try {
+            String gatedDistance = "";
+            gatedDistance = intent.getStringExtra("distance");
+            if (gatedDistance != "") {
+                Dist = Double.parseDouble(intent.getStringExtra("distance"));
+                dist = (int) Math.round(Dist);
+                time = (int) (Dist * 1.5);
+                distance.setText(intent.getStringExtra("distance") + "Km,  " + time + " min");
+            } else {
+                LatLng latLng = new LatLng(Double.parseDouble(lat), Double.parseDouble(lng));
+                LatLng driverLatLong = new LatLng(driverPosLat, driverPosLong);
+                double distanceInKm = distanceInKilometer(latLng.latitude, latLng.longitude,
+                        driverLatLong.latitude, driverLatLong.longitude);
+
+                dist = (int) Math.round(distanceInKm);
+                time = (int) (distanceInKm * 1.5);
+                distance.setText(intent.getStringExtra("distance") + "Km,  " + time + " min");
+
+            }
+            Log.e("Commandac", "onCreate: distance " + intent.getStringExtra("distance"));
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            Log.e("Commandac", "onCreate: " + e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("Commandac", "onCreate:1111111 " + e.getMessage());
+            dist = 0;
+            time = 0;
+        }
         clientID = intent.getStringExtra("name");
         userId = intent.getStringExtra("userId");
 
-        double time = Double.parseDouble(intent.getStringExtra("distance")) * 1.5;
-        distance.setText(intent.getStringExtra("distance") + "Km,  " + time + " min");
 
         try {
-            FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("rating").addListenerForSingleValueEvent(new ValueEventListener() {
+            FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("rating")
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if (!dataSnapshot.getKey().isEmpty()) {
 
-                        int oneStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("1").getValue(String.class)));
-                        int one = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("1").getValue(String.class)));
-                        int twoStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("2").getValue(String.class)));
-                        int two = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("2").getValue(String.class))) * 2;
-                        int threeStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("3").getValue(String.class)));
-                        int three = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("3").getValue(String.class))) * 3;
-                        int fourStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("4").getValue(String.class)));
-                        int four = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("4").getValue(String.class))) * 4;
-                        int fiveStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("5").getValue(String.class)));
-                        int five = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("5").getValue(String.class))) * 5;
+                        if (dataSnapshot.getValue() == null) {
+                            ratingShow.setText("0");
+                        } else {
+                            int oneStarPerson = 0;
+                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+                                oneStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("1").getValue(String.class)));
 
-                        double totalRating = one + two + three + four + five;
-                        double totalRatingPerson = oneStarPerson + twoStarPerson + threeStarPerson + fourStarPerson + fiveStarPerson;
-                    
-                        try {
-                            double avgRating = totalRating / totalRatingPerson;
-                            String avg = String.format("%.2f", avgRating);
-                            String newString = avg.replace(",", ".");
-                            ratingShow.setText(newString);
-                        } catch (ArithmeticException e) {
-                            e.printStackTrace();
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                            int one = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("1").getValue(String.class)));
+                            int twoStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("2").getValue(String.class)));
+                            int two = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("2").getValue(String.class))) * 2;
+                            int threeStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("3").getValue(String.class)));
+                            int three = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("3").getValue(String.class))) * 3;
+                            int fourStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("4").getValue(String.class)));
+                            int four = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("4").getValue(String.class))) * 4;
+                            int fiveStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("5").getValue(String.class)));
+                            int five = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("5").getValue(String.class))) * 5;
+
+                            double totalRating = one + two + three + four + five;
+                            double totalRatingPerson = oneStarPerson + twoStarPerson + threeStarPerson + fourStarPerson + fiveStarPerson;
+
+                            try {
+                                double avgRating = totalRating / totalRatingPerson;
+                                String avg = String.format("%.2f", avgRating);
+                                String newString = avg.replace(",", ".");
+                                ratingShow.setText(newString);
+                            } catch (ArithmeticException e) {
+                                e.printStackTrace();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
+                        }
+
                     } else {
                         ratingShow.setText(4.5 + "");
                     }
-
                 }
 
                 @Override
@@ -228,32 +276,15 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
                 .findFragmentById(R.id.map_command));
         map.getMapAsync(this);
 
-        lat = intent.getStringExtra("startLat");
-        lng = intent.getStringExtra("startLong");
-
-        distance.setText("5 min /" + dist + "km");
+        distance.setText(time+" min /" + dist + "km");
         startText.setText("De : " + intent.getStringExtra("start"));
-
-//        final DatabaseReference pickupRequest = FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId)/*.child(clientID)*/;
-//
-//        pickupRequest.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                if (!dataSnapshot.exists()) {
-//                    commandActivity.this.finish();
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//            }
-//        });
-
 
         decline.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (mp.isPlaying()) {
+                    mp.stop();
+                }
                 vibrator.cancel();
                 FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
                 commandActivity.this.finish();
@@ -283,6 +314,9 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         accept.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (mp.isPlaying()) {
+                    mp.stop();
+                }
                 FirebaseDatabase.getInstance().getReference("COURSES").orderByChild("client").
                         equalTo(clientID).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -354,7 +388,6 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
                                     data.put("startAddress", intent.getStringExtra("start"));
                                     data.put("endAddress", intent.getStringExtra("arrival"));
 
-
                                     //default Values
                                     data.put("state", "0");
                                     data.put("preWaitTime", "0");
@@ -395,6 +428,28 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
             }
         });
 
+    }
+
+    // Calculating KM from 2 LatLong
+    private double distanceInKilometer(double lat1, double lon1, double lat2, double lon2) {
+        double theta = lon1 - lon2;
+        double dist = Math.sin(deg2rad(lat1))
+                * Math.sin(deg2rad(lat2))
+                + Math.cos(deg2rad(lat1))
+                * Math.cos(deg2rad(lat2))
+                * Math.cos(deg2rad(theta));
+        dist = Math.acos(dist);
+        dist = rad2deg(dist);
+        dist = dist * 60 * 1.1515;
+        return (dist);
+    }
+
+    private double deg2rad(double deg) {
+        return (deg * Math.PI / 180.0);
+    }
+
+    private double rad2deg(double rad) {
+        return (rad * 180.0 / Math.PI);
     }
 
     static boolean active = false;

@@ -82,7 +82,6 @@ public class loginActivity extends AppCompatActivity {
                     for(DataSnapshot data: dataSnapshot.getChildren()){
                         if(data.child("password").getValue(String.class).equals(password)){
                             if(data.child("isVerified").getValue(String.class).equals("0")){
-                                //Account is Banned
                                 Toast.makeText(loginActivity.this, "This account is currently disabled", Toast.LENGTH_SHORT).show();
                             }else {
                                 loggedIn("+212"+ number, data.getKey());

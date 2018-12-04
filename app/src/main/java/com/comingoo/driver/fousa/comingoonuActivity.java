@@ -1,6 +1,7 @@
 package com.comingoo.driver.fousa;
 
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -109,7 +110,13 @@ public class comingoonuActivity extends AppCompatActivity {
         phoneNumber = (TextView) findViewById(R.id.phone_value);
 
         todayEarnings.setText(getIntent().getStringExtra("earnings") + " MAD");
-        debt.setText(getIntent().getStringExtra("debt") + "MAD");
+        double debtPrice = Double.parseDouble(getIntent().getStringExtra("debt"));
+        debt.setText(debt + "MAD");
+        if(debtPrice>0){
+            debt.setTextColor(Color.GREEN);
+        }else{
+            debt.setTextColor(Color.RED);
+        }
         courses.setText(getIntent().getStringExtra("courses"));
         userName.setText(getIntent().getStringExtra("name"));
         phoneNumber.setText(getIntent().getStringExtra("phone"));

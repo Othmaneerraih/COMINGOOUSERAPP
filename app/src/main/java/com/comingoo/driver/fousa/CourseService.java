@@ -49,7 +49,6 @@ import java.util.Map;
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
 public class CourseService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
-
     private DatabaseReference onlineDriver;
     private DatabaseReference courseRef;
 
@@ -95,7 +94,7 @@ public class CourseService extends Service implements GoogleApiClient.Connection
     private boolean checkedState;
 
     private EventListener driverO;
-    private String promoCode = null;
+    private String promoCode = "";
 
 
     private GoogleApiClient mGoogleApiClient;
@@ -115,6 +114,7 @@ public class CourseService extends Service implements GoogleApiClient.Connection
     private String driverName;
 
     private int promoVal = 0;
+    private int commission = 25; // 25% comission
 
 
     private class CourseServiceTask extends AsyncTask<String, Integer, String> {
@@ -279,23 +279,6 @@ public class CourseService extends Service implements GoogleApiClient.Connection
         @Override
         protected String doInBackground(String... params) {
 
-            ///////////////////////////////////////////////////////////////////////////
-            ///////////////////////////////////////////////////////////////////////////
-            // FINDING USER STATE
-
-
-            if (state == 0) {
-
-            }
-
-            ///////////////////////////////////////////////////////////////////////////
-            ///////////////////////////////////////////////////////////////////////////
-
-            ///////////////////////////////////////////////////////////////////////////
-            ///////////////////////////////////////////////////////////////////////////
-            // WAITING CLIENT STATE
-
-
             final Handler handler = new Handler(Looper.getMainLooper());
             final Runnable runnable = new Runnable() {
                 @Override
@@ -315,33 +298,32 @@ public class CourseService extends Service implements GoogleApiClient.Connection
                 }
             }
 
-            FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("PROMOCODE").addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if (dataSnapshot.exists()) {
-                        promoCode = dataSnapshot.getValue(String.class);
-                        FirebaseDatabase.getInstance().getReference("CLIENTNOTIFICATIONS").orderByChild(promoCode).equalTo(promoCode).addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                for (DataSnapshot data : dataSnapshot.getChildren()) {
-                                    promoVal = Integer.parseInt(data.child("value").getValue(String.class));
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                            }
-                        });
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
-
+//            FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("PROMOCODE").addListenerForSingleValueEvent(new ValueEventListener() {
+//                @Override
+//                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                    if (dataSnapshot.exists()) {
+//                        promoCode = dataSnapshot.getValue(String.class);
+//                        FirebaseDatabase.getInstance().getReference("CLIENTNOTIFICATIONS").orderByChild(promoCode).equalTo(promoCode).addListenerForSingleValueEvent(new ValueEventListener() {
+//                            @Override
+//                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                for (DataSnapshot data : dataSnapshot.getChildren()) {
+//                                    promoVal = Integer.parseInt(data.child("value").getValue(String.class));
+//                                }
+//                            }
+//
+//                            @Override
+//                            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                            }
+//                        });
+//                    }
+//                }
+//
+//                @Override
+//                public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                }
+//            });
 
             if (state == 2) {
                 countingPreWait = false;
@@ -350,14 +332,6 @@ public class CourseService extends Service implements GoogleApiClient.Connection
                     r.run();
                 }
             }
-
-            ///////////////////////////////////////////////////////////////////////////
-            ///////////////////////////////////////////////////////////////////////////
-
-            ///////////////////////////////////////////////////////////////////////////
-            ///////////////////////////////////////////////////////////////////////////
-            // COURSE ENDED
-
 
             if (state == 3 && !checkedState) {
                 getLastLocation();
@@ -377,11 +351,11 @@ public class CourseService extends Service implements GoogleApiClient.Connection
                             final String startA = (dataSnapshot.child("startAddress").getValue(String.class));
                             final String endA = (dataSnapshot.child("endAddress").getValue(String.class));
 
-                            startPos = new LatLng(Double.parseDouble(dataSnapshot.child("startLat").getValue(String.class)), Double.parseDouble(dataSnapshot.child("startLong").getValue(String.class)));
+                            startPos = new LatLng(Double.parseDouble(dataSnapshot.child("startLat").getValue(String.class)),
+                                    Double.parseDouble(dataSnapshot.child("startLong").getValue(String.class)));
                             if (dataSnapshot.child("endLat").getValue(String.class).length() > 0)
-                                endPos = new LatLng(Double.parseDouble(dataSnapshot.child("endLat").getValue(String.class)), Double.parseDouble(dataSnapshot.child("endLong").getValue(String.class)));
-
-                            //  new GeoCoderTask().execute();
+                                endPos = new LatLng(Double.parseDouble(dataSnapshot.child("endLat").getValue(String.class)),
+                                        Double.parseDouble(dataSnapshot.child("endLong").getValue(String.class)));
 
 
                             FirebaseDatabase.getInstance().getReference("PRICES").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -402,10 +376,15 @@ public class CourseService extends Service implements GoogleApiClient.Connection
                                         if (preWaitTime > 180) {
                                             preWaitT = 3;
                                         }
-                                        int preWait = (int) (waitTime / 60);
+                                        int preWait = waitTime / 60;
 
+// *****************************         need to add here commision & promo code calculation   **********************************************************
 
-                                        double price = Math.ceil(base + (distanceTraveled * km) + (preWait * att) + preWaitT);
+//                                        double price1 = base + (distanceInKm * km) + (att * driverWaitTime);
+//                                        double price2 = price1 * comission;
+//                                        double price3 = price2 * (1-promoCode);
+
+                                        double price = Math.ceil(base + (distanceTraveled * km) + (preWait * att));//+ preWaitT);
                                         if (price < min) {
                                             price = min;
                                         }
@@ -421,10 +400,9 @@ public class CourseService extends Service implements GoogleApiClient.Connection
                                         data.put("driver", userId);
                                         data.put("startAddress", startA);
                                         data.put("endAddress", endA);
-                                        data.put("driver", userId);
                                         data.put("distance", Double.toString(distanceTraveled));
                                         data.put("waitTime", Integer.toString(preWait));
-                                        data.put("preWaitTime", Integer.toString((int) preWaitTime / 60));
+                                        data.put("preWaitTime", Integer.toString(preWaitTime / 60));
                                         if (isFixed) {
                                             data.put("fixedDest", "1");
                                             data.put("price", Integer.toString((int) fixedPrice));
@@ -485,32 +463,41 @@ public class CourseService extends Service implements GoogleApiClient.Connection
                                                 FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").addListenerForSingleValueEvent(new ValueEventListener() {
                                                     @Override
                                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                        float debt = 0;
+                                                        double debt = 0;
                                                         if (dataSnapshot.exists()) {
-                                                            debt = Float.parseFloat(dataSnapshot.getValue(String.class));
+                                                            debt = Double.parseDouble(dataSnapshot.getValue(String.class));
                                                         }
-
 
                                                         final Map<String, String> earnings = new HashMap<>();
                                                         earnings.put("earnings", "" + ee);
                                                         earnings.put("voyages", "" + vv);
 
 
-                                                        final float ddd = debt;
+                                                        final double ddd = debt;
                                                         FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).addListenerForSingleValueEvent(new ValueEventListener() {
                                                             @Override
                                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                                if (dataSnapshot.child("USECREDIT").getValue(String.class).equals("1") && Integer.parseInt(dataSnapshot.child("SOLDE").getValue(String.class)) >= (int) getP) {
-                                                                    int newSolde = Integer.parseInt(dataSnapshot.child("SOLDE").getValue(String.class)) - (int) getP;
-                                                                    FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("SOLDE").setValue("" + newSolde);
-                                                                    FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("1");
+                                                                if (dataSnapshot.child("SOLDE").exists()) {
+                                                                    double oldSold = Double.parseDouble(dataSnapshot.child("SOLDE").getValue(String.class));
+                                                                    if (dataSnapshot.child("USECREDIT").getValue(String.class).equals("1") && Integer.parseInt(dataSnapshot.child("SOLDE").getValue(String.class)) >= (int) getP) {
+                                                                        double newSolde = oldSold - getP;
+                                                                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("SOLDE").setValue("" + newSolde);
+                                                                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("1");
+                                                                        double commission = getP * percent;
+                                                                        double driverIncome = getP - commission;
+                                                                        double newDebt = ddd + driverIncome;
 
-                                                                    float newDebt = (ddd - (float) getP) + (float) (getP * percent);
-                                                                    FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Float.toString(newDebt));
-                                                                } else {
-                                                                    FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("0");
-                                                                    FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Float.toString((float) (ddd + (float) (getP * percent))));
+                                                                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
+                                                                    } else {
+                                                                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("0");
+                                                                        double commission = getP * percent;
+                                                                        double userDue = getP - oldSold;
+                                                                        double newDebt = ddd + (getP - userDue - commission);
+                                                                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("SOLDE").setValue("" + 0);
+                                                                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
+                                                                    }
                                                                 }
+
                                                             }
 
                                                             @Override
@@ -640,22 +627,27 @@ public class CourseService extends Service implements GoogleApiClient.Connection
     @Override
     public void onDestroy() {
         super.onDestroy();
+        try {
+            h.removeCallbacks(r);
+            hh.removeCallbacks(rr);
+            //fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+            if (mGoogleApiClient != null)
+                mGoogleApiClient.disconnect();
 
-        h.removeCallbacks(r);
-        hh.removeCallbacks(rr);
-        //fusedLocationProviderClient.removeLocationUpdates(locationCallback);
-        if (mGoogleApiClient != null)
-            mGoogleApiClient.disconnect();
 
-
-        if (mLocationManager != null) {
-            for (int i = 0; i < mLocationListeners.length; i++) {
-                try {
-                    mLocationManager.removeUpdates(mLocationListeners[i]);
-                } catch (Exception ex) {
-                    Log.i(TAG, "fail to remove location listners, ignore", ex);
+            if (mLocationManager != null) {
+                for (int i = 0; i < mLocationListeners.length; i++) {
+                    try {
+                        mLocationManager.removeUpdates(mLocationListeners[i]);
+                    } catch (Exception ex) {
+                        Log.i(TAG, "fail to remove location listners, ignore", ex);
+                    }
                 }
             }
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -848,7 +840,7 @@ public class CourseService extends Service implements GoogleApiClient.Connection
                                         earnings.put("earnings", "" + ee);
                                         earnings.put("voyages", "" + vv);
 
-                                        final double ddd = debt;
+//                                        final double ddd = debt;
                                       /*  FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
