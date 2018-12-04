@@ -506,7 +506,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-//    private AudioManager audioManager;
+    //    private AudioManager audioManager;
     boolean isLoud = false;
     private MediaPlayer mp;
     TextView callState, caller_name, tv_name_voip_one;
@@ -648,7 +648,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
-                if(mp.isPlaying()){
+                if (mp.isPlaying()) {
                     mp.stop();
                 }
                 mp.release();
@@ -679,7 +679,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View v) {
                 call.hangup();
-                if(mp.isPlaying()){
+                if (mp.isPlaying()) {
                     mp.stop();
                 }
                 dialog.dismiss();
@@ -695,7 +695,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View v) {
                 if (call != null) {
-                    if(mp.isPlaying()){
+                    if (mp.isPlaying()) {
                         mp.stop();
                     }
                     call.answer();
@@ -915,14 +915,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                 double distanceInKm = distanceInKilometer(drawRouteStart.latitude, drawRouteStart.longitude,
                                                                         drawRouteArrival.latitude, drawRouteArrival.longitude);
 
-//                                                    Log.e("kilometer", "onDataChange: " + distanceInKm);
+                                                                double comission = 0.25; // 25% commisiion
+                                                                double promoCode = 0.20; // 20% reduction for promo code
+//
+                                                                double base = Double.parseDouble(dataSnapshot.child("base").getValue(String.class));
+                                                                double km = Double.parseDouble(dataSnapshot.child("km").getValue(String.class));
+                                                                double att = Double.parseDouble(dataSnapshot.child("att").getValue(String.class));
+
+                                                                double price1 = base + (distanceInKm * km) + (att * driverWaitTime);
+                                                                double price2 = price1 * comission;
+                                                                double price3 = price2 * (1-promoCode);
 
 
-                                                                double price1 = Double.parseDouble(dataSnapshot.child("base").getValue(String.class) +
-                                                                        (Double.parseDouble(dataSnapshot.child("km").getValue(String.class)) * distanceInKm) +
-                                                                        Double.parseDouble(dataSnapshot.child("att").getValue(String.class)) * driverWaitTime);
-
-//                                                    Log.e("kilometer price", "onDataChange: " + price1);
                                                                 price.setText(price1 + " MAD");
                                                             }
                                                         } catch (NullPointerException e) {
