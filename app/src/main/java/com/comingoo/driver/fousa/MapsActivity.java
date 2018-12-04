@@ -1270,8 +1270,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
                                     }
                                 }
-//                            }
-
                             @Override
                             public void onCancelled(@NonNull DatabaseError databaseError) {
 
