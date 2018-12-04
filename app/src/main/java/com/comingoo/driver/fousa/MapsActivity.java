@@ -825,14 +825,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (dialog.isShowing())
-            dialog.dismiss();
-    }
-
     int RATE = 4;
     int cM = 0;
     boolean rideMorethanThree = false;
