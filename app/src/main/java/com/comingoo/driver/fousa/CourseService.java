@@ -49,7 +49,6 @@ import java.util.Map;
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
 public class CourseService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
-
     private DatabaseReference onlineDriver;
     private DatabaseReference courseRef;
 
@@ -385,7 +384,7 @@ public class CourseService extends Service implements GoogleApiClient.Connection
 //                                        double price2 = price1 * comission;
 //                                        double price3 = price2 * (1-promoCode);
 
-                                        double price = Math.ceil(base + (distanceTraveled * km) + (preWait * att) );//+ preWaitT);
+                                        double price = Math.ceil(base + (distanceTraveled * km) + (preWait * att));//+ preWaitT);
                                         if (price < min) {
                                             price = min;
                                         }
@@ -478,7 +477,7 @@ public class CourseService extends Service implements GoogleApiClient.Connection
                                                         FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).addListenerForSingleValueEvent(new ValueEventListener() {
                                                             @Override
                                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                                if(dataSnapshot.child("SOLDE").exists()){
+                                                                if (dataSnapshot.child("SOLDE").exists()) {
                                                                     double oldSold = Double.parseDouble(dataSnapshot.child("SOLDE").getValue(String.class));
                                                                     if (dataSnapshot.child("USECREDIT").getValue(String.class).equals("1") && Integer.parseInt(dataSnapshot.child("SOLDE").getValue(String.class)) >= (int) getP) {
                                                                         double newSolde = oldSold - getP;
