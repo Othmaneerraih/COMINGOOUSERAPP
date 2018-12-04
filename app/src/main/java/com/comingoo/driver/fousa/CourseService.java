@@ -352,9 +352,11 @@ public class CourseService extends Service implements GoogleApiClient.Connection
                             final String startA = (dataSnapshot.child("startAddress").getValue(String.class));
                             final String endA = (dataSnapshot.child("endAddress").getValue(String.class));
 
-                            startPos = new LatLng(Double.parseDouble(dataSnapshot.child("startLat").getValue(String.class)), Double.parseDouble(dataSnapshot.child("startLong").getValue(String.class)));
+                            startPos = new LatLng(Double.parseDouble(dataSnapshot.child("startLat").getValue(String.class)),
+                                    Double.parseDouble(dataSnapshot.child("startLong").getValue(String.class)));
                             if (dataSnapshot.child("endLat").getValue(String.class).length() > 0)
-                                endPos = new LatLng(Double.parseDouble(dataSnapshot.child("endLat").getValue(String.class)), Double.parseDouble(dataSnapshot.child("endLong").getValue(String.class)));
+                                endPos = new LatLng(Double.parseDouble(dataSnapshot.child("endLat").getValue(String.class)),
+                                        Double.parseDouble(dataSnapshot.child("endLong").getValue(String.class)));
 
 
                             FirebaseDatabase.getInstance().getReference("PRICES").addListenerForSingleValueEvent(new ValueEventListener() {

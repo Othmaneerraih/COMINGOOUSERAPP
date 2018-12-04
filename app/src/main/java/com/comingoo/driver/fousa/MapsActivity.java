@@ -588,7 +588,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 iv_recv_call_voip_one.setVisibility(View.GONE);
 
-                params.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                    params.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                }
                 params.addRule(RelativeLayout.CENTER_HORIZONTAL);
                 iv_cancel_call_voip_one.setLayoutParams(params);
                 mp.stop();
@@ -611,7 +613,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 caller_name.setTypeface(null, Typeface.BOLD);
                 callState.setText("ringing");
                 iv_recv_call_voip_one.setVisibility(View.GONE);
-                params.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                    params.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                }
                 params.addRule(RelativeLayout.CENTER_HORIZONTAL);
                 iv_cancel_call_voip_one.setLayoutParams(params);
                 mp.stop();
@@ -767,7 +771,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void switchOfflineUI(boolean... params) {
-
         CustomAnimation.fadeIn(MapsActivity.this, offlineButton, 500, 10);
         CustomAnimation.fadeIn(MapsActivity.this, switchOnlineButton, 500, 10);
         CustomAnimation.fadeOut(MapsActivity.this, onlineButton, 0, 10);
@@ -832,6 +835,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     int RATE = 4;
     int cM = 0;
     boolean rideMorethanThree = false;
+    Double finalPriceOfCourse = 0.0;
 
     private class checkCourseFinished extends AsyncTask<String, Integer, String> {
         @Override
@@ -878,28 +882,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         final Button charge = (Button) dialog.findViewById(R.id.btn_recharger);
                                         final EditText moneyAmount = (EditText) dialog.findViewById(R.id.editText);
 
-                                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").
-                                                child(userId).child("PAID").addListenerForSingleValueEvent(new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                if (dataSnapshot.exists()) {
-                                                    if (dataSnapshot.getValue(String.class).equals("0")) {
-                                                        price.setText(dataSnapshott.child("price").getValue(String.class) + " MAD");
-                                                    } else {
-                                                        price.setText("0 MAD");
-                                                        charge.setVisibility(View.GONE);
-                                                        moneyAmount.setVisibility(View.GONE);
-                                                    }
-                                                } else {
-                                                    price.setText(dataSnapshott.child("price").getValue(String.class) + " MAD");
-                                                }
-                                            }
-
-                                            @Override
-                                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                            }
-                                        });
+//                                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").
+//                                                child(userId).child("PAID").addListenerForSingleValueEvent(new ValueEventListener() {
+//                                            @Override
+//                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                                if (dataSnapshot.exists()) {
+//                                                    if (dataSnapshot.getValue(String.class).equals("0")) {
+//                                                        price.setText(dataSnapshott.child("price").getValue(String.class) + " MAD");
+//                                                    } else {
+//                                                        price.setText("0 MAD");
+//                                                        charge.setVisibility(View.GONE);
+//                                                        moneyAmount.setVisibility(View.GONE);
+//                                                    }
+//                                                } else {
+//                                                    price.setText(dataSnapshott.child("price").getValue(String.class) + " MAD");
+//                                                }
+//                                            }
+//
+//                                            @Override
+//                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                                            }
+//                                        });
 
 
                                         FirebaseDatabase.getInstance().getReference("PRICES").
@@ -918,12 +922,35 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                 double km = Double.parseDouble(dataSnapshot.child("km").getValue(String.class));
                                                                 double att = Double.parseDouble(dataSnapshot.child("att").getValue(String.class));
 
-                                                                double price1 = base + (distanceInKm * km) + (att * driverWaitTime);
+                                                               final double price1 = base + (distanceInKm * km) + (att * driverWaitTime);
                                                                 double price2 = price1 * comission;
-                                                                double price3 = price2 * (1-promoCode);
+                                                                final double price3 = price2 * (1 - promoCode);
 
 
-                                                                price.setText(price1 + " MAD");
+
+
+                                                                FirebaseDatabase.getInstance().getReference("clientUSERS").
+                                                                        child(userId).child("PROMOCODE").addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                    @Override
+                                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                        if (dataSnapshot.exists()){
+                                                                            price.setText(price3+ " MAD");
+                                                                            finalPriceOfCourse = price3;
+                                                                        } else {
+                                                                            price.setText(price1 + " MAD");
+                                                                            finalPriceOfCourse = price1;
+                                                                        }
+
+                                                                        Log.e(TAG, "onDataChange:finalPriceOfCourse:  "+finalPriceOfCourse );
+                                                                    }
+
+                                                                    @Override
+                                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                                    }
+                                                                });
+
+
                                                             }
                                                         } catch (NullPointerException e) {
                                                             e.printStackTrace();
@@ -1746,6 +1773,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 @Override
                 public void onClick(View v) {
                     courseRef.child("state").setValue("1");
+//                    courseRef.child("price").setValue(finalPriceOfCourse);
                 }
             });
             courseActionButton.setText("Appuyez pour arriver");
@@ -1787,6 +1815,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 public void onClick(View v) {
                     courseRef.child("state").setValue("3");
                     wazeButton.setVisibility(View.GONE);
+                    
                 }
             });
 
