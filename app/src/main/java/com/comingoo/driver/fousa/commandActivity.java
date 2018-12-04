@@ -382,7 +382,6 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
                                     data.put("startAddress", intent.getStringExtra("start"));
                                     data.put("endAddress", intent.getStringExtra("arrival"));
 
-
                                     //default Values
                                     data.put("state", "0");
                                     data.put("preWaitTime", "0");
