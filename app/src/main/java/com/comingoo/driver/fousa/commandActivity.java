@@ -13,6 +13,7 @@ import android.os.CountDownTimer;
 import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
@@ -107,7 +108,9 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
-                mp.stop();
+                if (mp.isPlaying()) {
+                    mp.stop();
+                }
                 mp.release();
                 vibrator.cancel();
                 am.setStreamVolume(AudioManager.STREAM_MUSIC, origionalVolume, 0);
@@ -127,14 +130,29 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
 
         final TextView clientLevel = (TextView) findViewById(R.id.textView6);
         final Intent intent = getIntent();
-
-        double Dist = Double.parseDouble(intent.getStringExtra("distance"));
-        int dist = (int) Dist;
+        int dist = 0;
+        double Dist;
+        try {
+            String gatedDistance = "";
+            gatedDistance = intent.getStringExtra("distance");
+            if (gatedDistance != "") {
+                Dist = Double.parseDouble(intent.getStringExtra("distance"));
+                dist = (int) Math.round(Dist);
+                double time = Dist * 1.5;
+                distance.setText(intent.getStringExtra("distance") + "Km,  " + time + " min");
+            }
+            Log.e("Commandac", "onCreate: distance " + intent.getStringExtra("distance"));
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            Log.e("Commandac", "onCreate: " + e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("Commandac", "onCreate:1111111 " + e.getMessage());
+            dist = 0;
+        }
         clientID = intent.getStringExtra("name");
         userId = intent.getStringExtra("userId");
 
-        double time = Double.parseDouble(intent.getStringExtra("distance")) * 1.5;
-        distance.setText(intent.getStringExtra("distance") + "Km,  " + time + " min");
 
         try {
             FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("rating").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -142,9 +160,9 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if (!dataSnapshot.getKey().isEmpty()) {
 
-                        if(dataSnapshot.getValue() == null){
+                        if (dataSnapshot.getValue() == null) {
                             ratingShow.setText("0");
-                        }else{
+                        } else {
                             int oneStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("1").getValue(String.class)));
                             int one = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("1").getValue(String.class)));
                             int twoStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("2").getValue(String.class)));
@@ -174,7 +192,6 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
                     } else {
                         ratingShow.setText(4.5 + "");
                     }
-
                 }
 
                 @Override
@@ -259,7 +276,7 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         decline.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(mp.isPlaying()){
+                if (mp.isPlaying()) {
                     mp.stop();
                 }
                 vibrator.cancel();
@@ -291,7 +308,7 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         accept.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(mp.isPlaying()){
+                if (mp.isPlaying()) {
                     mp.stop();
                 }
                 FirebaseDatabase.getInstance().getReference("COURSES").orderByChild("client").
