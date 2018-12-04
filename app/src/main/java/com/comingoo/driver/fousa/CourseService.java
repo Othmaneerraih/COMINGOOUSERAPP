@@ -95,7 +95,7 @@ public class CourseService extends Service implements GoogleApiClient.Connection
     private boolean checkedState;
 
     private EventListener driverO;
-    private String promoCode = null;
+    private String promoCode = "";
 
 
     private GoogleApiClient mGoogleApiClient;
@@ -115,6 +115,7 @@ public class CourseService extends Service implements GoogleApiClient.Connection
     private String driverName;
 
     private int promoVal = 0;
+    private int commission = 25; // 25% comission
 
 
     private class CourseServiceTask extends AsyncTask<String, Integer, String> {
@@ -375,10 +376,15 @@ public class CourseService extends Service implements GoogleApiClient.Connection
                                         if (preWaitTime > 180) {
                                             preWaitT = 3;
                                         }
-                                        int preWait = (int) (waitTime / 60);
+                                        int preWait = waitTime / 60;
 
+// *****************************         need to add here commision & promo code calculation   **********************************************************
 
-                                        double price = Math.ceil(base + (distanceTraveled * km) + (preWait * att) + preWaitT);
+//                                        double price1 = base + (distanceInKm * km) + (att * driverWaitTime);
+//                                        double price2 = price1 * comission;
+//                                        double price3 = price2 * (1-promoCode);
+
+                                        double price = Math.ceil(base + (distanceTraveled * km) + (preWait * att) );//+ preWaitT);
                                         if (price < min) {
                                             price = min;
                                         }
@@ -397,7 +403,7 @@ public class CourseService extends Service implements GoogleApiClient.Connection
                                         data.put("driver", userId);
                                         data.put("distance", Double.toString(distanceTraveled));
                                         data.put("waitTime", Integer.toString(preWait));
-                                        data.put("preWaitTime", Integer.toString((int) preWaitTime / 60));
+                                        data.put("preWaitTime", Integer.toString(preWaitTime / 60));
                                         if (isFixed) {
                                             data.put("fixedDest", "1");
                                             data.put("price", Integer.toString((int) fixedPrice));
@@ -458,9 +464,9 @@ public class CourseService extends Service implements GoogleApiClient.Connection
                                                 FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").addListenerForSingleValueEvent(new ValueEventListener() {
                                                     @Override
                                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                        float debt = 0;
+                                                        double debt = 0;
                                                         if (dataSnapshot.exists()) {
-                                                            debt = Float.parseFloat(dataSnapshot.getValue(String.class));
+                                                            debt = Double.parseDouble(dataSnapshot.getValue(String.class));
                                                         }
 
 
@@ -469,21 +475,31 @@ public class CourseService extends Service implements GoogleApiClient.Connection
                                                         earnings.put("voyages", "" + vv);
 
 
-                                                        final float ddd = debt;
+                                                        final double ddd = debt;
                                                         FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).addListenerForSingleValueEvent(new ValueEventListener() {
                                                             @Override
                                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                                if (dataSnapshot.child("USECREDIT").getValue(String.class).equals("1") && Integer.parseInt(dataSnapshot.child("SOLDE").getValue(String.class)) >= (int) getP) {
-                                                                    int newSolde = Integer.parseInt(dataSnapshot.child("SOLDE").getValue(String.class)) - (int) getP;
-                                                                    FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("SOLDE").setValue("" + newSolde);
-                                                                    FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("1");
+                                                                if(dataSnapshot.child("SOLDE").exists()){
+                                                                    double oldSold = Double.parseDouble(dataSnapshot.child("SOLDE").getValue(String.class));
+                                                                    if (dataSnapshot.child("USECREDIT").getValue(String.class).equals("1") && Integer.parseInt(dataSnapshot.child("SOLDE").getValue(String.class)) >= (int) getP) {
+                                                                        double newSolde = oldSold - getP;
+                                                                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("SOLDE").setValue("" + newSolde);
+                                                                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("1");
+                                                                        double commission = getP * percent;
+                                                                        double driverIncome = getP - commission;
+                                                                        double newDebt = ddd + driverIncome;
 
-                                                                    float newDebt = (ddd - (float) getP) + (float) (getP * percent);
-                                                                    FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Float.toString(newDebt));
-                                                                } else {
-                                                                    FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("0");
-                                                                    FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Float.toString((float) (ddd + (float) (getP * percent))));
+                                                                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
+                                                                    } else {
+                                                                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("0");
+                                                                        double commission = getP * percent;
+                                                                        double userDue = getP - oldSold;
+                                                                        double newDebt = ddd + (getP - userDue - commission);
+                                                                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("SOLDE").setValue("" + 0);
+                                                                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
+                                                                    }
                                                                 }
+
                                                             }
 
                                                             @Override
@@ -821,7 +837,7 @@ public class CourseService extends Service implements GoogleApiClient.Connection
                                         earnings.put("earnings", "" + ee);
                                         earnings.put("voyages", "" + vv);
 
-                                        final double ddd = debt;
+//                                        final double ddd = debt;
                                       /*  FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
