@@ -299,33 +299,32 @@ public class CourseService extends Service implements GoogleApiClient.Connection
                 }
             }
 
-            FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("PROMOCODE").addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if (dataSnapshot.exists()) {
-                        promoCode = dataSnapshot.getValue(String.class);
-                        FirebaseDatabase.getInstance().getReference("CLIENTNOTIFICATIONS").orderByChild(promoCode).equalTo(promoCode).addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                for (DataSnapshot data : dataSnapshot.getChildren()) {
-                                    promoVal = Integer.parseInt(data.child("value").getValue(String.class));
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                            }
-                        });
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
-
+//            FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("PROMOCODE").addListenerForSingleValueEvent(new ValueEventListener() {
+//                @Override
+//                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                    if (dataSnapshot.exists()) {
+//                        promoCode = dataSnapshot.getValue(String.class);
+//                        FirebaseDatabase.getInstance().getReference("CLIENTNOTIFICATIONS").orderByChild(promoCode).equalTo(promoCode).addListenerForSingleValueEvent(new ValueEventListener() {
+//                            @Override
+//                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                for (DataSnapshot data : dataSnapshot.getChildren()) {
+//                                    promoVal = Integer.parseInt(data.child("value").getValue(String.class));
+//                                }
+//                            }
+//
+//                            @Override
+//                            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                            }
+//                        });
+//                    }
+//                }
+//
+//                @Override
+//                public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                }
+//            });
 
             if (state == 2) {
                 countingPreWait = false;
@@ -353,9 +352,11 @@ public class CourseService extends Service implements GoogleApiClient.Connection
                             final String startA = (dataSnapshot.child("startAddress").getValue(String.class));
                             final String endA = (dataSnapshot.child("endAddress").getValue(String.class));
 
-                            startPos = new LatLng(Double.parseDouble(dataSnapshot.child("startLat").getValue(String.class)), Double.parseDouble(dataSnapshot.child("startLong").getValue(String.class)));
+                            startPos = new LatLng(Double.parseDouble(dataSnapshot.child("startLat").getValue(String.class)),
+                                    Double.parseDouble(dataSnapshot.child("startLong").getValue(String.class)));
                             if (dataSnapshot.child("endLat").getValue(String.class).length() > 0)
-                                endPos = new LatLng(Double.parseDouble(dataSnapshot.child("endLat").getValue(String.class)), Double.parseDouble(dataSnapshot.child("endLong").getValue(String.class)));
+                                endPos = new LatLng(Double.parseDouble(dataSnapshot.child("endLat").getValue(String.class)),
+                                        Double.parseDouble(dataSnapshot.child("endLong").getValue(String.class)));
 
 
                             FirebaseDatabase.getInstance().getReference("PRICES").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -400,7 +401,6 @@ public class CourseService extends Service implements GoogleApiClient.Connection
                                         data.put("driver", userId);
                                         data.put("startAddress", startA);
                                         data.put("endAddress", endA);
-                                        data.put("driver", userId);
                                         data.put("distance", Double.toString(distanceTraveled));
                                         data.put("waitTime", Integer.toString(preWait));
                                         data.put("preWaitTime", Integer.toString(preWaitTime / 60));
@@ -468,7 +468,6 @@ public class CourseService extends Service implements GoogleApiClient.Connection
                                                         if (dataSnapshot.exists()) {
                                                             debt = Double.parseDouble(dataSnapshot.getValue(String.class));
                                                         }
-
 
                                                         final Map<String, String> earnings = new HashMap<>();
                                                         earnings.put("earnings", "" + ee);
@@ -629,22 +628,27 @@ public class CourseService extends Service implements GoogleApiClient.Connection
     @Override
     public void onDestroy() {
         super.onDestroy();
+        try {
+            h.removeCallbacks(r);
+            hh.removeCallbacks(rr);
+            //fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+            if (mGoogleApiClient != null)
+                mGoogleApiClient.disconnect();
 
-        h.removeCallbacks(r);
-        hh.removeCallbacks(rr);
-        //fusedLocationProviderClient.removeLocationUpdates(locationCallback);
-        if (mGoogleApiClient != null)
-            mGoogleApiClient.disconnect();
 
-
-        if (mLocationManager != null) {
-            for (int i = 0; i < mLocationListeners.length; i++) {
-                try {
-                    mLocationManager.removeUpdates(mLocationListeners[i]);
-                } catch (Exception ex) {
-                    Log.i(TAG, "fail to remove location listners, ignore", ex);
+            if (mLocationManager != null) {
+                for (int i = 0; i < mLocationListeners.length; i++) {
+                    try {
+                        mLocationManager.removeUpdates(mLocationListeners[i]);
+                    } catch (Exception ex) {
+                        Log.i(TAG, "fail to remove location listners, ignore", ex);
+                    }
                 }
             }
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

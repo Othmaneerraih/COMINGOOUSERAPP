@@ -588,7 +588,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 iv_recv_call_voip_one.setVisibility(View.GONE);
 
-                params.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                    params.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                }
                 params.addRule(RelativeLayout.CENTER_HORIZONTAL);
                 iv_cancel_call_voip_one.setLayoutParams(params);
                 mp.stop();
@@ -611,7 +613,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 caller_name.setTypeface(null, Typeface.BOLD);
                 callState.setText("ringing");
                 iv_recv_call_voip_one.setVisibility(View.GONE);
-                params.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                    params.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                }
                 params.addRule(RelativeLayout.CENTER_HORIZONTAL);
                 iv_cancel_call_voip_one.setLayoutParams(params);
                 mp.stop();
@@ -751,10 +755,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void switchOnlineUI() {
-        //offlineButton.setVisibility(View.GONE);
-        //switchOnlineButton.setVisibility(View.GONE);
-        //onlineButton.setVisibility(View.VISIBLE);
-
         CustomAnimation.fadeOut(MapsActivity.this, offlineButton, 0, 10);
         CustomAnimation.fadeOut(MapsActivity.this, switchOnlineButton, 0, 10);
         CustomAnimation.fadeIn(MapsActivity.this, onlineButton, 500, 10);
@@ -767,7 +767,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void switchOfflineUI(boolean... params) {
-
         CustomAnimation.fadeIn(MapsActivity.this, offlineButton, 500, 10);
         CustomAnimation.fadeIn(MapsActivity.this, switchOnlineButton, 500, 10);
         CustomAnimation.fadeOut(MapsActivity.this, onlineButton, 0, 10);
@@ -791,8 +790,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         clientInfoLayout.setVisibility(View.VISIBLE);
         destinationLayout.setVisibility(View.VISIBLE);
         userInfoLayout.setBackgroundColor(Color.WHITE);
-//        clientInfoLayout.setBackgroundColor(Color.WHITE);
-//        constraint_user_info.setBackgroundColor(Color.WHITE);
     }
 
     private void cancelCourseUI() {
@@ -829,9 +826,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (dialog.isShowing())
+            dialog.dismiss();
+    }
+
     int RATE = 4;
     int cM = 0;
     boolean rideMorethanThree = false;
+    Double finalPriceOfCourse = 0.0;
+    Dialog dialog;
+    SharedPreferences.Editor editor;
 
     private class checkCourseFinished extends AsyncTask<String, Integer, String> {
         @Override
@@ -842,24 +849,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // This is run in a background thread
         @Override
         protected String doInBackground(String... params) {
-
             final SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
             final String userId = prefs.getString("userId", null);
             driverId = userId;
 
             if (userId == null) return "";
+
             FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).
                     child("COURSE").addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
                     if (dataSnapshot.exists()) {
                         FirebaseDatabase.getInstance().getReference("DRIVERFINISHEDCOURSES").
-                                child(userId).child(dataSnapshot.getValue(String.class)).
-                                addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull final DataSnapshot dataSnapshott) {
-
-                                        final Dialog dialog = new Dialog(MapsActivity.this);
+                                child(userId).child(dataSnapshot.getValue(String.class)).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull final DataSnapshot dataSnapshott) {
+                                if (dataSnapshott.exists()) {
+                                    SharedPreferences prefs = getSharedPreferences("IS_RATED_USER", MODE_PRIVATE);
+                                    boolean isRated = prefs.getBoolean("isRated", false);
+                                    if (!isRated) {
+                                        dialog = new Dialog(MapsActivity.this);
                                         dialog.setContentView(R.layout.finished_course);
 
                                         Button dialogButton = (Button) dialog.findViewById(R.id.button);
@@ -869,14 +878,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         final Button star4 = (Button) dialog.findViewById(R.id.star4);
                                         final Button star5 = (Button) dialog.findViewById(R.id.star5);
 
-
                                         final Button price = (Button) dialog.findViewById(R.id.button3);
 
                                         final ImageView imot = (ImageView) dialog.findViewById(R.id.stars_rating);
 
                                         final Button gotMoney = (Button) dialog.findViewById(R.id.button);
                                         final Button charge = (Button) dialog.findViewById(R.id.btn_recharger);
-                                        final EditText moneyAmount = (EditText) dialog.findViewById(R.id.editText);
+                                        final EditText moneyAmount = dialog.findViewById(R.id.editText);
 
                                         FirebaseDatabase.getInstance().getReference("DRIVERUSERS").
                                                 child(userId).child("PAID").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -911,19 +919,44 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                 double distanceInKm = distanceInKilometer(drawRouteStart.latitude, drawRouteStart.longitude,
                                                                         drawRouteArrival.latitude, drawRouteArrival.longitude);
 
-                                                                double comission = 0.25; // 25% commisiion
                                                                 double promoCode = 0.20; // 20% reduction for promo code
 //
                                                                 double base = Double.parseDouble(dataSnapshot.child("base").getValue(String.class));
                                                                 double km = Double.parseDouble(dataSnapshot.child("km").getValue(String.class));
                                                                 double att = Double.parseDouble(dataSnapshot.child("att").getValue(String.class));
+                                                                double comission = Double.parseDouble(dataSnapshot.child("percent").getValue(String.class));
 
-                                                                double price1 = base + (distanceInKm * km) + (att * driverWaitTime);
-                                                                double price2 = price1 * comission;
-                                                                double price3 = price2 * (1-promoCode);
+                                                                final double price1 = base + (distanceInKm * km) + (att * driverWaitTime);
+                                                                final double price2 = price1 * comission;
+                                                                final double price3 = price2 * (1 - promoCode);
+
+                                                                FirebaseDatabase.getInstance().getReference("COURSES").
+                                                                        child(driverId).child("PROMOCODE").addListenerForSingleValueEvent(new ValueEventListener() {
+
+                                                                    @Override
+                                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                        if (dataSnapshot.exists()) {
+                                                                            boolean isPromoCode = dataSnapshot.getValue(Boolean.class);
+                                                                            Log.e(TAG, "onDataChange:isPromoCode " + isPromoCode);
+                                                                            if (isPromoCode) {
+                                                                                price.setText(price3 + " MAD");
+                                                                                finalPriceOfCourse = price3;
+                                                                            } else {
+                                                                                price.setText(price2 + " MAD");
+                                                                                finalPriceOfCourse = price2;
+                                                                            }
+
+                                                                            Log.e(TAG, "onDataChange:finalPriceOfCourse:  " + finalPriceOfCourse);
+                                                                        }
+                                                                    }
+
+                                                                    @Override
+                                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                                    }
+                                                                });
 
 
-                                                                price.setText(price1 + " MAD");
                                                             }
                                                         } catch (NullPointerException e) {
                                                             e.printStackTrace();
@@ -945,6 +978,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                 startService(intent);
                                             }
                                         });
+
                                         gotMoney.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View v) {
@@ -972,11 +1006,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                         }
                                                     }, 3000);
 
-
                                                 }
                                             }
                                         });
-
 
 //                                moneyAmount.addTextChangedListener(new TextWatcher() {
 //                                    @Override
@@ -1006,12 +1038,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //
 //                                    }
 //                                });
-
                                         dialogButton.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View view) {
                                                 try {
-
+                                                    Log.e(TAG, "onClick:client id " + clientId);
                                                     FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("rating").child(Integer.toString(RATE)).addListenerForSingleValueEvent(new ValueEventListener() {
                                                         @Override
                                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -1020,6 +1051,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                 FirebaseDatabase.getInstance().getReference("clientUSERS").
                                                                         child(clientId).child("rating").child(Integer.toString(RATE)).setValue("" + Rating);
                                                             }
+                                                             editor = getSharedPreferences("IS_RATED_USER", MODE_PRIVATE).edit();
+                                                            editor.putBoolean("isRated", true);
+                                                            editor.apply();
                                                             dialog.dismiss();
                                                         }
 
@@ -1030,10 +1064,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                     });
                                                 } catch (NumberFormatException e) {
                                                     e.printStackTrace();
+                                                    editor = getSharedPreferences("IS_RATED_USER", MODE_PRIVATE).edit();
+                                                    editor.putBoolean("isRated", true);
+                                                    editor.apply();
                                                     dialog.dismiss();
 
                                                 } catch (Exception e) {
                                                     e.printStackTrace();
+                                                    editor = getSharedPreferences("IS_RATED_USER", MODE_PRIVATE).edit();
+                                                    editor.putBoolean("isRated", true);
+                                                    editor.apply();
                                                     dialog.dismiss();
                                                 }
 
@@ -1058,7 +1098,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                     addListenerForSingleValueEvent(new ValueEventListener() {
                                                                         @Override
                                                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
                                                                             cM = money;
                                                                             if (dataSnapshot.exists()) {
                                                                                 cM += Integer.parseInt(dataSnapshot.getValue(String.class));
@@ -1107,14 +1146,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                     } else
                                                         Toast.makeText(MapsActivity.this, "Vous ne pouvez pas dépasser 100 MAD de recharge pour ce client.", Toast.LENGTH_LONG).show();
 
-                                                    final Handler handler = new Handler();
-                                                    handler.postDelayed(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            //Do something after 3000ms
-                                                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").removeValue();
-                                                        }
-                                                    }, 3000);
+//                                                        final Handler handler = new Handler();
+//                                                        handler.postDelayed(new Runnable() {
+//                                                            @Override
+//                                                            public void run() {
+                                                    //Do something after 3000ms
+//                                                            }
+//                                                        }, 3000);
 
                                                 }
                                             }
@@ -1130,7 +1168,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                             @Override
                                             public void onClick(View v) {
                                                 RATE = 1;
-
                                                 star1.setBackgroundResource(R.drawable.selected_star);
                                                 star2.setBackgroundResource(R.drawable.unselected_star);
                                                 star3.setBackgroundResource(R.drawable.unselected_star);
@@ -1210,23 +1247,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         dialog.getWindow().setAttributes(lp);
                                         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                                         dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-
-                            /*    String price = dataSnapshott.child("price").getValue(String.class);
-                                Intent finishedCour²se = new Intent(MainActivity.this, finishedCourse.class);
-                                finishedCourse.putExtra("price", price+" MAD");
-                                finishedCourse.putExtra("courseID", dataSnapshot.getValue(String.class));
-                                finishedCourse.putExtra("driverID", dataSnapshott.child("driver").getValue(String.class));
-
-                                startActivity(finishedCourse);
-                            */
-
                                     }
+                                }
+                            }
 
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                                    }
-                                });
+                            }
+                        });
                     }
                 }
 
@@ -1240,20 +1269,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             return "this string is passed to onPostExecute";
         }
 
-        // This is called from background thread but runs in UI
         @Override
         protected void onProgressUpdate(Integer... values) {
             super.onProgressUpdate(values);
-
-            // Do things like update the progress bar
         }
 
-        // This runs in UI when background thread finishes
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-
-            // Do things like hide the progress bar or change a TextView
         }
     }
 
@@ -1746,6 +1769,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 @Override
                 public void onClick(View v) {
                     courseRef.child("state").setValue("1");
+//                    courseRef.child("price").setValue(finalPriceOfCourse);
                 }
             });
             courseActionButton.setText("Appuyez pour arriver");
@@ -1787,6 +1811,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 public void onClick(View v) {
                     courseRef.child("state").setValue("3");
                     wazeButton.setVisibility(View.GONE);
+
                 }
             });
 
