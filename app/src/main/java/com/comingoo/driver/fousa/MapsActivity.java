@@ -867,7 +867,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 if (dataSnapshott.exists()) {
                                     SharedPreferences prefs = getSharedPreferences("IS_RATED_USER", MODE_PRIVATE);
                                     boolean isRated = prefs.getBoolean("isRated", false);
-                                    if (!isRated) {
+
+//                                    if (!isRated) {
                                         dialog = new Dialog(MapsActivity.this);
                                         dialog.setContentView(R.layout.finished_course);
 
@@ -930,23 +931,43 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                 final double price2 = price1 * comission;
                                                                 final double price3 = price2 * (1 - promoCode);
 
-                                                                FirebaseDatabase.getInstance().getReference("COURSES").
-                                                                        child(driverId).child("PROMOCODE").addListenerForSingleValueEvent(new ValueEventListener() {
+//                                                                FirebaseDatabase.getInstance().getReference("COURSES").
+//                                                                        child(driverId).child("PROMOCODE").addListenerForSingleValueEvent(new ValueEventListener() {
+//
+//                                                                    @Override
+//                                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                                                        if (dataSnapshot.exists()) {
+//                                                                            boolean isPromoCode = dataSnapshot.getValue(Boolean.class);
+//                                                                            Log.e(TAG, "onDataChange:isPromoCode " + isPromoCode);
+//                                                                            if (isPromoCode) {
+//                                                                                price.setText(price3 + " MAD");
+//                                                                                finalPriceOfCourse = price3;
+//                                                                            } else {
+//                                                                                price.setText(price2 + " MAD");
+//                                                                                finalPriceOfCourse = price2;
+//                                                                            }
+//
+//                                                                            Log.e(TAG, "onDataChange:finalPriceOfCourse:  " + finalPriceOfCourse);
+//                                                                        }
+//                                                                    }
+//
+//                                                                    @Override
+//                                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                                                                    }
+//                                                                });
 
+
+                                                                FirebaseDatabase.getInstance().getReference("clientUSERS").
+                                                                        child(userId).child("PROMOCODE").addValueEventListener(new ValueEventListener() {
                                                                     @Override
                                                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                                         if (dataSnapshot.exists()) {
-                                                                            boolean isPromoCode = dataSnapshot.getValue(Boolean.class);
-                                                                            Log.e(TAG, "onDataChange:isPromoCode " + isPromoCode);
-                                                                            if (isPromoCode) {
-                                                                                price.setText(price3 + " MAD");
-                                                                                finalPriceOfCourse = price3;
-                                                                            } else {
-                                                                                price.setText(price2 + " MAD");
-                                                                                finalPriceOfCourse = price2;
-                                                                            }
-
-                                                                            Log.e(TAG, "onDataChange:finalPriceOfCourse:  " + finalPriceOfCourse);
+                                                                            price.setText(price3 + " MAD");
+                                                                            finalPriceOfCourse = price3;
+                                                                        } else {
+                                                                            price.setText(price2 + " MAD");
+                                                                            finalPriceOfCourse = price2;
                                                                         }
                                                                     }
 
@@ -1051,7 +1072,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                 FirebaseDatabase.getInstance().getReference("clientUSERS").
                                                                         child(clientId).child("rating").child(Integer.toString(RATE)).setValue("" + Rating);
                                                             }
-                                                             editor = getSharedPreferences("IS_RATED_USER", MODE_PRIVATE).edit();
+                                                            editor = getSharedPreferences("IS_RATED_USER", MODE_PRIVATE).edit();
                                                             editor.putBoolean("isRated", true);
                                                             editor.apply();
                                                             dialog.dismiss();
@@ -1249,7 +1270,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
                                     }
                                 }
-                            }
+//                            }
 
                             @Override
                             public void onCancelled(@NonNull DatabaseError databaseError) {
