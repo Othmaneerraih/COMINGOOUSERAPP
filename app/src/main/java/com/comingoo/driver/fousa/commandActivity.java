@@ -60,6 +60,7 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
     private ProgressBar barTimer;
     public static CountDownTimer countDownTimer;
     private String clientType = "new";
+    private Double driverPosLat, driverPosLong;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,7 +120,7 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         });
 
 
-        tvUserRating = (TextView) findViewById(R.id.textView10);
+        tvUserRating =  findViewById(R.id.textView10);
         ratingShow = (TextView) findViewById(R.id.rating_txt);
         distance = (TextView) findViewById(R.id.textView8);
         startText = (TextView) findViewById(R.id.textView9);
@@ -132,14 +133,33 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         final Intent intent = getIntent();
         int dist = 0;
         double Dist;
+        int time = 0;
+
+        lat = intent.getStringExtra("startLat");
+        lng = intent.getStringExtra("startLong");
+
+        driverPosLat = intent.getDoubleExtra("driverPosLat", 0.0);
+        driverPosLong = intent.getDoubleExtra("driverPosLong", 0.0);
+
+
         try {
             String gatedDistance = "";
             gatedDistance = intent.getStringExtra("distance");
             if (gatedDistance != "") {
                 Dist = Double.parseDouble(intent.getStringExtra("distance"));
                 dist = (int) Math.round(Dist);
-                double time = Dist * 1.5;
+                time = (int) (Dist * 1.5);
                 distance.setText(intent.getStringExtra("distance") + "Km,  " + time + " min");
+            } else {
+                LatLng latLng = new LatLng(Double.parseDouble(lat), Double.parseDouble(lng));
+                LatLng driverLatLong = new LatLng(driverPosLat, driverPosLong);
+                double distanceInKm = distanceInKilometer(latLng.latitude, latLng.longitude,
+                        driverLatLong.latitude, driverLatLong.longitude);
+
+                dist = (int) Math.round(distanceInKm);
+                time = (int) (distanceInKm * 1.5);
+                distance.setText(intent.getStringExtra("distance") + "Km,  " + time + " min");
+
             }
             Log.e("Commandac", "onCreate: distance " + intent.getStringExtra("distance"));
         } catch (NumberFormatException e) {
@@ -149,13 +169,15 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
             e.printStackTrace();
             Log.e("Commandac", "onCreate:1111111 " + e.getMessage());
             dist = 0;
+            time = 0;
         }
         clientID = intent.getStringExtra("name");
         userId = intent.getStringExtra("userId");
 
 
         try {
-            FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("rating").addListenerForSingleValueEvent(new ValueEventListener() {
+            FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("rating")
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if (!dataSnapshot.getKey().isEmpty()) {
@@ -163,7 +185,10 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
                         if (dataSnapshot.getValue() == null) {
                             ratingShow.setText("0");
                         } else {
-                            int oneStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("1").getValue(String.class)));
+                            int oneStarPerson = 0;
+                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+                                oneStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("1").getValue(String.class)));
+
                             int one = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("1").getValue(String.class)));
                             int twoStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("2").getValue(String.class)));
                             int two = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("2").getValue(String.class))) * 2;
@@ -187,6 +212,7 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
+                        }
                         }
 
                     } else {
@@ -250,28 +276,8 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
                 .findFragmentById(R.id.map_command));
         map.getMapAsync(this);
 
-        lat = intent.getStringExtra("startLat");
-        lng = intent.getStringExtra("startLong");
-
-        distance.setText("5 min /" + dist + "km");
+        distance.setText(time+" min /" + dist + "km");
         startText.setText("De : " + intent.getStringExtra("start"));
-
-//        final DatabaseReference pickupRequest = FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId)/*.child(clientID)*/;
-//
-//        pickupRequest.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                if (!dataSnapshot.exists()) {
-//                    commandActivity.this.finish();
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//            }
-//        });
-
 
         decline.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -422,6 +428,28 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
             }
         });
 
+    }
+
+    // Calculating KM from 2 LatLong
+    private double distanceInKilometer(double lat1, double lon1, double lat2, double lon2) {
+        double theta = lon1 - lon2;
+        double dist = Math.sin(deg2rad(lat1))
+                * Math.sin(deg2rad(lat2))
+                + Math.cos(deg2rad(lat1))
+                * Math.cos(deg2rad(lat2))
+                * Math.cos(deg2rad(theta));
+        dist = Math.acos(dist);
+        dist = rad2deg(dist);
+        dist = dist * 60 * 1.1515;
+        return (dist);
+    }
+
+    private double deg2rad(double deg) {
+        return (deg * Math.PI / 180.0);
+    }
+
+    private double rad2deg(double rad) {
+        return (rad * 180.0 / Math.PI);
     }
 
     static boolean active = false;
