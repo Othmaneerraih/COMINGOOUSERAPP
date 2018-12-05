@@ -110,6 +110,7 @@ public class comingoonuActivity extends AppCompatActivity {
         phoneNumber = (TextView) findViewById(R.id.phone_value);
 
         todayEarnings.setText(getIntent().getStringExtra("earnings") + " MAD");
+        todayEarnings.setTextColor(Color.GREEN);
         double debtPrice = Double.parseDouble(getIntent().getStringExtra("debt"));
         debt.setText(debt + "MAD");
         if(debtPrice>0){
