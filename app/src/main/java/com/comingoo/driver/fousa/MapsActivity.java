@@ -479,9 +479,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onResume() {
         super.onResume();
+        if (ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(MapsActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
+        }
+    }
 
-//        constraint_user_info.setBackgroundColor(Color.WHITE);
-//        userInfoLayout.setBackgroundColor(Color.WHITE);
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(MapsActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
+        }
     }
 
     private class SinchCallClientListener implements CallClientListener {
@@ -830,6 +838,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Double finalPriceOfCourse = 0.0;
     Dialog dialog;
     boolean isPriceSeted = false;
+    double debt = 0;
 
     private class checkCourseFinished extends AsyncTask<String, Integer, String> {
         @Override
@@ -1252,13 +1261,36 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                 cM += Integer.parseInt(dataSnapshot.getValue(String.class));
                                                                             }
 
+
+                                                                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                                @Override
+                                                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                                                                                    if (dataSnapshot.exists()) {
+                                                                                        debt = Double.parseDouble(dataSnapshot.getValue(String.class));
+                                                                                    }
+                                                                                }
+
+                                                                                @Override
+                                                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                                                }
+                                                                            });
+
+
+
                                                                             FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(riderId).addValueEventListener(new ValueEventListener() {
                                                                                 @Override
                                                                                 public void onDataChange(DataSnapshot dataSnapshot) {
                                                                                     if (dataSnapshot.exists()) {
+                                                                                        debt -= cM;
                                                                                         if (dataSnapshot.getChildrenCount() >= 3) {
                                                                                             rideMorethanThree = true;
                                                                                             if (cM <= 100) {
+                                                                                                // Enter the value into driver wallet here
+
+
+
                                                                                                 FirebaseDatabase.getInstance().getReference("clientUSERS").child(dataSnapshott.child("client").getValue(String.class)).child("SOLDE").setValue("" + cM);
                                                                                                 dialog.dismiss();
                                                                                             } else
@@ -1266,6 +1298,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                         } else {
                                                                                             rideMorethanThree = false;
                                                                                             if (cM <= 10) {
+                                                                                                // Enter the value into driver wallet here
+
+
+
                                                                                                 FirebaseDatabase.getInstance().getReference("clientUSERS").child(dataSnapshott.child("client").getValue(String.class)).child("SOLDE").setValue("" + cM);
                                                                                                 dialog.dismiss();
                                                                                             } else
@@ -1280,6 +1316,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                     dialog.dismiss();
                                                                                 }
                                                                             });
+
+
 
                                                                         }
 
@@ -1668,7 +1706,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     private String courseID;
-    private String courseState = "4";
+    private String courseState;
     private DatabaseReference courseRef;
     private DataSnapshot driverData;
     private String clientId;
@@ -1897,18 +1935,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .orderByKey()*/.limitToLast(1).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot child : dataSnapshot.getChildren()) {
-                    Log.e(TAG, "date of ride: " + child.child("date").getValue().toString());
+                if (dataSnapshot.exists()) {
+                    try {
+                        for (DataSnapshot child : dataSnapshot.getChildren()) {
+                            Log.e(TAG, "date of ride: " + child.child("date").getValue().toString());
 
-                    String longV = child.child("date").getValue().toString();
+                            String longV = child.child("date").getValue().toString();
 //                    long millisecond = Long.parseLong(longV);
 //                    String dateString = DateFormat.format("dd/MM/yyyy", new Date(millisecond)).toString();
-                    String dateString = convertDate(longV, "dd/MM/yyyy hh:mm:ss");
+                            String dateString = convertDate(longV, "dd/MM/yyyy hh:mm:ss");
 
-                    date.setText(dateString);
-                    userInfoLayout.setBackgroundColor(Color.WHITE);
+                            date.setText(dateString);
+                            userInfoLayout.setBackgroundColor(Color.WHITE);
+                        }
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
                 }
-
             }
 
             @Override
@@ -2076,13 +2119,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.waze"));
             startActivity(intent);
         }
-//        final String appPackageName = getPackageName(); // getPackageName() from Context or Activity object
-//        try {
-//            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.waze" + appPackageName)));
-//        } catch (android.content.ActivityNotFoundException anfe) {
-//            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.waze" + appPackageName)));
-//        }
-
     }
 
 

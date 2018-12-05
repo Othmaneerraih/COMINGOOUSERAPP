@@ -50,6 +50,7 @@ import static com.google.android.gms.location.LocationServices.getFusedLocationP
 
 public class CourseService extends Service implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+
     private DatabaseReference onlineDriver;
     private DatabaseReference courseRef;
 
@@ -175,22 +176,6 @@ public class CourseService extends Service implements
 
             //desconnect Driver if still Online
             onlineDriver = FirebaseDatabase.getInstance().getReference("ONLINEDRIVERS").child(userId);
-
-//            DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference("COURSES");
-//            DatabaseReference userNameRef = rootRef.child("ujwal");
-//            ValueEventListener eventListener = new ValueEventListener() {
-//                @Override
-//                public void onDataChange(DataSnapshot dataSnapshot) {
-//                    if(dataSnapshot.exists()) {
-//                        Log.e(TAG, "onDataChange: ujjwal exists" );
-//                    } else  Log.e(TAG, "onDataChange: ujjwal not exists" );
-//                }
-//
-//                @Override
-//                public void onCancelled(DatabaseError databaseError) {}
-//            };
-//            userNameRef.addListenerForSingleValueEvent(eventListener);
-
             return "this string is passed to onPostExecute";
         }
 
@@ -254,6 +239,7 @@ public class CourseService extends Service implements
 
         return START_STICKY;
     }
+
 
     private class CheckStateTask extends AsyncTask<String, Integer, String> {
         @Override
@@ -382,10 +368,10 @@ public class CourseService extends Service implements
                                                         if (dataSnapshot.exists()) {
                                                             Log.e(TAG, "PROMOCODE onDataChange: " + dataSnapshot.getValue(String.class));
                                                             price = price3;
-//                                                    FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").setValue(price3);
+                                                            FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").setValue(price3);
                                                         } else {
                                                             price = price2;
-//                                                    FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").setValue(price2);
+                                                            FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").setValue(price2);
                                                         }
                                                     }
 
@@ -394,9 +380,6 @@ public class CourseService extends Service implements
 
                                                     }
                                                 });
-
-
-//                                        double price = Math.ceil(base + (distanceTraveled * km) + (preWait * att));//+ preWaitT);
 
 
                                                 SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
@@ -482,14 +465,21 @@ public class CourseService extends Service implements
                                                                 earnings.put("voyages", "" + vv);
 
 
+                                                                Log.e(TAG, "onDataChange:clientID in calculation: ClientID: " + clientID);
+                                                                Log.e(TAG, "onDataChange:clientID in calculation: DriverID: " + courseID);
+
                                                                 final double priviousDebt = debt;
-                                                                FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).addValueEventListener(new ValueEventListener() {
                                                                     @Override
                                                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                                                                        Log.e(TAG, "onDataChange:111111111111111111111111 ");
+
                                                                         if (dataSnapshot.child("SOLDE").exists()) {
                                                                             try {
                                                                                 double oldSold = Double.parseDouble(dataSnapshot.child("SOLDE").getValue(String.class));
                                                                                 if (dataSnapshot.child("USECREDIT").getValue(String.class).equals("1") && Double.parseDouble(dataSnapshot.child("SOLDE").getValue(String.class)) >= currentBil) {
+                                                                                    Log.e(TAG, "onDataChange:222222222222222 ");
                                                                                     double newSolde = oldSold - currentBil;
                                                                                     FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("SOLDE").setValue("" + newSolde);
                                                                                     FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("1");
@@ -500,6 +490,7 @@ public class CourseService extends Service implements
                                                                                     FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
 
                                                                                 } else {
+                                                                                    Log.e(TAG, "onDataChange:33333333333333333 ");
                                                                                     FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("0");
                                                                                     double commission = currentBil * percent;
                                                                                     double userDue = currentBil - oldSold;
@@ -510,11 +501,14 @@ public class CourseService extends Service implements
                                                                                 }
                                                                             } catch (NumberFormatException e) {
                                                                                 e.printStackTrace();
+                                                                                Log.e(TAG, "onDataChange:NumberFormatException " + e.getMessage());
                                                                             } catch (Exception e) {
+                                                                                Log.e(TAG, "onDataChange:Exception " + e.getMessage());
                                                                                 e.printStackTrace();
                                                                             }
                                                                         } else {
                                                                             try {
+                                                                                Log.e(TAG, "onDataChange:4444444444 ");
                                                                                 double commission = currentBil * percent * -1;
                                                                                 double newDebt = (priviousDebt + commission);
                                                                                 FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("0");
@@ -531,12 +525,15 @@ public class CourseService extends Service implements
 
                                                                     @Override
                                                                     public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                                                                        Log.e(TAG, "onCancelled:11111 " + databaseError.getMessage());
                                                                     }
                                                                 });
+
+
                                                                 FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("level").addListenerForSingleValueEvent(new ValueEventListener() {
                                                                     @Override
                                                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                        Log.e(TAG, "onDataChange:55555555555 ");
                                                                         if (dataSnapshot.getValue(String.class).equals("2"))
                                                                             FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("level").setValue("1");
 
@@ -546,9 +543,16 @@ public class CourseService extends Service implements
 
                                                                     @Override
                                                                     public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                                                                        Log.e(TAG, "onCancelled:2222 " + databaseError.getMessage());
                                                                     }
                                                                 });
+
+
+                                                                FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("LASTCOURSE").setValue("Derniére course : Captain " + driverName + " / " + currentBil + " MAD");
+                                                                FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("COURSE").setValue(courseID);
+                                                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").setValue(courseID);
+                                                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("EARNINGS").child(getDateMonth(GetUnixTime())).child(getDateDay(GetUnixTime())).setValue(earnings);
+
 
                                                                 final Handler handler = new Handler();
                                                                 handler.postDelayed(new Runnable() {
@@ -557,13 +561,6 @@ public class CourseService extends Service implements
                                                                         FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).removeValue();
                                                                     }
                                                                 }, 3000);
-
-                                                                FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("LASTCOURSE").setValue("Derniére course : Captain " + driverName + " / " + currentBil + " MAD");
-                                                                FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("COURSE").setValue(courseID);
-                                                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").setValue(courseID);
-                                                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("EARNINGS").child(getDateMonth(GetUnixTime())).child(getDateDay(GetUnixTime())).setValue(earnings);
-
-
                                                             }
 
                                                             @Override
@@ -1124,7 +1121,7 @@ public class CourseService extends Service implements
     }
 
 
-    private static final String TAG = "BOOMBOOMTESTGPS";
+    private static final String TAG = "CourseService";
     private LocationManager mLocationManager = null;
     private static final int LOCATION_INTERVAL = 1000;
     private static final float LOCATION_DISTANCE = 10f;
