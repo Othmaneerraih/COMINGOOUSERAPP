@@ -882,40 +882,62 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                 if (dataSnapshot.exists()) {
-                                                    if (dataSnapshot.getValue(String.class).equals("0")) {
-//                                                        price.setText(dataSnapshott.child("price").getValue(String.class) + " MAD");
+                                                    if (dataSnapshot.getValue(String.class).equals("1")) {
+                                                        price.setText("0 MAD");
                                                     } else {
-//                                                        price.setText("0 MAD");
-                                                        charge.setVisibility(View.GONE);
-                                                        moneyAmount.setVisibility(View.GONE);
-                                                    }
-                                                } else {
-//                                                    price.setText(dataSnapshott.child("price").getValue(String.class) + " MAD");
-                                                }
-                                            }
-
-                                            @Override
-                                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                            }
-                                        });
-
-                                        FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").addValueEventListener(new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                try {
-                                                    if (dataSnapshot.getValue(Double.class) != null) {
-                                                        Log.e(TAG, "COURSES value ujjwal onDataChange: " + dataSnapshot.getValue(Double.class));
+                                                        
+                                                        FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").addValueEventListener(new ValueEventListener() {
+                                                            @Override
+                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                try {
+                                                                    if (dataSnapshot.getValue(Double.class) != null) {
+                                                                        Log.e(TAG, "COURSES value onDataChange: " + dataSnapshot.getValue(Double.class));
 //                                                    if (dataSnapshot.exists()) {
 //                                                        if (!isPriceSeted) {
 //                                                            isPriceSeted = true;
-                                                        finalPriceOfCourse = dataSnapshot.getValue(Double.class);
-                                                        Log.e(TAG, "COURSES value ujjwal finalPriceOfCourse: " + finalPriceOfCourse);
-                                                        price.setText(finalPriceOfCourse + " MAD");
-                                                    }
+                                                                        finalPriceOfCourse = dataSnapshot.getValue(Double.class);
+                                                                        Log.e(TAG, "COURSES value finalPriceOfCourse: " + finalPriceOfCourse);
+                                                                        price.setText(finalPriceOfCourse + " MAD");
+                                                                    }
 //                                                    }
-                                                } catch (Exception e) {
-                                                    e.printStackTrace();
+                                                                } catch (Exception e) {
+                                                                    e.printStackTrace();
+                                                                }
+                                                            }
+
+                                                            @Override
+                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                            }
+                                                        });
+
+                                                    }
+                                                } else {
+                                                    FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").addValueEventListener(new ValueEventListener() {
+                                                        @Override
+                                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                            try {
+                                                                if (dataSnapshot.getValue(Double.class) != null) {
+                                                                    Log.e(TAG, "COURSES value onDataChange: " + dataSnapshot.getValue(Double.class));
+//                                                    if (dataSnapshot.exists()) {
+//                                                        if (!isPriceSeted) {
+//                                                            isPriceSeted = true;
+                                                                    finalPriceOfCourse = dataSnapshot.getValue(Double.class);
+                                                                    Log.e(TAG, "COURSES value finalPriceOfCourse: " + finalPriceOfCourse);
+                                                                    price.setText(finalPriceOfCourse + " MAD");
+                                                                }
+//                                                    }
+                                                            } catch (Exception e) {
+                                                                e.printStackTrace();
+                                                            }
+                                                        }
+
+                                                        @Override
+                                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                        }
+                                                    });
+
                                                 }
                                             }
 
@@ -924,6 +946,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                             }
                                         });
+
 
 
                                         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -934,7 +957,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                             }
                                         });
 
-
+/*
                                         FirebaseDatabase.getInstance().getReference("PRICES").
                                                 addListenerForSingleValueEvent(new ValueEventListener() {
                                                     @Override
@@ -1134,7 +1157,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                     public void onCancelled(@NonNull DatabaseError databaseError) {
 
                                                     }
-                                                });
+                                                });*/
 
 
                                         gotMoney.setOnClickListener(new View.OnClickListener() {
