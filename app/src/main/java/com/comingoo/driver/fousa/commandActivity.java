@@ -282,12 +282,16 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         decline.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                try {
                 if (mp.isPlaying()) {
                     mp.stop();
                 }
                 vibrator.cancel();
                 FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
                 commandActivity.this.finish();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
 

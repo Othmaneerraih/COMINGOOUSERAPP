@@ -22,7 +22,7 @@
             android:layout_marginRight="8dp"
             android:layout_marginTop="32dp"
             android:background="@drawable/price_tag"
-            android:text="18 MAD"
+            android:text=""
             android:textAllCaps="false"
             android:textColor="@color/colorPrimary"
             android:textSize="17sp"

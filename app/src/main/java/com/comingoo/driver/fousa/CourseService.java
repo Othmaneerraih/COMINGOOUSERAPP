@@ -263,7 +263,6 @@ public class CourseService extends Service implements
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-
         }
 
         // This is run in a background thread
@@ -331,7 +330,8 @@ public class CourseService extends Service implements
                 countingDistance = false;
 
 
-                FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).addListenerForSingleValueEvent(new ValueEventListener() {
+                FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).
+                        addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (dataSnapshot.exists()) {
@@ -352,7 +352,7 @@ public class CourseService extends Service implements
                             FirebaseDatabase.getInstance().getReference("PRICES").addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
+                                    Log.e("Price", " Price Calculation in Course Service" );
                                     if (dataSnapshot.exists()) {
                                         double att = Double.parseDouble(dataSnapshot.child("att").getValue(String.class));
                                         double base = Double.parseDouble(dataSnapshot.child("base").getValue(String.class));
@@ -370,16 +370,35 @@ public class CourseService extends Service implements
                                         int preWait = waitTime / 60;
 
 // *****************************         need to add here commision & promo code calculation   **********************************************************
+                                        double promoCode = 0.20;
+                                        double price1 = base + (distanceTraveled * km) + (att * waitTime);
+                                        final double price2 = price1 * percent;
+                                        final double price3 =  price2 * (1 - promoCode);
 
-//                                        double price1 = base + (distanceInKm * km) + (att * driverWaitTime);
-//                                        double price2 = price1 * comission;
-//                                        double price3 = price2 * (1-promoCode);
+                                        // need to get promo code here
+                                        FirebaseDatabase.getInstance().getReference("clientUSERS").
+                                                child(clientID).child("PROMOCODE").addValueEventListener(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                if (dataSnapshot.exists()) {
+                                                    Log.e(TAG, "PROMOCODE onDataChange: "+dataSnapshot.getValue(String.class) );
+                                                    FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").setValue(price3);
+                                                } else {
+                                                    FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").setValue(price2);
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                            }
+                                        });
+
 
                                         double price = Math.ceil(base + (distanceTraveled * km) + (preWait * att));//+ preWaitT);
                                         if (price < min) {
                                             price = min;
                                         }
-
 
                                         SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
                                         prefs.edit().putString("online", "1").apply();
@@ -440,7 +459,6 @@ public class CourseService extends Service implements
 
                                                 }
 
-
                                                 if (isFixed)
                                                     earned += fixedPrice;
                                                 else
@@ -477,7 +495,6 @@ public class CourseService extends Service implements
                                                                         double commission = getP * percent;
                                                                         double driverIncome = getP - commission;
                                                                         double newDebt = ddd + driverIncome;
-
                                                                         FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
                                                                     } else {
                                                                         FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("0");
@@ -511,7 +528,15 @@ public class CourseService extends Service implements
 
                                                             }
                                                         });
-                                                        FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).removeValue();
+
+                                                        final Handler handler = new Handler();
+                                                        handler.postDelayed(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).removeValue();
+                                                            }
+                                                        }, 3000);
+
                                                         FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("LASTCOURSE").setValue("Derniére course : Captain " + driverName + " / " + getP + " MAD");
                                                         FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("COURSE").setValue(courseID);
                                                         FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").setValue(courseID);
@@ -563,8 +588,14 @@ public class CourseService extends Service implements
             if (state == 5) {
                 countingPreWait = false;
                 countingDistance = false;
-
-                FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).removeValue();
+                final Handler handler1 = new Handler();
+                handler1.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        //Do something after 3000ms
+                        FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).removeValue();
+                    }
+                }, 3000);
 
             }
 
