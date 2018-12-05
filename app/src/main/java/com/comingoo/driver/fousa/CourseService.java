@@ -48,7 +48,8 @@ import java.util.Map;
 
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
-public class CourseService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class CourseService extends Service implements
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     private DatabaseReference onlineDriver;
     private DatabaseReference courseRef;
 
@@ -69,11 +70,7 @@ public class CourseService extends Service implements GoogleApiClient.Connection
     private ValueEventListener listener;
 
     private double time = 0;
-
-
     private Service myService;
-
-
     private Location userLoc;
 
     private Service thisService;
@@ -96,7 +93,6 @@ public class CourseService extends Service implements GoogleApiClient.Connection
     private EventListener driverO;
     private String promoCode = "";
 
-
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     double speed;
@@ -115,7 +111,6 @@ public class CourseService extends Service implements GoogleApiClient.Connection
 
     private int promoVal = 0;
     private int commission = 25; // 25% comission
-
 
     private class CourseServiceTask extends AsyncTask<String, Integer, String> {
         @Override
@@ -159,8 +154,6 @@ public class CourseService extends Service implements GoogleApiClient.Connection
                                 isFixed = true;
                                 fixedPrice = Double.parseDouble(dataSnapshot.child("fixedPrice").getValue(String.class));
                             }
-                            //checkState();
-
 
                             if (state == 3 && !checkedState) {
                                 new CheckStateTask().execute();
@@ -187,7 +180,6 @@ public class CourseService extends Service implements GoogleApiClient.Connection
             //desconnect Driver if still Online
             onlineDriver = FirebaseDatabase.getInstance().getReference("ONLINEDRIVERS").child(userId);
 
-
 //            DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference("COURSES");
 //            DatabaseReference userNameRef = rootRef.child("ujwal");
 //            ValueEventListener eventListener = new ValueEventListener() {
@@ -202,7 +194,6 @@ public class CourseService extends Service implements GoogleApiClient.Connection
 //                public void onCancelled(DatabaseError databaseError) {}
 //            };
 //            userNameRef.addListenerForSingleValueEvent(eventListener);
-
 
             return "this string is passed to onPostExecute";
         }
