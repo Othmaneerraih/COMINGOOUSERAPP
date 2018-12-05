@@ -98,11 +98,11 @@ public class CourseService extends Service implements
     double speed;
 
 
-    private Handler h;
-    private Runnable r;
+//    private Handler h;
+//    private Runnable r;
 
-    private Handler hh;
-    private Runnable rr;
+//    private Handler hh;
+//    private Runnable rr;
 
     private LocationCallback locationCallback;
     private FusedLocationProviderClient fusedLocationProviderClient;
@@ -114,12 +114,12 @@ public class CourseService extends Service implements
         protected void onPreExecute() {
             super.onPreExecute();
             isFixed = false;
+            Log.e(TAG, "onPreExecute: CourseServiceTask 1111111111 " );
         }
 
         // This is run in a background thread
         @Override
         protected String doInBackground(String... params) {
-
             SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
             userId = prefs.getString("userId", null);
             courseID = prefs.getString("courseID", null);
@@ -153,11 +153,12 @@ public class CourseService extends Service implements
                             }
 
                             if (state == 3 && !checkedState) {
-                                new CheckStateTask().execute();
+//                                new CheckStateTask().execute();
                                 courseRef.removeEventListener(this);
-                            } else {
-                                new CheckStateTask().execute();
                             }
+//                              else {
+                                new CheckStateTask().execute();
+//                            }
                         } catch (Exception e) {
                             thisService.stopSelf();
                         }
@@ -217,24 +218,26 @@ public class CourseService extends Service implements
             }
         });
 
-        h = new Handler(Looper.getMainLooper());
-        hh = new Handler(Looper.getMainLooper());
-
-        r = new Runnable() {
-            @Override
-            public void run() {
-                if (countingDistance) {
-                    if (checkIfLocationOpened()) {
-                        time += 0.3;
-                        getLastLocation();
-                    }
-                    h.postDelayed(this, 300);
-                }
-            }
-        };
-
 //        new LocationUpdatesTask().execute();
         new CourseServiceTask().execute();
+
+
+//        h = new Handler(Looper.getMainLooper());
+//        hh = new Handler(Looper.getMainLooper());
+
+//        r = new Runnable() {
+//            @Override
+//            public void run() {
+//                if (countingDistance) {
+//                    if (checkIfLocationOpened()) {
+//                        time += 3;
+                        getLastLocation();
+//                    }
+//                    h.postDelayed(this, 3000);
+//                }
+//            }
+//        };
+
 
 
         return START_STICKY;
@@ -245,6 +248,7 @@ public class CourseService extends Service implements
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            Log.e(TAG, "onPreExecute: worked ujjwal" );
         }
 
         // This is run in a background thread
@@ -301,12 +305,13 @@ public class CourseService extends Service implements
                 countingPreWait = false;
                 if (!countingDistance) {
                     countingDistance = true;
-                    r.run();
+//                    runnable.run();
+                    handler.removeCallbacks(runnable);
                 }
             }
 
             if (state == 3 && !checkedState) {
-                getLastLocation();
+//                getLastLocation();
                 checkedState = true;
                 countingPreWait = false;
                 countingDistance = false;
@@ -597,6 +602,7 @@ public class CourseService extends Service implements
 
                             }
                         });
+
             }
 
             ///////////////////////////////////////////////////////////////////////////
@@ -626,7 +632,6 @@ public class CourseService extends Service implements
         protected void onProgressUpdate(Integer... values) {
             super.onProgressUpdate(values);
 
-            // Do things like update the progress bar
         }
 
         // This runs in UI when background thread finishes
@@ -668,8 +673,8 @@ public class CourseService extends Service implements
     public void onDestroy() {
         super.onDestroy();
         try {
-            h.removeCallbacks(r);
-            hh.removeCallbacks(rr);
+//            h.removeCallbacks(r);
+//            hh.removeCallbacks(rr);
             //fusedLocationProviderClient.removeLocationUpdates(locationCallback);
             if (mGoogleApiClient != null)
                 mGoogleApiClient.disconnect();
@@ -1125,7 +1130,6 @@ public class CourseService extends Service implements
     private LocationManager mLocationManager = null;
     private static final int LOCATION_INTERVAL = 1000;
     private static final float LOCATION_DISTANCE = 10f;
-
 
     LocationListener[] mLocationListeners = new LocationListener[]{
             new LocationListener(LocationManager.GPS_PROVIDER),
