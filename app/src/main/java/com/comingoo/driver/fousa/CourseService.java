@@ -445,7 +445,7 @@ public class CourseService extends Service implements
                                                 dCourse.child("date").setValue(timestamp);
 
 
-                                                final double getP = price;
+                                                final double currentBil = price;
                                                 FirebaseDatabase.getInstance().getReference("DRIVERUSERS").
                                                         child(userId).child("EARNINGS").child(getDateMonth(GetUnixTime())).child(getDateDay(GetUnixTime())).addListenerForSingleValueEvent(new ValueEventListener() {
                                                     @Override
@@ -462,7 +462,7 @@ public class CourseService extends Service implements
                                                         if (isFixed)
                                                             earned += fixedPrice;
                                                         else
-                                                            earned += getP;
+                                                            earned += currentBil;
 
                                                         voyages += 1;
 
@@ -482,28 +482,28 @@ public class CourseService extends Service implements
                                                                 earnings.put("voyages", "" + vv);
 
 
-                                                                final double ddd = debt;
+                                                                final double priviousDebt = debt;
                                                                 FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).addListenerForSingleValueEvent(new ValueEventListener() {
                                                                     @Override
                                                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                                         if (dataSnapshot.child("SOLDE").exists()) {
                                                                             try {
                                                                                 double oldSold = Double.parseDouble(dataSnapshot.child("SOLDE").getValue(String.class));
-                                                                                if (dataSnapshot.child("USECREDIT").getValue(String.class).equals("1") && Integer.parseInt(dataSnapshot.child("SOLDE").getValue(String.class)) >= (int) getP) {
-                                                                                    double newSolde = oldSold - getP;
+                                                                                if (dataSnapshot.child("USECREDIT").getValue(String.class).equals("1") && Double.parseDouble(dataSnapshot.child("SOLDE").getValue(String.class)) >= getP) {
+                                                                                    double newSolde = oldSold - currentBil;
                                                                                     FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("SOLDE").setValue("" + newSolde);
                                                                                     FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("1");
-                                                                                    double commission = getP * percent;
-                                                                                    double driverIncome = getP - commission;
-                                                                                    double newDebt = ddd + driverIncome;
+                                                                                    double commission = currentBil * percent;
+                                                                                    double driverIncome = currentBil - commission;
+                                                                                    double newDebt = priviousDebt + driverIncome;
                                                                                     FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").setValue("0.0");
                                                                                     FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
 
                                                                                 } else {
                                                                                     FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("0");
-                                                                                    double commission = getP * percent;
-                                                                                    double userDue = getP - oldSold;
-                                                                                    double newDebt = ddd + (getP - userDue - commission);
+                                                                                    double commission = currentBil * percent;
+                                                                                    double userDue = currentBil - oldSold;
+                                                                                    double newDebt = priviousDebt + (currentBil - userDue - commission);
                                                                                     FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("SOLDE").setValue("" + 0);
                                                                                     FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").setValue(Double.toString(userDue));
                                                                                     FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
@@ -515,8 +515,8 @@ public class CourseService extends Service implements
                                                                             }
                                                                         } else {
                                                                             try {
-                                                                                double commission = getP * percent * -1;
-                                                                                double newDebt = (ddd + commission);
+                                                                                double commission = currentBil * percent * -1;
+                                                                                double newDebt = (priviousDebt + commission);
                                                                                 FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("0");
                                                                                 FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
                                                                                 FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").setValue(Double.toString(price));
