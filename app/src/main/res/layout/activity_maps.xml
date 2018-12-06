@@ -148,7 +148,7 @@
                 android:layout_marginRight="8dp"
                 android:layout_marginBottom="8dp"
                 android:gravity="center_vertical"
-                android:text="Ecole Bla Bla Bla Casablance,  Morocco."
+                android:text=""
                 android:textColor="@android:color/white"
                 android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="parent"
