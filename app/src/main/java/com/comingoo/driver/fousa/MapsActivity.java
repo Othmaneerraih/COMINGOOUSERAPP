@@ -158,6 +158,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(MapsActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.READ_CONTACTS}, 1);
         }
+
+        if (offlineButton.getVisibility() == View.VISIBLE) {
+            switchOnlineUI();
+        }
     }
 
     BitmapFactory.Options bOptions;
@@ -357,12 +361,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     switchOnlineUI();
                 }
             });
+
             onlineButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     switchOfflineUI();
                 }
             });
+
             menuButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -455,6 +461,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         userInfoLayout.setBackgroundColor(Color.WHITE);
 //        constraint_user_info.setBackgroundColor(Color.WHITE);
     }
+
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -964,12 +971,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         });
 
 
-
                                         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                                             @Override
                                             public void onDismiss(DialogInterface dialog) {
                                                 stopService(intent);
-                                                startService(intent);
+//                                                startService(intent);
+                                                switchOnlineUI();
                                             }
                                         });
 
@@ -1176,8 +1183,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //                                                });*/
 
 
-
-
                                         FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).
                                                 addListenerForSingleValueEvent(new ValueEventListener() {
                                                     @Override
@@ -1234,10 +1239,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                 if (dataSnapshot.exists()) {
                                                                                     Log.e(TAG, "PROMOCODE onDataChange: " + dataSnapshot.getValue(String.class));
                                                                                     ridePrice = price3;
-                                                                                    FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").setValue(price3);
+//                                                                                    FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").setValue(price3);
                                                                                 } else {
                                                                                     ridePrice = price2;
-                                                                                    FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").setValue(price2);
+//                                                                                    FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").setValue(price2);
                                                                                 }
                                                                             }
 
@@ -1343,17 +1348,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                                                                                 if (dataSnapshot.child("SOLDE").exists()) {
                                                                                                     try {
+
                                                                                                         double oldSold = Double.parseDouble(dataSnapshot.child("SOLDE").getValue(String.class));
+
                                                                                                         if (dataSnapshot.child("USECREDIT").getValue(String.class).equals("1") && Double.parseDouble(dataSnapshot.child("SOLDE").getValue(String.class)) >= currentBil) {
                                                                                                             Log.e(TAG, "onDataChange:222222222222222 ");
                                                                                                             double newSolde = oldSold - currentBil;
                                                                                                             FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("SOLDE").setValue("" + newSolde);
+                                                                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("USECREDIT").setValue("1");
                                                                                                             FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("1");
                                                                                                             double commission = currentBil * percent;
                                                                                                             double driverIncome = currentBil - commission;
                                                                                                             double newDebt = priviousDebt + driverIncome;
                                                                                                             FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").setValue("0.0");
-                                                                                                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
+//                                                                                                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
 
                                                                                                         } else {
                                                                                                             Log.e(TAG, "onDataChange:33333333333333333 ");
@@ -1362,8 +1370,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                                             double userDue = currentBil - oldSold;
                                                                                                             double newDebt = priviousDebt + (currentBil - userDue - commission);
                                                                                                             FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("SOLDE").setValue("" + 0);
+                                                                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("USECREDIT").setValue("0");
                                                                                                             FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").setValue(Double.toString(userDue));
-                                                                                                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
+//                                                                                                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
                                                                                                         }
                                                                                                     } catch (NumberFormatException e) {
                                                                                                         e.printStackTrace();
@@ -1378,7 +1387,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                                         double commission = currentBil * percent * -1;
                                                                                                         double newDebt = (priviousDebt + commission);
                                                                                                         FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("0");
-                                                                                                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
+//                                                                                                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
                                                                                                         FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").setValue(Double.toString(ridePrice));
                                                                                                     } catch (NumberFormatException e) {
                                                                                                         e.printStackTrace();
@@ -1399,7 +1408,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                         FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("level").addListenerForSingleValueEvent(new ValueEventListener() {
                                                                                             @Override
                                                                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                                                                Log.e(TAG, "onDataChange:55555555555 ");
                                                                                                 if (dataSnapshot.getValue(String.class).equals("2"))
                                                                                                     FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("level").setValue("1");
 
@@ -1425,6 +1433,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                             @Override
                                                                                             public void run() {
                                                                                                 FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).removeValue();
+//                                                                                                switchOnlineUI();
                                                                                             }
                                                                                         }, 3000);
                                                                                     }
@@ -1465,8 +1474,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                 });
 
 
-
-
                                         gotMoney.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View v) {
@@ -1492,6 +1499,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                         public void run() {
                                                             //Do something after 3000ms
                                                             FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").removeValue();
+//                                                            switchOnlineUI();
                                                         }
                                                     }, 3000);
 
@@ -1539,105 +1547,109 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         charge.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View v) {
-                                                String val = moneyAmount.getText().toString();
+
                                                 if (moneyAmount.getText().toString().length() > 0) {
+                                                    final String value = moneyAmount.getText().toString();
+                                                    final int userProvidedRecharge = Integer.parseInt(value);
 
-                                                    String value = moneyAmount.getText().toString();
-                                                    int finalValue = Integer.parseInt(value);
+                                                    if (userProvidedRecharge < 100) {
+//                                                        final int money = (userProvidedRecharge - Integer.parseInt(dataSnapshott.child("price").getValue(String.class)));
+//                                                        if (money > 0) {
+                                                        final String riderId = dataSnapshott.child("client").getValue(String.class);
 
-                                                    if (finalValue < 100) {
-                                                        final int money = (finalValue - Integer.parseInt(dataSnapshott.child("price").getValue(String.class)));
-                                                        if (money > 0) {
-                                                            final String riderId = dataSnapshott.child("client").getValue(String.class);
-                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").
-                                                                    child(dataSnapshott.child("client").getValue(String.class)).child("SOLDE").
-                                                                    addListenerForSingleValueEvent(new ValueEventListener() {
-                                                                        @Override
-                                                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                                            cM = money;
-                                                                            if (dataSnapshot.exists()) {
-                                                                                cM += Integer.parseInt(dataSnapshot.getValue(String.class));
+                                                        FirebaseDatabase.getInstance().getReference("clientUSERS").
+                                                                child(dataSnapshott.child("client").getValue(String.class)).child("SOLDE").
+                                                                addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                    @Override
+                                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                        cM = userProvidedRecharge;
+                                                                        if (dataSnapshot.exists()) {
+                                                                            cM += Double.parseDouble(dataSnapshot.getValue(String.class));
+                                                                        }
+
+                                                                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                            @Override
+                                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                                                                                if (dataSnapshot.exists()) {
+                                                                                    debt = Double.parseDouble(dataSnapshot.getValue(String.class));
+                                                                                }
                                                                             }
 
+                                                                            @Override
+                                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                                                                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").addListenerForSingleValueEvent(new ValueEventListener() {
-                                                                                @Override
-                                                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                            }
+                                                                        });
 
-                                                                                    if (dataSnapshot.exists()) {
-                                                                                        debt = Double.parseDouble(dataSnapshot.getValue(String.class));
-                                                                                    }
-                                                                                }
+                                                                        // Inserting user recharge into user information table
+                                                                        FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(riderId).addValueEventListener(new ValueEventListener() {
+                                                                            @Override
+                                                                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                                                                if (dataSnapshot.exists()) {
 
-                                                                                @Override
-                                                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                                                    Log.e(TAG, "onDataChange driver already have: "+ debt);
+                                                                                    Log.e(TAG, "onDataChange wants user input: "+ cM);
 
-                                                                                }
-                                                                            });
+                                                                                    debt -= userProvidedRecharge;
 
+                                                                                    Log.e(TAG, "onDataChange after calculation: "+ debt);
 
-
-                                                                            FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(riderId).addValueEventListener(new ValueEventListener() {
-                                                                                @Override
-                                                                                public void onDataChange(DataSnapshot dataSnapshot) {
-                                                                                    if (dataSnapshot.exists()) {
-                                                                                        debt -= cM;
-                                                                                        if (dataSnapshot.getChildrenCount() >= 3) {
-                                                                                            rideMorethanThree = true;
-                                                                                            if (cM <= 100) {
-                                                                                                // Enter the value into driver wallet here
-
-
-
-                                                                                                FirebaseDatabase.getInstance().getReference("clientUSERS").child(dataSnapshott.child("client").getValue(String.class)).child("SOLDE").setValue("" + cM);
-                                                                                                dialog.dismiss();
-                                                                                            } else
-                                                                                                Toast.makeText(MapsActivity.this, "Vous ne pouvez pas dépasser 100 MAD de recharge pour ce client.", Toast.LENGTH_LONG).show();
-                                                                                        } else {
-                                                                                            rideMorethanThree = false;
-                                                                                            if (cM <= 10) {
-                                                                                                // Enter the value into driver wallet here
-
-
-
-                                                                                                FirebaseDatabase.getInstance().getReference("clientUSERS").child(dataSnapshott.child("client").getValue(String.class)).child("SOLDE").setValue("" + cM);
-                                                                                                dialog.dismiss();
-                                                                                            } else
-                                                                                                Toast.makeText(MapsActivity.this, "Vous ne pouvez pas dépasser 10 MAD de recharge pour ce client.", Toast.LENGTH_LONG).show();
-                                                                                        }
+                                                                                    if (dataSnapshot.getChildrenCount() >= 3) {
+                                                                                        rideMorethanThree = true;
+                                                                                        if (cM <= 100) {
+                                                                                            // Enter the value into driver wallet here
+                                                                                            Log.e(TAG, "onDataChange:DRIVERUSERS id: "+userId );
+                                                                                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(""+debt);
+                                                                                            Log.e(TAG, "onDataChange: value saved" + debt);
+                                                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(dataSnapshott.child("client").getValue(String.class)).child("SOLDE").setValue("" + cM);
+                                                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(dataSnapshott.child("client").getValue(String.class)).child("USECREDIT").setValue("1");
+                                                                                            dialog.dismiss();
+                                                                                        } else
+                                                                                            Toast.makeText(MapsActivity.this, "Vous ne pouvez pas dépasser 100 MAD de recharge pour ce client.", Toast.LENGTH_LONG).show();
                                                                                     } else {
+                                                                                        rideMorethanThree = false;
+                                                                                        if (cM <= 10) {
+                                                                                            // Enter the value into driver wallet here
+                                                                                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(debt));
+                                                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(dataSnapshott.child("client").getValue(String.class)).child("SOLDE").setValue("" + cM);
+                                                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(dataSnapshott.child("client").getValue(String.class)).child("USECREDIT").setValue("1");
+                                                                                            dialog.dismiss();
+                                                                                        } else
+                                                                                            Toast.makeText(MapsActivity.this, "Vous ne pouvez pas dépasser 10 MAD de recharge pour ce client.", Toast.LENGTH_LONG).show();
                                                                                     }
+                                                                                } else {
                                                                                 }
+                                                                            }
 
-                                                                                @Override
-                                                                                public void onCancelled(DatabaseError databaseError) {
-                                                                                    dialog.dismiss();
-                                                                                }
-                                                                            });
+                                                                            @Override
+                                                                            public void onCancelled(DatabaseError databaseError) {
+                                                                                dialog.dismiss();
+                                                                            }
+                                                                        });
 
 
+                                                                    }
 
-                                                                        }
+                                                                    @Override
+                                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                                        dialog.dismiss();
+                                                                    }
+                                                                });
 
-                                                                        @Override
-                                                                        public void onCancelled(@NonNull DatabaseError databaseError) {
-                                                                            dialog.dismiss();
-                                                                        }
-                                                                    });
-
-                                                        } else
-                                                            Toast.makeText(MapsActivity.this, getString(R.string.txt_not_enough_money), Toast.LENGTH_LONG).show();
+//                                                        } else
+//                                                            Toast.makeText(MapsActivity.this, getString(R.string.txt_not_enough_money), Toast.LENGTH_LONG).show();
 
                                                     } else
                                                         Toast.makeText(MapsActivity.this, "Vous ne pouvez pas dépasser 100 MAD de recharge pour ce client.", Toast.LENGTH_LONG).show();
 
-                                                    final Handler handler = new Handler();
-                                                    handler.postDelayed(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-
-                                                        }
-                                                    }, 3000);
+//                                                    final Handler handler = new Handler();
+////                                                    handler.postDelayed(new Runnable() {
+////                                                        @Override
+////                                                        public void run() {
+////
+////                                                        }
+////                                                    }, 3000);
 
                                                 }
                                             }
@@ -2246,7 +2258,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             date.setText(dateString);
                             userInfoLayout.setBackgroundColor(Color.WHITE);
                         }
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
@@ -2369,17 +2381,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return DateFormat.format(dateFormat, Long.parseLong(dateInMilliseconds)).toString();
     }
 
-    private void switchtoCourseUI() {
-        switchOfflineUI();
-        findViewById(R.id.statusConstraint).setVisibility(View.GONE);
-        findViewById(R.id.money).setVisibility(View.GONE);
-        clientInfoLayout.setVisibility(View.VISIBLE);
-        destinationLayout.setVisibility(View.VISIBLE);
-        menuButton.setVisibility(View.GONE);
-
-//        constraint_user_info.setBackgroundColor(Color.WHITE);
-//        clientInfoLayout.setBackgroundColor(Color.WHITE);
-    }
 
     private void courseUIOff() {
         findViewById(R.id.statusConstraint).setVisibility(View.VISIBLE);
