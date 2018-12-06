@@ -1311,7 +1311,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                         else currentBil = price2;
 
                                                                         Log.e(TAG, "onDataChange: "+currentBil );
-                                                                        
+
                                                                         FirebaseDatabase.getInstance().getReference("DRIVERUSERS").
                                                                                 child(userId).child("EARNINGS").child(getDateMonth(GetUnixTime())).child(getDateDay(GetUnixTime())).addListenerForSingleValueEvent(new ValueEventListener() {
                                                                             @Override
