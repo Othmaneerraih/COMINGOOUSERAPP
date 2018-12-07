@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,7 +35,7 @@ import java.util.Locale;
 import java.util.Map;
 
 public class comingoonuActivity extends AppCompatActivity {
-
+    private String TAG = "comingoonuActivity";
     private int selectedScreen = 0;
     private ConstraintLayout parametreLayout, profileLayout, addCarLayout, changePasswordLayout, carsLayout, portFeuilleLayout;
     private ImageView paramsImage, profilImage, portFImage;
@@ -75,62 +76,22 @@ public class comingoonuActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comingoonu);
 
-        parametreLayout = (ConstraintLayout) findViewById(R.id.parametres_layout);
-        profileLayout = (ConstraintLayout) findViewById(R.id.profil_layout);
-        addCarLayout = (ConstraintLayout) findViewById(R.id.add_car_layout);
-        changePasswordLayout = (ConstraintLayout) findViewById(R.id.change_password);
-        carsLayout = (ConstraintLayout) findViewById(R.id.cars_layout);
-        portFeuilleLayout = (ConstraintLayout) findViewById(R.id.porte_feuille_layout);
-
-        paramsImage = (ImageView) findViewById(R.id.imageView13);
-        profilImage = (ImageView) findViewById(R.id.imageView17);
-        portFImage = (ImageView) findViewById(R.id.imageView16);
-
-
-        pA = (ConstraintLayout) findViewById(R.id.paLayout);
-        pR = (ConstraintLayout) findViewById(R.id.prLayout);
-        pO = (ConstraintLayout) findViewById(R.id.poLayout);
-
-        tvTarrif = findViewById(R.id.tv_tarrif);
-
-        changePasswordButton = (ConstraintLayout) findViewById(R.id.change_password_button);
-        backChangePassword = (ImageButton) findViewById(R.id.back_select_password);
-
-        manageCars = (ConstraintLayout) findViewById(R.id.manageCars);
-        backManageCars = (ImageButton) findViewById(R.id.back_select_cars);
-
-        addCarButton = (Button) findViewById(R.id.add_car_button);
-        backAddCar = (ImageButton) findViewById(R.id.back_select_add_car);
-
-
-        todayEarnings = (TextView) findViewById(R.id.earnings_value);
-        debt = (TextView) findViewById(R.id.debt_value);
-        courses = (TextView) findViewById(R.id.courses_value);
-        userName = (TextView) findViewById(R.id.name_value);
-        phoneNumber = (TextView) findViewById(R.id.phone_value);
+        initialize();
 
         todayEarnings.setText(getIntent().getStringExtra("earnings") + " MAD");
+        todayEarnings.setTextColor(Color.GREEN);
         double debtPrice = Double.parseDouble(getIntent().getStringExtra("debt"));
-        debt.setText(debt + "MAD");
-        if(debtPrice>0){
+        debt.setText(debtPrice + "MAD");
+
+        if (debtPrice > 0) {
             debt.setTextColor(Color.GREEN);
-        }else{
+        } else {
             debt.setTextColor(Color.RED);
         }
         courses.setText(getIntent().getStringExtra("courses"));
         userName.setText(getIntent().getStringExtra("name"));
         phoneNumber.setText(getIntent().getStringExtra("phone"));
 
-        changePassBtn = (Button) findViewById(R.id.change_password_btn);
-
-        typeCar = (EditText) findViewById(R.id.marque_car);
-        modelCar = (EditText) findViewById(R.id.modele_car);
-        immCar = (EditText) findViewById(R.id.imm_car);
-        colorCar = (EditText) findViewById(R.id.color_car);
-        addCar = (Button) findViewById(R.id.add_car);
-
-        tarifs = (ConstraintLayout) findViewById(R.id.tarifs);
-        tarifsLayout = (ConstraintLayout) findViewById(R.id.tarifsLayout);
         ivTarifBack = findViewById(R.id.iv_back_tarifs);
 
         selectedScreen = 0;
@@ -286,6 +247,53 @@ public class comingoonuActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void initialize() {
+
+        changePassBtn = (Button) findViewById(R.id.change_password_btn);
+
+        typeCar = (EditText) findViewById(R.id.marque_car);
+        modelCar = (EditText) findViewById(R.id.modele_car);
+        immCar = (EditText) findViewById(R.id.imm_car);
+        colorCar = (EditText) findViewById(R.id.color_car);
+        addCar = (Button) findViewById(R.id.add_car);
+
+        tarifs = (ConstraintLayout) findViewById(R.id.tarifs);
+        tarifsLayout = (ConstraintLayout) findViewById(R.id.tarifsLayout);
+        parametreLayout = (ConstraintLayout) findViewById(R.id.parametres_layout);
+        profileLayout = (ConstraintLayout) findViewById(R.id.profil_layout);
+        addCarLayout = (ConstraintLayout) findViewById(R.id.add_car_layout);
+        changePasswordLayout = (ConstraintLayout) findViewById(R.id.change_password);
+        carsLayout = (ConstraintLayout) findViewById(R.id.cars_layout);
+        portFeuilleLayout = (ConstraintLayout) findViewById(R.id.porte_feuille_layout);
+
+        paramsImage = (ImageView) findViewById(R.id.imageView13);
+        profilImage = (ImageView) findViewById(R.id.imageView17);
+        portFImage = (ImageView) findViewById(R.id.imageView16);
+
+
+        pA = (ConstraintLayout) findViewById(R.id.paLayout);
+        pR = (ConstraintLayout) findViewById(R.id.prLayout);
+        pO = (ConstraintLayout) findViewById(R.id.poLayout);
+
+        tvTarrif = findViewById(R.id.tv_tarrif);
+
+        changePasswordButton = (ConstraintLayout) findViewById(R.id.change_password_button);
+        backChangePassword = (ImageButton) findViewById(R.id.back_select_password);
+
+        manageCars = (ConstraintLayout) findViewById(R.id.manageCars);
+        backManageCars = (ImageButton) findViewById(R.id.back_select_cars);
+
+        addCarButton = (Button) findViewById(R.id.add_car_button);
+        backAddCar = (ImageButton) findViewById(R.id.back_select_add_car);
+
+
+        todayEarnings = (TextView) findViewById(R.id.earnings_value);
+        debt = findViewById(R.id.debt_value);
+        courses = (TextView) findViewById(R.id.courses_value);
+        userName = (TextView) findViewById(R.id.name_value);
+        phoneNumber = (TextView) findViewById(R.id.phone_value);
     }
 
     private void addNewCar(String marque, String modele, String imm, String colorCar) {
