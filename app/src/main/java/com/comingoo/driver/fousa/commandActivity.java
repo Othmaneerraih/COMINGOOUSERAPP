@@ -112,7 +112,7 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
                 if (mp.isPlaying()) {
                     mp.stop();
                 }
-                mp.release();
+//                mp.release();
                 vibrator.cancel();
                 am.setStreamVolume(AudioManager.STREAM_MUSIC, origionalVolume, 0);
 
@@ -321,6 +321,7 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
                 if (mp.isPlaying()) {
                     mp.stop();
                 }
+                vibrator.cancel();
                 FirebaseDatabase.getInstance().getReference("COURSES").orderByChild("client").
                         equalTo(clientID).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -472,6 +473,11 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
                 barTimer.setProgress((int) seconds);
                 if (seconds == 0) {
                     try {
+                        if(mp.isPlaying()){
+                            mp.stop();
+                        }
+                        
+                        vibrator.cancel();
                         showCustomDialog(commandActivity.this);
                     } catch (Exception e) {
                         e.printStackTrace();
