@@ -2195,7 +2195,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 mMap.clear();
 
         } else {
-
             switchToCourseUI();
             if (courseState.equals("3")) {
                 stopCourseService();
@@ -2362,7 +2361,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 @Override
                 public void onClick(View v) {
                     courseRef.child("state").setValue("3");
-//                    courseState = "4";
+                    courseState = "4";
                     wazeButton.setVisibility(View.GONE);
                     if (!isRatingPopupShowed) {
                         new checkCourseFinished().execute();
