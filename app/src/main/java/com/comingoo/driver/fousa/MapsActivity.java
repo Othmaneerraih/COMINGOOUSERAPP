@@ -405,6 +405,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 public void onClick(View v) {
                     logout();
                     switchOfflineUI();
+                    stopCourseService();
                     startActivity(new Intent(MapsActivity.this, MainActivity.class));
                     finish();
                 }
@@ -2685,6 +2686,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 @Override
                 public void onClick(View v) {
                     courseRef.child("state").setValue("2");
+//                    isRatingPopupShowed = false;
                 }
             });
             if (mMap != null)
