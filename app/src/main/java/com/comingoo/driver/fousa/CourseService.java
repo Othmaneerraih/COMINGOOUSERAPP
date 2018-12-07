@@ -247,8 +247,7 @@ public class CourseService extends Service implements GoogleApiClient.Connection
         };
 
 //        new LocationUpdatesTask().execute();
-//        new CourseServiceTask().execute();
-        new CheckStateTask().execute();
+        new CourseServiceTask().execute();
 
 
         return START_STICKY;

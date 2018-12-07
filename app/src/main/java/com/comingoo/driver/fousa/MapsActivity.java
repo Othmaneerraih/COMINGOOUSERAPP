@@ -1303,7 +1303,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                             currentBil = price3;
                                                                         else currentBil = price2;
 
-                                                                        Log.e(TAG, "onDataChange: " + currentBil);
+                                                                        Log.e(TAG, "onDataChange: final currentBil:  " + currentBil);
 
                                                                         FirebaseDatabase.getInstance().getReference("DRIVERUSERS").
                                                                                 child(userId).child("EARNINGS").child(getDateMonth(GetUnixTime())).child(getDateDay(GetUnixTime())).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -1367,7 +1367,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                                             double driverIncome = currentBil - commission;
                                                                                                             double newDebt = priviousDebt + driverIncome;
                                                                                                             FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").setValue("0.0");
-//                                                                                                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
+                                                                                                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
                                                                                                             price.setText("0.0 MAD");
 
                                                                                                         } else {
@@ -1388,7 +1388,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                                                                                             price.setText(String.format("%.2f", userDue) + " MAD");
 
-//                                                                                                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
+                                                                                                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
                                                                                                         }
                                                                                                     } catch (NumberFormatException e) {
                                                                                                         e.printStackTrace();
@@ -1407,7 +1407,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                                                                                         double newDebt = (priviousDebt + commission);
                                                                                                         FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("0");
-//                                                                                                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
+                                                                                                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
                                                                                                         FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").setValue(Double.toString(ridePrice));
                                                                                                         price.setText(String.format("%.2f", ridePrice) + " MAD");
                                                                                                     } catch (NumberFormatException e) {
