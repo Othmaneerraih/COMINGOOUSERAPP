@@ -2687,7 +2687,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 @Override
                 public void onClick(View v) {
                     courseRef.child("state").setValue("2");
-//                    isRatingPopupShowed = false;
+                    isRatingPopupShowed = false;
                 }
             });
             if (mMap != null)
