@@ -279,6 +279,9 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         distance.setText(time+" min /" + dist + "km");
         startText.setText("De : " + intent.getStringExtra("start"));
 
+        accept.setClickable(true);
+        accept.setEnabled(true);
+
         decline.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -318,6 +321,8 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         accept.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                accept.setClickable(false);
+                accept.setEnabled(false);
                 if (mp.isPlaying()) {
                     mp.stop();
                 }
@@ -514,36 +519,6 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
 
-//    AlertDialog.Builder dialogBuilder;
-//    AlertDialog OptionDialog;
-//
-//    public void showCustomDialog() {
-//        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(commandActivity.this);
-//        LayoutInflater inflater = this.getLayoutInflater();
-//        View dialogView = inflater.inflate(R.layout.content_misses_ride_request, null);
-//        dialogBuilder.setView(dialogView);
-//        final AlertDialog OptionDialog = dialogBuilder.create();
-//        Button btnOk = dialogView.findViewById(R.id.btn_passer_hors);
-//        btnOk.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                OptionDialog.dismiss();
-//                FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
-//            }
-//        });
-//
-//        Button btnCancel = dialogView.findViewById(R.id.btn_rester_engine);
-//        btnCancel.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                OptionDialog.dismiss();
-//                finish();
-//            }
-//        });
-//
-//        OptionDialog.show();
-//        dialogBuilder.show();
-//    }
 
     public void showCustomDialog(final Context context) {
         final Dialog dialog = new Dialog(context);
@@ -569,10 +544,6 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         });
 
         dialog.setContentView(dialogView);
-//        final Window window = dialog.getWindow();
-//        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
-//        window.setBackgroundDrawableResource(R.color.colorTransparent);
-//        window.setGravity(Gravity.CENTER);
         dialog.show();
     }
 
@@ -580,8 +551,6 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
     public void onStop() {
         super.onStop();
         active = false;
-//        if (OptionDialog != null)
-//            OptionDialog.dismiss();
     }
 
 }

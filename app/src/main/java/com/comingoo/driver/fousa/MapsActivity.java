@@ -1888,8 +1888,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                             FirebaseDatabase.getInstance().getReference("clientUSERS").child(dataSnapshott.child("client").getValue(String.class)).child("SOLDE").setValue("" + newSold);
                                                                                             FirebaseDatabase.getInstance().getReference("clientUSERS").child(dataSnapshott.child("client").getValue(String.class)).child("USECREDIT").setValue("1");
                                                                                             dialog.dismiss();
-                                                                                        } else
+                                                                                        } else {
                                                                                             Toast.makeText(MapsActivity.this, "Vous ne pouvez pas dépasser 100 MAD de recharge pour ce client.", Toast.LENGTH_LONG).show();
+                                                                                        }
                                                                                     } else {
                                                                                         rideMorethanThree = false;
                                                                                         if (cM <= 10) {
@@ -1900,8 +1901,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                             FirebaseDatabase.getInstance().getReference("clientUSERS").child(dataSnapshott.child("client").getValue(String.class)).child("SOLDE").setValue("" + newSold);
                                                                                             FirebaseDatabase.getInstance().getReference("clientUSERS").child(dataSnapshott.child("client").getValue(String.class)).child("USECREDIT").setValue("1");
                                                                                             dialog.dismiss();
-                                                                                        } else
+                                                                                        } else {
                                                                                             Toast.makeText(MapsActivity.this, "Vous ne pouvez pas dépasser 10 MAD de recharge pour ce client.", Toast.LENGTH_LONG).show();
+                                                                                        }
                                                                                     }
                                                                                 }
                                                                             }
