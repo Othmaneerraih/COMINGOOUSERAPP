@@ -48,8 +48,7 @@ import java.util.Map;
 
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
-public class CourseService extends Service implements
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class CourseService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private DatabaseReference onlineDriver;
     private DatabaseReference courseRef;
@@ -71,7 +70,11 @@ public class CourseService extends Service implements
     private ValueEventListener listener;
 
     private double time = 0;
+
+
     private Service myService;
+
+
     private Location userLoc;
 
     private Service thisService;
@@ -92,6 +95,8 @@ public class CourseService extends Service implements
     private boolean checkedState;
 
     private EventListener driverO;
+    private String promoCode = null;
+
 
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
@@ -108,6 +113,9 @@ public class CourseService extends Service implements
     private FusedLocationProviderClient fusedLocationProviderClient;
 
     private String driverName;
+
+    private int promoVal = 0;
+
 
     private class CourseServiceTask extends AsyncTask<String, Integer, String> {
         @Override
@@ -151,13 +159,15 @@ public class CourseService extends Service implements
                                 isFixed = true;
                                 fixedPrice = Double.parseDouble(dataSnapshot.child("fixedPrice").getValue(String.class));
                             }
+                            //checkState();
+
 
                             if (state == 3 && !checkedState) {
-                                new CheckStateTask().execute();
+                                getLastLocation();
                                 courseRef.removeEventListener(this);
-                            } else {
-                                new CheckStateTask().execute();
                             }
+                            new CheckStateTask().execute();
+
                         } catch (Exception e) {
                             thisService.stopSelf();
                         }
@@ -175,7 +185,10 @@ public class CourseService extends Service implements
 
 
             //desconnect Driver if still Online
+
             onlineDriver = FirebaseDatabase.getInstance().getReference("ONLINEDRIVERS").child(userId);
+
+
             return "this string is passed to onPostExecute";
         }
 
@@ -234,22 +247,40 @@ public class CourseService extends Service implements
         };
 
 //        new LocationUpdatesTask().execute();
-        new CourseServiceTask().execute();
+//        new CourseServiceTask().execute();
+        new CheckStateTask().execute();
 
 
         return START_STICKY;
     }
 
-
     private class CheckStateTask extends AsyncTask<String, Integer, String> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+
         }
 
         // This is run in a background thread
         @Override
         protected String doInBackground(String... params) {
+
+            ///////////////////////////////////////////////////////////////////////////
+            ///////////////////////////////////////////////////////////////////////////
+            // FINDING USER STATE
+
+
+            if (state == 0) {
+
+            }
+
+            ///////////////////////////////////////////////////////////////////////////
+            ///////////////////////////////////////////////////////////////////////////
+
+            ///////////////////////////////////////////////////////////////////////////
+            ///////////////////////////////////////////////////////////////////////////
+            // WAITING CLIENT STATE
+
 
             final Handler handler = new Handler(Looper.getMainLooper());
             final Runnable runnable = new Runnable() {
@@ -269,7 +300,7 @@ public class CourseService extends Service implements
                     runnable.run();
                 }
             }
-
+//
 //            FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("PROMOCODE").addListenerForSingleValueEvent(new ValueEventListener() {
 //                @Override
 //                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -297,6 +328,7 @@ public class CourseService extends Service implements
 //                }
 //            });
 
+
             if (state == 2) {
                 countingPreWait = false;
                 if (!countingDistance) {
@@ -305,298 +337,240 @@ public class CourseService extends Service implements
                 }
             }
 
+            ///////////////////////////////////////////////////////////////////////////
+            ///////////////////////////////////////////////////////////////////////////
+
+            ///////////////////////////////////////////////////////////////////////////
+            ///////////////////////////////////////////////////////////////////////////
+            // COURSE ENDED
+
+
             if (state == 3 && !checkedState) {
                 getLastLocation();
                 checkedState = true;
                 countingPreWait = false;
                 countingDistance = false;
 
-
-                FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).
-                        addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                if (dataSnapshot.exists()) {
-                                    final String clientID = dataSnapshot.child("client").getValue(String.class);
-                                    final int preWaitTime = Integer.parseInt(dataSnapshot.child("preWaitTime").getValue(String.class));
-                                    final double distanceTraveled = Double.parseDouble(dataSnapshot.child("distanceTraveled").getValue(String.class));
-                                    final int waitTime = Integer.parseInt(dataSnapshot.child("waitTime").getValue(String.class));
-                                    final String startA = (dataSnapshot.child("startAddress").getValue(String.class));
-                                    final String endA = (dataSnapshot.child("endAddress").getValue(String.class));
-
-                                    startPos = new LatLng(Double.parseDouble(dataSnapshot.child("startLat").getValue(String.class)),
-                                            Double.parseDouble(dataSnapshot.child("startLong").getValue(String.class)));
-                                    if (dataSnapshot.child("endLat").getValue(String.class).length() > 0)
-                                        endPos = new LatLng(Double.parseDouble(dataSnapshot.child("endLat").getValue(String.class)),
-                                                Double.parseDouble(dataSnapshot.child("endLong").getValue(String.class)));
+                final Handler handler1 = new Handler();
+                handler1.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).removeValue();
+                    }
+                }, 3000);
 
 
-                                    FirebaseDatabase.getInstance().getReference("PRICES").addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                            Log.e("Price", " Price Calculation in Course Service");
-                                            if (dataSnapshot.exists()) {
-                                                double att = Double.parseDouble(dataSnapshot.child("att").getValue(String.class));
-                                                double base = Double.parseDouble(dataSnapshot.child("base").getValue(String.class));
-                                                double km = Double.parseDouble(dataSnapshot.child("km").getValue(String.class));
-                                                double min = Double.parseDouble(dataSnapshot.child("minimum").getValue(String.class));
-                                                final double percent = Double.parseDouble(dataSnapshot.child("percent").getValue(String.class));
+//                              new GeoCoderTask().execute();
 
-                                                long timestamp = GetUnixTime() * -1;
-
-                                                double preWaitT = 0;
-
-                                                if (preWaitTime > 180) {
-                                                    preWaitT = 3;
-                                                }
-                                                int preWait = waitTime / 60;
-
-// *****************************         need to add here commision & promo code calculation   **********************************************************
-                                                double promoCode = 0.20;
-                                                double price1 = base + (distanceTraveled * km) + (att * waitTime);
-                                                if (price1 < min) {
-                                                    price1 = min;
-                                                }
-                                                final double price2 = price1 * percent;
-                                                final double price3 = price2 * (1 - promoCode);
-
-                                                // need to get promo code here
-                                                FirebaseDatabase.getInstance().getReference("clientUSERS").
-                                                        child(clientID).child("PROMOCODE").addValueEventListener(new ValueEventListener() {
-                                                    @Override
-                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                        if (dataSnapshot.exists()) {
-                                                            Log.e(TAG, "PROMOCODE onDataChange: " + dataSnapshot.getValue(String.class));
-                                                            price = price3;
-                                                            FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").setValue(price3);
-                                                        } else {
-                                                            price = price2;
-                                                            FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").setValue(price2);
-                                                        }
-                                                    }
-
-                                                    @Override
-                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                                    }
-                                                });
-
-
-                                                SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
-                                                prefs.edit().putString("online", "1").apply();
-
-                                                DatabaseReference mCourse = FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(clientID).child(courseID);
-
-                                                Map<String, String> data = new HashMap<>();
-                                                data.put("client", clientID);
-                                                data.put("driver", userId);
-                                                data.put("startAddress", startA);
-                                                data.put("endAddress", endA);
-                                                data.put("distance", Double.toString(distanceTraveled));
-                                                data.put("waitTime", Integer.toString(preWait));
-                                                data.put("preWaitTime", Integer.toString(preWaitTime / 60));
-                                                if (isFixed) {
-                                                    data.put("fixedDest", "1");
-                                                    data.put("price", Integer.toString((int) fixedPrice));
-
-                                                } else {
-                                                    data.put("fixedDest", "0");
-                                                    data.put("price", Double.toString(price));
-                                                }
-                                                mCourse.setValue(data);
-                                                mCourse.child("date").setValue(timestamp);
-
-                                                DatabaseReference dCourse = FirebaseDatabase.getInstance().getReference("DRIVERFINISHEDCOURSES").child(userId).child(courseID);
-
-                                                Map<String, String> dData = new HashMap<>();
-                                                dData.put("client", clientID);
-                                                dData.put("driver", userId);
-                                                dData.put("startAddress", startA);
-                                                dData.put("endAddress", endA);
-                                                dData.put("distance", Double.toString(distanceTraveled));
-                                                dData.put("waitTime", Integer.toString(preWait));
-                                                dData.put("preWaitTime", Integer.toString((int) preWaitTime / 60));
-                                                if (isFixed) {
-                                                    dData.put("fixedDest", "1");
-                                                    dData.put("price", Integer.toString((int) fixedPrice));
-
-                                                } else {
-                                                    dData.put("fixedDest", "0");
-                                                    dData.put("price", Double.toString(price));
-                                                }
-                                                dCourse.setValue(dData);
-                                                dCourse.child("date").setValue(timestamp);
-
-
-                                                final double currentBil = price;
-                                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").
-                                                        child(userId).child("EARNINGS").child(getDateMonth(GetUnixTime())).child(getDateDay(GetUnixTime())).addListenerForSingleValueEvent(new ValueEventListener() {
-                                                    @Override
-                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                        double earned = 0;
-                                                        int voyages = 0;
-                                                        if (dataSnapshot.exists()) {
-
-                                                            earned = Double.parseDouble(dataSnapshot.child("earnings").getValue(String.class));
-                                                            voyages = Integer.parseInt(dataSnapshot.child("voyages").getValue(String.class));
-
-                                                        }
-
-                                                        if (isFixed)
-                                                            earned += fixedPrice;
-                                                        else
-                                                            earned += currentBil;
-
-                                                        voyages += 1;
-
-
-                                                        final double ee = earned;
-                                                        final int vv = voyages;
-                                                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").addListenerForSingleValueEvent(new ValueEventListener() {
-                                                            @Override
-                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                                double debt = 0;
-                                                                if (dataSnapshot.exists()) {
-                                                                    debt = Double.parseDouble(dataSnapshot.getValue(String.class));
-                                                                }
-
-                                                                final Map<String, String> earnings = new HashMap<>();
-                                                                earnings.put("earnings", "" + ee);
-                                                                earnings.put("voyages", "" + vv);
-
-
-                                                                Log.e(TAG, "onDataChange:clientID in calculation: ClientID: " + clientID);
-                                                                Log.e(TAG, "onDataChange:clientID in calculation: DriverID: " + courseID);
-
-                                                                final double priviousDebt = debt;
-                                                                FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).addValueEventListener(new ValueEventListener() {
-                                                                    @Override
-                                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                                                                        Log.e(TAG, "onDataChange:111111111111111111111111 ");
-
-                                                                        if (dataSnapshot.child("SOLDE").exists()) {
-                                                                            try {
-                                                                                double oldSold = Double.parseDouble(dataSnapshot.child("SOLDE").getValue(String.class));
-                                                                                if (dataSnapshot.child("USECREDIT").getValue(String.class).equals("1") && Double.parseDouble(dataSnapshot.child("SOLDE").getValue(String.class)) >= currentBil) {
-                                                                                    Log.e(TAG, "onDataChange:222222222222222 ");
-                                                                                    double newSolde = oldSold - currentBil;
-                                                                                    FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("SOLDE").setValue("" + newSolde);
-                                                                                    FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("1");
-                                                                                    double commission = currentBil * percent;
-                                                                                    double driverIncome = currentBil - commission;
-                                                                                    double newDebt = priviousDebt + driverIncome;
-                                                                                    FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").setValue("0.0");
-                                                                                    FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
-
-                                                                                } else {
-                                                                                    Log.e(TAG, "onDataChange:33333333333333333 ");
-                                                                                    FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("0");
-                                                                                    double commission = currentBil * percent;
-                                                                                    double userDue = currentBil - oldSold;
-                                                                                    double newDebt = priviousDebt + (currentBil - userDue - commission);
-                                                                                    FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("SOLDE").setValue("" + 0);
-                                                                                    FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").setValue(Double.toString(userDue));
-                                                                                    FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
-                                                                                }
-                                                                            } catch (NumberFormatException e) {
-                                                                                e.printStackTrace();
-                                                                                Log.e(TAG, "onDataChange:NumberFormatException " + e.getMessage());
-                                                                            } catch (Exception e) {
-                                                                                Log.e(TAG, "onDataChange:Exception " + e.getMessage());
-                                                                                e.printStackTrace();
-                                                                            }
-                                                                        } else {
-                                                                            try {
-                                                                                Log.e(TAG, "onDataChange:4444444444 ");
-                                                                                double commission = currentBil * percent * -1;
-                                                                                double newDebt = (priviousDebt + commission);
-                                                                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("0");
-                                                                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
-                                                                                FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").setValue(Double.toString(price));
-                                                                            } catch (NumberFormatException e) {
-                                                                                e.printStackTrace();
-                                                                            } catch (Exception e) {
-                                                                                e.printStackTrace();
-                                                                            }
-                                                                        }
-
-                                                                    }
-
-                                                                    @Override
-                                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                                                                        Log.e(TAG, "onCancelled:11111 " + databaseError.getMessage());
-                                                                    }
-                                                                });
-
-
-                                                                FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("level").addListenerForSingleValueEvent(new ValueEventListener() {
-                                                                    @Override
-                                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                                        Log.e(TAG, "onDataChange:55555555555 ");
-                                                                        if (dataSnapshot.getValue(String.class).equals("2"))
-                                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("level").setValue("1");
-
-                                                                        if (dataSnapshot.getValue(String.class).equals("1"))
-                                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("level").setValue("0");
-                                                                    }
-
-                                                                    @Override
-                                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                                                                        Log.e(TAG, "onCancelled:2222 " + databaseError.getMessage());
-                                                                    }
-                                                                });
-
-
-                                                                FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("LASTCOURSE").setValue("Derniére course : Captain " + driverName + " / " + currentBil + " MAD");
-                                                                FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("COURSE").setValue(courseID);
-                                                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").setValue(courseID);
-                                                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("EARNINGS").child(getDateMonth(GetUnixTime())).child(getDateDay(GetUnixTime())).setValue(earnings);
-
-
-                                                                final Handler handler = new Handler();
-                                                                handler.postDelayed(new Runnable() {
-                                                                    @Override
-                                                                    public void run() {
-                                                                        FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).removeValue();
-                                                                    }
-                                                                }, 3000);
-                                                            }
-
-                                                            @Override
-                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                                            }
-                                                        });
-
-
-                                                    }
-
-                                                    @Override
-                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                                    }
-                                                });
-
-
-                                            }
-                                        }
-
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                        }
-                                    });
-
-
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                            }
-                        });
+//                FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).addListenerForSingleValueEvent(new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                        if (dataSnapshot.exists()) {
+//                            final String clientID = dataSnapshot.child("client").getValue(String.class);
+//                            final int preWaitTime = Integer.parseInt(dataSnapshot.child("preWaitTime").getValue(String.class));
+//                            final double distanceTraveled = Double.parseDouble(dataSnapshot.child("distanceTraveled").getValue(String.class));
+//                            final int waitTime = Integer.parseInt(dataSnapshot.child("waitTime").getValue(String.class));
+//                            final String startA = (dataSnapshot.child("startAddress").getValue(String.class));
+//                            final String endA = (dataSnapshot.child("endAddress").getValue(String.class));
+//
+//                            startPos = new LatLng(Double.parseDouble(dataSnapshot.child("startLat").getValue(String.class)), Double.parseDouble(dataSnapshot.child("startLong").getValue(String.class)));
+//                            if (dataSnapshot.child("endLat").getValue(String.class).length() > 0)
+//                                endPos = new LatLng(Double.parseDouble(dataSnapshot.child("endLat").getValue(String.class)), Double.parseDouble(dataSnapshot.child("endLong").getValue(String.class)));
+//
+//
+//
+//                            FirebaseDatabase.getInstance().getReference("PRICES").addListenerForSingleValueEvent(new ValueEventListener() {
+//                                @Override
+//                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//
+//                                    if (dataSnapshot.exists()) {
+//                                        double att = Double.parseDouble(dataSnapshot.child("att").getValue(String.class));
+//                                        double base = Double.parseDouble(dataSnapshot.child("base").getValue(String.class));
+//                                        double km = Double.parseDouble(dataSnapshot.child("km").getValue(String.class));
+//                                        double min = Double.parseDouble(dataSnapshot.child("minimum").getValue(String.class));
+//                                        final double percent = Double.parseDouble(dataSnapshot.child("percent").getValue(String.class));
+//
+//                                        long timestamp = GetUnixTime() * -1;
+//
+//                                        double preWaitT = 0;
+//
+//                                        if (preWaitTime > 180) {
+//                                            preWaitT = 3;
+//                                        }
+//                                        int preWait = (int) (waitTime / 60);
+//
+//
+//                                        double price = Math.ceil(base + (distanceTraveled * km) + (preWait * att) + preWaitT);
+//                                        if (price < min) {
+//                                            price = min;
+//                                        }
+//
+//
+//                                        SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
+//                                        prefs.edit().putString("online", "1").apply();
+//
+//                                        DatabaseReference mCourse = FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(clientID).child(courseID);
+//
+//                                        Map<String, String> data = new HashMap<>();
+//                                        data.put("client", clientID);
+//                                        data.put("driver", userId);
+//                                        data.put("startAddress", startA);
+//                                        data.put("endAddress", endA);
+//                                        data.put("driver", userId);
+//                                        data.put("distance", Double.toString(distanceTraveled));
+//                                        data.put("waitTime", Integer.toString(preWait));
+//                                        data.put("preWaitTime", Integer.toString((int) preWaitTime / 60));
+//                                        if (isFixed) {
+//                                            data.put("fixedDest", "1");
+//                                            data.put("price", Integer.toString((int) fixedPrice));
+//
+//                                        } else {
+//                                            data.put("fixedDest", "0");
+//                                            data.put("price", Integer.toString((int) price));
+//                                        }
+//                                        mCourse.setValue(data);
+//                                        mCourse.child("date").setValue(timestamp);
+//
+//                                        DatabaseReference dCourse = FirebaseDatabase.getInstance().getReference("DRIVERFINISHEDCOURSES").child(userId).child(courseID);
+//
+//                                        Map<String, String> dData = new HashMap<>();
+//                                        dData.put("client", clientID);
+//                                        dData.put("driver", userId);
+//                                        dData.put("startAddress", startA);
+//                                        dData.put("endAddress", endA);
+//                                        dData.put("distance", Double.toString(distanceTraveled));
+//                                        dData.put("waitTime", Integer.toString(preWait));
+//                                        dData.put("preWaitTime", Integer.toString((int) preWaitTime / 60));
+//                                        if (isFixed) {
+//                                            dData.put("fixedDest", "1");
+//                                            dData.put("price", Integer.toString((int) fixedPrice));
+//
+//                                        } else {
+//                                            dData.put("fixedDest", "0");
+//                                            dData.put("price", Integer.toString((int) (price - (price * promoVal))));
+//                                        }
+//                                        dCourse.setValue(dData);
+//                                        dCourse.child("date").setValue(timestamp);
+//
+//
+//                                        final double getP = price;
+//                                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("EARNINGS").child(getDateMonth(GetUnixTime())).child(getDateDay(GetUnixTime())).addListenerForSingleValueEvent(new ValueEventListener() {
+//                                            @Override
+//                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                                double earned = 0;
+//                                                int voyages = 0;
+//                                                if (dataSnapshot.exists()) {
+//
+//                                                    earned = Double.parseDouble(dataSnapshot.child("earnings").getValue(String.class));
+//                                                    voyages = Integer.parseInt(dataSnapshot.child("voyages").getValue(String.class));
+//
+//                                                }
+//
+//
+//                                                if (isFixed)
+//                                                    earned += fixedPrice;
+//                                                else
+//                                                    earned += getP;
+//
+//                                                voyages += 1;
+//
+//
+//                                                final double ee = earned;
+//                                                final int vv = voyages;
+//                                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").addListenerForSingleValueEvent(new ValueEventListener() {
+//                                                    @Override
+//                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                                        float debt = 0;
+//                                                        if (dataSnapshot.exists()) {
+//                                                            debt = Float.parseFloat(dataSnapshot.getValue(String.class));
+//                                                        }
+//
+//
+//                                                        final Map<String, String> earnings = new HashMap<>();
+//                                                        earnings.put("earnings", "" + ee);
+//                                                        earnings.put("voyages", "" + vv);
+//
+//
+//                                                        final float ddd = debt;
+//                                                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).addListenerForSingleValueEvent(new ValueEventListener() {
+//                                                            @Override
+//                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                                                if (dataSnapshot.child("USECREDIT").getValue(String.class).equals("1") && Integer.parseInt(dataSnapshot.child("SOLDE").getValue(String.class)) >= (int) getP) {
+//                                                                    int newSolde = Integer.parseInt(dataSnapshot.child("SOLDE").getValue(String.class)) - (int) getP;
+//                                                                    FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("SOLDE").setValue("" + newSolde);
+//                                                                    FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("1");
+//
+//                                                                    float newDebt = (ddd - (float) getP) + (float) (getP * percent);
+//                                                                    FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Float.toString(newDebt));
+//                                                                } else {
+//                                                                    FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("0");
+//                                                                    FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Float.toString((float) (ddd + (float) (getP * percent))));
+//                                                                }
+//                                                            }
+//
+//                                                            @Override
+//                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                                                            }
+//                                                        });
+//                                                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("level").addListenerForSingleValueEvent(new ValueEventListener() {
+//                                                            @Override
+//                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                                                if (dataSnapshot.getValue(String.class).equals("2"))
+//                                                                    FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("level").setValue("1");
+//
+//                                                                if (dataSnapshot.getValue(String.class).equals("1"))
+//                                                                    FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("level").setValue("0");
+//                                                            }
+//
+//                                                            @Override
+//                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                                                            }
+//                                                        });
+//                                                        FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).removeValue();
+//                                                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("LASTCOURSE").setValue("Derniére course : Captain " + driverName + " / " + getP + " MAD");
+//                                                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("COURSE").setValue(courseID);
+//                                                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").setValue(courseID);
+//                                                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("EARNINGS").child(getDateMonth(GetUnixTime())).child(getDateDay(GetUnixTime())).setValue(earnings);
+//
+//
+//                                                    }
+//
+//                                                    @Override
+//                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                                                    }
+//                                                });
+//
+//
+//                                            }
+//
+//                                            @Override
+//                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                                            }
+//                                        });
+//
+//
+//                                    }
+//                                }
+//
+//                                @Override
+//                                public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                                }
+//                            });
+//
+//
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                    }
+//                });
             }
 
             ///////////////////////////////////////////////////////////////////////////
@@ -606,14 +580,8 @@ public class CourseService extends Service implements
             if (state == 5) {
                 countingPreWait = false;
                 countingDistance = false;
-                final Handler handler1 = new Handler();
-                handler1.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        //Do something after 3000ms
-                        FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).removeValue();
-                    }
-                }, 3000);
+
+                FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).removeValue();
 
             }
 
@@ -667,27 +635,22 @@ public class CourseService extends Service implements
     @Override
     public void onDestroy() {
         super.onDestroy();
-        try {
-            h.removeCallbacks(r);
-            hh.removeCallbacks(rr);
-            //fusedLocationProviderClient.removeLocationUpdates(locationCallback);
-            if (mGoogleApiClient != null)
-                mGoogleApiClient.disconnect();
+
+        h.removeCallbacks(r);
+        hh.removeCallbacks(rr);
+        //fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+        if (mGoogleApiClient != null)
+            mGoogleApiClient.disconnect();
 
 
-            if (mLocationManager != null) {
-                for (int i = 0; i < mLocationListeners.length; i++) {
-                    try {
-                        mLocationManager.removeUpdates(mLocationListeners[i]);
-                    } catch (Exception ex) {
-                        Log.i(TAG, "fail to remove location listners, ignore", ex);
-                    }
+        if (mLocationManager != null) {
+            for (int i = 0; i < mLocationListeners.length; i++) {
+                try {
+                    mLocationManager.removeUpdates(mLocationListeners[i]);
+                } catch (Exception ex) {
+                    Log.i(TAG, "fail to remove location listners, ignore", ex);
                 }
             }
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
@@ -765,177 +728,176 @@ public class CourseService extends Service implements
             }
 
 
-            FirebaseDatabase.getInstance().getReference("PRICES").addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                    if (dataSnapshot.exists()) {
-                        double att = Double.parseDouble(dataSnapshot.child("att").getValue(String.class));
-                        double base = Double.parseDouble(dataSnapshot.child("base").getValue(String.class));
-                        double km = Double.parseDouble(dataSnapshot.child("km").getValue(String.class));
-                        double min = Double.parseDouble(dataSnapshot.child("minimum").getValue(String.class));
-                        final double percent = Double.parseDouble(dataSnapshot.child("percent").getValue(String.class));
-
-                        long timestamp = GetUnixTime() * -1;
-
-                        double preWaitT = 0;
-
-                        if (preWaitTime > 180) {
-                            preWaitT = 3;
-                        }
-                        int preWait = (int) (waitTime / 60);
-
-
-                        double price = Math.ceil(base + (distanceTraveled * km) + (preWait * att) + preWaitT);
-                        if (price < min) {
-                            price = min;
-                        }
-
-
-                        SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
-                        prefs.edit().putString("online", "1").apply();
-
-                        DatabaseReference mCourse = FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(clientID).child(courseID);
-
-                        Map<String, String> data = new HashMap<>();
-                        data.put("client", clientID);
-                        data.put("driver", userId);
-                        data.put("startAddress", startA);
-                        data.put("endAddress", endA);
-                        data.put("driver", userId);
-                        data.put("distance", Double.toString(distanceTraveled));
-                        data.put("waitTime", Integer.toString(preWait));
-                        data.put("preWaitTime", Integer.toString((int) preWaitTime / 60));
-                        if (isFixed) {
-                            data.put("fixedDest", "1");
-                            data.put("price", Integer.toString((int) fixedPrice));
-
-                        } else {
-                            data.put("fixedDest", "0");
-                            data.put("price", Integer.toString((int) price));
-                        }
-                        mCourse.setValue(data);
-                        mCourse.child("date").setValue(timestamp);
-
-                        DatabaseReference dCourse = FirebaseDatabase.getInstance().getReference("DRIVERFINISHEDCOURSES").child(userId).child(courseID);
-
-                        Map<String, String> dData = new HashMap<>();
-                        dData.put("client", clientID);
-                        dData.put("driver", userId);
-                        dData.put("startAddress", startA);
-                        dData.put("endAddress", endA);
-                        dData.put("distance", Double.toString(distanceTraveled));
-                        dData.put("waitTime", Integer.toString(preWait));
-                        dData.put("preWaitTime", Integer.toString((int) preWaitTime / 60));
-                        if (isFixed) {
-                            dData.put("fixedDest", "1");
-                            dData.put("price", Integer.toString((int) fixedPrice));
-
-                        } else {
-                            dData.put("fixedDest", "0");
-                            dData.put("price", Integer.toString((int) price));
-                        }
-                        dCourse.setValue(dData);
-                        dCourse.child("date").setValue(timestamp);
-
-
-                        final double getP = price;
-                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("EARNINGS").child(getDateMonth(GetUnixTime())).child(getDateDay(GetUnixTime())).addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                double earned = 0;
-                                int voyages = 0;
-                                if (dataSnapshot.exists()) {
-
-                                    earned = Double.parseDouble(dataSnapshot.child("earnings").getValue(String.class));
-                                    voyages = Integer.parseInt(dataSnapshot.child("voyages").getValue(String.class));
-
-                                }
-
-
-                                if (isFixed)
-                                    earned += fixedPrice;
-                                else
-                                    earned += getP;
-
-                                voyages += 1;
-
-
-                                final double ee = earned;
-                                final int vv = voyages;
-                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                        double debt = 0;
-                                        if (dataSnapshot.exists()) {
-                                            debt = Double.parseDouble(dataSnapshot.getValue(String.class));
-                                        }
-
-                                        if (isFixed)
-                                            debt += (fixedPrice * percent);
-                                        else
-                                            debt += (getP * percent);
-
-                                        final Map<String, String> earnings = new HashMap<>();
-                                        earnings.put("earnings", "" + ee);
-                                        earnings.put("voyages", "" + vv);
-
+//            FirebaseDatabase.getInstance().getReference("PRICES").addListenerForSingleValueEvent(new ValueEventListener() {
+//                @Override
+//                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//
+//                    if (dataSnapshot.exists()) {
+//                        double att = Double.parseDouble(dataSnapshot.child("att").getValue(String.class));
+//                        double base = Double.parseDouble(dataSnapshot.child("base").getValue(String.class));
+//                        double km = Double.parseDouble(dataSnapshot.child("km").getValue(String.class));
+//                        double min = Double.parseDouble(dataSnapshot.child("minimum").getValue(String.class));
+//                        final double percent = Double.parseDouble(dataSnapshot.child("percent").getValue(String.class));
+//
+//                        long timestamp = GetUnixTime() * -1;
+//
+//                        double preWaitT = 0;
+//
+//                        if (preWaitTime > 180) {
+//                            preWaitT = 3;
+//                        }
+//                        int preWait = (int) (waitTime / 60);
+//
+//
+//                        double price = Math.ceil(base + (distanceTraveled * km) + (preWait * att) + preWaitT);
+//                        if (price < min) {
+//                            price = min;
+//                        }
+//
+//
+//                        SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
+//                        prefs.edit().putString("online", "1").apply();
+//
+//                        DatabaseReference mCourse = FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(clientID).child(courseID);
+//
+//                        Map<String, String> data = new HashMap<>();
+//                        data.put("client", clientID);
+//                        data.put("driver", userId);
+//                        data.put("startAddress", startA);
+//                        data.put("endAddress", endA);
+//                        data.put("distance", Double.toString(distanceTraveled));
+//                        data.put("waitTime", Integer.toString(preWait));
+//                        data.put("preWaitTime", Integer.toString((int) preWaitTime / 60));
+//                        if (isFixed) {
+//                            data.put("fixedDest", "1");
+//                            data.put("price", Integer.toString((int) fixedPrice));
+//
+//                        } else {
+//                            data.put("fixedDest", "0");
+//                            data.put("price", Integer.toString((int) price));
+//                        }
+//                        mCourse.setValue(data);
+//                        mCourse.child("date").setValue(timestamp);
+//
+//                        DatabaseReference dCourse = FirebaseDatabase.getInstance().getReference("DRIVERFINISHEDCOURSES").child(userId).child(courseID);
+//
+//                        Map<String, String> dData = new HashMap<>();
+//                        dData.put("client", clientID);
+//                        dData.put("driver", userId);
+//                        dData.put("startAddress", startA);
+//                        dData.put("endAddress", endA);
+//                        dData.put("distance", Double.toString(distanceTraveled));
+//                        dData.put("waitTime", Integer.toString(preWait));
+//                        dData.put("preWaitTime", Integer.toString((int) preWaitTime / 60));
+//                        if (isFixed) {
+//                            dData.put("fixedDest", "1");
+//                            dData.put("price", Integer.toString((int) fixedPrice));
+//
+//                        } else {
+//                            dData.put("fixedDest", "0");
+//                            dData.put("price", Integer.toString((int) price));
+//                        }
+//                        dCourse.setValue(dData);
+//                        dCourse.child("date").setValue(timestamp);
+//
+//
+//                        final double getP = price;
+//                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("EARNINGS").child(getDateMonth(GetUnixTime())).child(getDateDay(GetUnixTime())).addListenerForSingleValueEvent(new ValueEventListener() {
+//                            @Override
+//                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                double earned = 0;
+//                                int voyages = 0;
+//                                if (dataSnapshot.exists()) {
+//
+//                                    earned = Double.parseDouble(dataSnapshot.child("earnings").getValue(String.class));
+//                                    voyages = Integer.parseInt(dataSnapshot.child("voyages").getValue(String.class));
+//
+//                                }
+//
+//
+//                                if (isFixed)
+//                                    earned += fixedPrice;
+//                                else
+//                                    earned += getP;
+//
+//                                voyages += 1;
+//
+//
+//                                final double ee = earned;
+//                                final int vv = voyages;
+//                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").addListenerForSingleValueEvent(new ValueEventListener() {
+//                                    @Override
+//                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                        double debt = 0;
+//                                        if (dataSnapshot.exists()) {
+//                                            debt = Double.parseDouble(dataSnapshot.getValue(String.class));
+//                                        }
+//
+//                                        if (isFixed)
+//                                            debt += (fixedPrice * percent);
+//                                        else
+//                                            debt += (getP * percent);
+//
+//                                        final Map<String, String> earnings = new HashMap<>();
+//                                        earnings.put("earnings", "" + ee);
+//                                        earnings.put("voyages", "" + vv);
+//
 //                                        final double ddd = debt;
-                                      /*  FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).addListenerForSingleValueEvent(new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                if(dataSnapshot.child("USECREDIT").getValue(String.class).equals("1") && Integer.parseInt(dataSnapshot.child("SOLDE").getValue(String.class)) >= (int) getP){
-                                                    int newSolde = Integer.parseInt(dataSnapshot.child("SOLDE").getValue(String.class)) - (int) getP;
-                                                    FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("SOLDE").setValue(newSolde);
-                                                    FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("1");
-                                                }else{
-                                                    FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("0");
-                                                }
-
-
-                                             //   FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).removeValue();
-                                                //  FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("COURSE").setValue(courseID);
-                                               // FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").setValue(courseID);
-                                                //FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("LASTCOURSE").setValue("Derniére course : Captain " + driverName + " / " + getP + " MAD");
-                                                //FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("EARNINGS").child(getDateMonth(GetUnixTime())).child(getDateDay(GetUnixTime())).setValue(earnings);
-                                                //FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(ddd));
-
-
-                                            }
-
-                                            @Override
-                                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                            }
-                                        });
-
-                                        */
-                                    }
-
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                    }
-                                });
-
-
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                            }
-                        });
-
-
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
+////                                      /*  FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).addListenerForSingleValueEvent(new ValueEventListener() {
+////                                            @Override
+////                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+////                                                if(dataSnapshot.child("USECREDIT").getValue(String.class).equals("1") && Integer.parseInt(dataSnapshot.child("SOLDE").getValue(String.class)) >= (int) getP){
+////                                                    int newSolde = Integer.parseInt(dataSnapshot.child("SOLDE").getValue(String.class)) - (int) getP;
+////                                                    FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("SOLDE").setValue(newSolde);
+////                                                    FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("1");
+////                                                }else{
+////                                                    FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("0");
+////                                                }
+////
+////
+////                                             //   FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).removeValue();
+////                                                //  FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("COURSE").setValue(courseID);
+////                                               // FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").setValue(courseID);
+////                                                //FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("LASTCOURSE").setValue("Derniére course : Captain " + driverName + " / " + getP + " MAD");
+////                                                //FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("EARNINGS").child(getDateMonth(GetUnixTime())).child(getDateDay(GetUnixTime())).setValue(earnings);
+////                                                //FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(ddd));
+////
+////
+////                                            }
+////
+////                                            @Override
+////                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+////
+////                                            }
+////                                        });
+////
+////                                        */
+//                                    }
+//
+//                                    @Override
+//                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                                    }
+//                                });
+//
+//
+//                            }
+//
+//                            @Override
+//                            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                            }
+//                        });
+//
+//
+//                    }
+//                }
+//
+//                @Override
+//                public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                }
+//            });
 
 
             return "this string is passed to onPostExecute";
@@ -996,7 +958,6 @@ public class CourseService extends Service implements
             super.onPreExecute();
             prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
             userId = prefs.getString("userId", null);
-            // Do something like display a progress bar
         }
 
         // This is run in a background thread
@@ -1029,12 +990,12 @@ public class CourseService extends Service implements
                 courseRef.child("distanceTraveled").setValue(distanceData);
                 time = 0;
             }
+
             userLoc = location;
             if (state == 0 || state == 1 || state == 2) {
                 FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("driverPosLat").setValue("" + userLoc.getLatitude());
                 FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("driverPosLong").setValue("" + userLoc.getLongitude());
             }
-
 
             return "this string is passed to onPostExecute";
         }
@@ -1121,7 +1082,7 @@ public class CourseService extends Service implements
     }
 
 
-    private static final String TAG = "CourseService";
+    private static final String TAG = "BOOMBOOMTESTGPS";
     private LocationManager mLocationManager = null;
     private static final int LOCATION_INTERVAL = 1000;
     private static final float LOCATION_DISTANCE = 10f;
