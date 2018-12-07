@@ -49,7 +49,6 @@ import java.util.Map;
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
 public class CourseService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
-
     private DatabaseReference onlineDriver;
     private DatabaseReference courseRef;
 
@@ -71,9 +70,7 @@ public class CourseService extends Service implements GoogleApiClient.Connection
 
     private double time = 0;
 
-
     private Service myService;
-
 
     private Location userLoc;
 
