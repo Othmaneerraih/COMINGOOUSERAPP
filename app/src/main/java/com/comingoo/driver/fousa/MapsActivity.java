@@ -853,6 +853,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     double currentBil = 0;
     boolean isPromoCode = false;
     private Button price;
+    private double currentDebt = 0.0;
+    private double currentWallet = 0.0;
 
     private class checkCourseFinished extends AsyncTask<String, Integer, String> {
         @Override
@@ -1658,6 +1660,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                         double debt = 0;
                                                                                         if (dataSnapshot.exists()) {
                                                                                             debt = Double.parseDouble(dataSnapshot.getValue(String.class));
+                                                                                            currentDebt = debt;
                                                                                         }
 
                                                                                         final Map<String, String> earnings = new HashMap<>();
@@ -1670,7 +1673,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                         Log.e(TAG, "onDataChange:clientID in calculation: currentBill: " + currentBil);
 
                                                                                         final double priviousDebt = debt;
-                                                                                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).addValueEventListener(new ValueEventListener() {
+                                                                                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).addListenerForSingleValueEvent(new ValueEventListener() {
                                                                                             @Override
                                                                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                                                                 if (dataSnapshot.child("SOLDE").exists()) {
@@ -1690,6 +1693,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                                             double commission = currentBil * percent;
                                                                                                             double driverIncome = currentBil - commission;
                                                                                                             double newDebt = priviousDebt + driverIncome;
+                                                                                                            currentDebt = newDebt;
+                                                                                                            currentWallet = newSolde;
                                                                                                             FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").setValue("0.0");
                                                                                                             FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
                                                                                                             price.setText("0.0 MAD");
@@ -1701,10 +1706,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                                             double commission = currentBil * percent;
                                                                                                             double userDue = currentBil - oldSold;
                                                                                                             double newDebt = priviousDebt + (currentBil - userDue - commission);
-
+                                                                                                            currentDebt = newDebt;
                                                                                                             Log.e(TAG, "onDataChange: 3333333 old sold: " + commission);
                                                                                                             Log.e(TAG, "onDataChange: 3333333 old currentbill: " + userDue);
-
+                                                                                                            currentWallet = 0.0;
                                                                                                             FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("SOLDE").setValue("" + 0);
                                                                                                             FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("USECREDIT").setValue("0");
 
@@ -1728,6 +1733,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                                         Log.e(TAG, "onDataChange: 4444444 commission: " + commission);
 
                                                                                                         double newDebt = (priviousDebt + commission);
+                                                                                                        currentDebt = newDebt;
                                                                                                         FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("0");
                                                                                                         FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
                                                                                                         FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").setValue(Double.toString(ridePrice));
@@ -1866,8 +1872,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                     Log.e(TAG, "onDataChange driver already have: " + debt);
                                                                                     Log.e(TAG, "onDataChange wants user input: " + cM);
 
-                                                                                    debt -= userProvidedRecharge;
-
+//                                                                                    debt -= userProvidedRecharge;
+                                                                                    double newdebt = currentDebt - userProvidedRecharge;
+                                                                                    currentDebt = newdebt;
+                                                                                    double newSold = currentWallet + userProvidedRecharge;
                                                                                     Log.e(TAG, "onDataChange after calculation: " + debt);
 
                                                                                     if (dataSnapshot.getChildrenCount() >= 3) {
@@ -1875,9 +1883,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                         if (cM <= 100) {
                                                                                             // Enter the value into driver wallet here
                                                                                             Log.e(TAG, "onDataChange: " + debt);
-                                                                                            Log.e(TAG, "onDataChange: " + userProvidedRecharge);
-                                                                                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue("" + debt);
-                                                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(dataSnapshott.child("client").getValue(String.class)).child("SOLDE").setValue("" + userProvidedRecharge);
+                                                                                            Log.e(TAG, "onDataChange: " + newSold);
+                                                                                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue("" + newdebt);
+                                                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(dataSnapshott.child("client").getValue(String.class)).child("SOLDE").setValue("" + newSold);
                                                                                             FirebaseDatabase.getInstance().getReference("clientUSERS").child(dataSnapshott.child("client").getValue(String.class)).child("USECREDIT").setValue("1");
                                                                                             dialog.dismiss();
                                                                                         } else
@@ -1887,15 +1895,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                         if (cM <= 10) {
                                                                                             // Enter the value into driver wallet here
                                                                                             Log.e(TAG, "onDataChange: " + debt);
-                                                                                            Log.e(TAG, "onDataChange: " + userProvidedRecharge);
-                                                                                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(/*Double.toString(*/"" + debt/*)*/);
-                                                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(dataSnapshott.child("client").getValue(String.class)).child("SOLDE").setValue("" + userProvidedRecharge);
+                                                                                            Log.e(TAG, "onDataChange: " + newSold);
+                                                                                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(/*Double.toString(*/"" + newdebt/*)*/);
+                                                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(dataSnapshott.child("client").getValue(String.class)).child("SOLDE").setValue("" + newSold);
                                                                                             FirebaseDatabase.getInstance().getReference("clientUSERS").child(dataSnapshott.child("client").getValue(String.class)).child("USECREDIT").setValue("1");
                                                                                             dialog.dismiss();
                                                                                         } else
                                                                                             Toast.makeText(MapsActivity.this, "Vous ne pouvez pas dépasser 10 MAD de recharge pour ce client.", Toast.LENGTH_LONG).show();
                                                                                     }
-                                                                                } else {
                                                                                 }
                                                                             }
 
@@ -2691,6 +2698,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     courseRef.child("state").setValue("3");
                     courseState = "4";
                     wazeButton.setVisibility(View.GONE);
+                    stopCourseService();
                     if (!isRatingPopupShowed) {
                         new checkCourseFinished().execute();
                     }
