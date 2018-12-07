@@ -2538,6 +2538,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if (courseState.equals("3")) {
                 stopCourseService();
                 courseState = "4";
+                isRatingPopupShowed = false;
                 if (mMap != null)
                     mMap.clear();
 
@@ -2561,7 +2562,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private boolean isRatingPopupShowed = false;
 
     public void checkCourseState() {
-        switchToCourseUI();
+//        switchToCourseUI();
 
 //         FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(clientId).child(userId)
 //                .orderByKey().limitToLast(1).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -2686,7 +2687,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 @Override
                 public void onClick(View v) {
                     courseRef.child("state").setValue("2");
-//                    isRatingPopupShowed = false;
+                    isRatingPopupShowed = false;
                 }
             });
             if (mMap != null)
