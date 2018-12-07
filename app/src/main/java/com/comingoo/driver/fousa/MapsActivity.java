@@ -396,6 +396,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 @Override
                 public void onClick(View v) {
                     logout();
+                    switchOfflineUI();
                     startActivity(new Intent(MapsActivity.this, MainActivity.class));
                     finish();
                 }
@@ -966,46 +967,184 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                             }
                                         });
 
-/*
-                                        FirebaseDatabase.getInstance().getReference("PRICES").
-                                                addListenerForSingleValueEvent(new ValueEventListener() {
-                                                    @Override
-                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                        try {
-                                                            Log.e("Price", " Price Calculation in Maps");
-                                                            if (drawRouteStart != null) {
-
-                                                                double distanceInKm = distanceInKilometer(drawRouteStart.latitude, drawRouteStart.longitude,
-                                                                        drawRouteArrival.latitude, drawRouteArrival.longitude);
-
-                                                                double promoCode = 0.20; // 20% reduction for promo code
+///*
+//                                        FirebaseDatabase.getInstance().getReference("PRICES").
+//                                                addListenerForSingleValueEvent(new ValueEventListener() {
+//                                                    @Override
+//                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                                        try {
+//                                                            Log.e("Price", " Price Calculation in Maps");
+//                                                            if (drawRouteStart != null) {
 //
-                                                                double base = Double.parseDouble(dataSnapshot.child("base").getValue(String.class));
-                                                                double km = Double.parseDouble(dataSnapshot.child("km").getValue(String.class));
-                                                                double att = Double.parseDouble(dataSnapshot.child("att").getValue(String.class));
-                                                                final double comission = Double.parseDouble(dataSnapshot.child("percent").getValue(String.class));
-
-                                                                final double price1 = base + (distanceInKm * km) + (att * driverWaitTime);
-                                                                final double price2 = price1 * comission;
-                                                                final double price3 = price2 * (1 - promoCode);
-
-//                                                                FirebaseDatabase.getInstance().getReference("COURSES").
-//                                                                        child(driverId).child("PROMOCODE").addListenerForSingleValueEvent(new ValueEventListener() {
+//                                                                double distanceInKm = distanceInKilometer(drawRouteStart.latitude, drawRouteStart.longitude,
+//                                                                        drawRouteArrival.latitude, drawRouteArrival.longitude);
 //
+//                                                                double promoCode = 0.20; // 20% reduction for promo code
+////
+//                                                                double base = Double.parseDouble(dataSnapshot.child("base").getValue(String.class));
+//                                                                double km = Double.parseDouble(dataSnapshot.child("km").getValue(String.class));
+//                                                                double att = Double.parseDouble(dataSnapshot.child("att").getValue(String.class));
+//                                                                final double comission = Double.parseDouble(dataSnapshot.child("percent").getValue(String.class));
+//
+//                                                                final double price1 = base + (distanceInKm * km) + (att * driverWaitTime);
+//                                                                final double price2 = price1 * comission;
+//                                                                final double price3 = price2 * (1 - promoCode);
+//
+////                                                                FirebaseDatabase.getInstance().getReference("COURSES").
+////                                                                        child(driverId).child("PROMOCODE").addListenerForSingleValueEvent(new ValueEventListener() {
+////
+////                                                                    @Override
+////                                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+////                                                                        if (dataSnapshot.exists()) {
+////                                                                            boolean isPromoCode = dataSnapshot.getValue(Boolean.class);
+////                                                                            Log.e(TAG, "onDataChange:isPromoCode " + isPromoCode);
+////                                                                            if (isPromoCode) {
+////                                                                                price.setText(price3 + " MAD");
+////                                                                                finalPriceOfCourse = price3;
+////                                                                            } else {
+////                                                                                price.setText(price2 + " MAD");
+////                                                                                finalPriceOfCourse = price2;
+////                                                                            }
+////
+////                                                                            Log.e(TAG, "onDataChange:finalPriceOfCourse:  " + finalPriceOfCourse);
+////                                                                        }
+////                                                                    }
+////
+////                                                                    @Override
+////                                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+////
+////                                                                    }
+////                                                                });
+//
+//
+//                                                                FirebaseDatabase.getInstance().getReference("clientUSERS").
+//                                                                        child(userId).child("PROMOCODE").addValueEventListener(new ValueEventListener() {
 //                                                                    @Override
 //                                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 //                                                                        if (dataSnapshot.exists()) {
-//                                                                            boolean isPromoCode = dataSnapshot.getValue(Boolean.class);
-//                                                                            Log.e(TAG, "onDataChange:isPromoCode " + isPromoCode);
-//                                                                            if (isPromoCode) {
-//                                                                                price.setText(price3 + " MAD");
-//                                                                                finalPriceOfCourse = price3;
-//                                                                            } else {
-//                                                                                price.setText(price2 + " MAD");
-//                                                                                finalPriceOfCourse = price2;
-//                                                                            }
 //
-//                                                                            Log.e(TAG, "onDataChange:finalPriceOfCourse:  " + finalPriceOfCourse);
+//                                                                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").
+//                                                                                    addListenerForSingleValueEvent(new ValueEventListener() {
+//                                                                                        @Override
+//                                                                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                                                                            double debt = 0;
+//                                                                                            if (dataSnapshot.exists()) {
+//                                                                                                debt = Double.parseDouble(dataSnapshot.getValue(String.class));
+//
+//                                                                                                final double finalDebt = debt;
+//                                                                                                FirebaseDatabase.getInstance().getReference("clientUSERS").child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+//                                                                                                    @Override
+//                                                                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                                                                                        if (dataSnapshot.child("SOLDE").exists()) {
+//                                                                                                            double oldSold = Double.parseDouble(dataSnapshot.child("SOLDE").getValue(String.class));
+//                                                                                                            if (dataSnapshot.child("USECREDIT").getValue(String.class).equals("1") && Integer.parseInt(dataSnapshot.child("SOLDE").getValue(String.class)) >= (int) price3) {
+//                                                                                                                double newSolde = oldSold - price3;
+//                                                                                                                FirebaseDatabase.getInstance().getReference("clientUSERS").child(userId).child("SOLDE").setValue("" + newSolde);
+//                                                                                                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("1");
+//                                                                                                                double commission = price3 * comission;
+//                                                                                                                double driverIncome = price3 - commission;
+//                                                                                                                double newDebt = finalDebt + driverIncome;
+////                                                                                                                price.setText(0 + " MAD");
+//                                                                                                                finalPriceOfCourse = 0.0;
+//                                                                                                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
+//                                                                                                            } else {
+//                                                                                                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("0");
+//                                                                                                                double commission = price3 * comission;
+//                                                                                                                double userDue = price3 - oldSold;
+////                                                                                                                price.setText(userDue + " MAD");
+//                                                                                                                finalPriceOfCourse = userDue;
+//                                                                                                                double newDebt = finalDebt + (price3 - userDue - commission);
+//                                                                                                                FirebaseDatabase.getInstance().getReference("clientUSERS").child(userId).child("SOLDE").setValue("" + 0);
+//                                                                                                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
+//                                                                                                            }
+//                                                                                                        } else {
+//                                                                                                            double commission = price3 * comission;
+//                                                                                                            double newDebt = finalDebt + commission;
+////                                                                                                            price.setText(price3 + " MAD");
+//                                                                                                            finalPriceOfCourse = price3;
+//                                                                                                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("0");
+//                                                                                                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
+//
+//                                                                                                        }
+//
+//                                                                                                    }
+//
+//                                                                                                    @Override
+//                                                                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                                                                                                    }
+//                                                                                                });
+//
+//                                                                                            }
+//                                                                                        }
+//
+//                                                                                        @Override
+//                                                                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                                                                                        }
+//                                                                                    });
+//
+//
+//                                                                        } else {
+//                                                                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").addListenerForSingleValueEvent(new ValueEventListener() {
+//                                                                                @Override
+//                                                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                                                                    double debt = 0;
+//                                                                                    if (dataSnapshot.exists()) {
+//                                                                                        debt = Double.parseDouble(dataSnapshot.getValue(String.class));
+//
+//                                                                                        final double finalDebt = debt;
+//                                                                                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+//                                                                                            @Override
+//                                                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                                                                                if (dataSnapshot.child("SOLDE").exists()) {
+//                                                                                                    double oldSold = Double.parseDouble(dataSnapshot.child("SOLDE").getValue(String.class));
+//                                                                                                    if (dataSnapshot.child("USECREDIT").getValue(String.class).equals("1") && Integer.parseInt(dataSnapshot.child("SOLDE").getValue(String.class)) >= (int) price2) {
+//                                                                                                        double newSolde = oldSold - price2;
+//                                                                                                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(userId).child("SOLDE").setValue("" + newSolde);
+//                                                                                                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("1");
+//                                                                                                        double commission = price2 * comission;
+//                                                                                                        double driverIncome = price2 - commission;
+//                                                                                                        double newDebt = finalDebt + driverIncome;
+//                                                                                                        price.setText(0 + " MAD");
+//                                                                                                        finalPriceOfCourse = 0.0;
+//                                                                                                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
+//                                                                                                    } else {
+//                                                                                                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("0");
+//                                                                                                        double commission = price2 * comission;
+//                                                                                                        double userDue = price2 - oldSold;
+//                                                                                                        price.setText(userDue + " MAD");
+//                                                                                                        finalPriceOfCourse = userDue;
+//                                                                                                        double newDebt = finalDebt + (price2 - userDue - commission);
+//                                                                                                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(userId).child("SOLDE").setValue("" + 0);
+//                                                                                                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
+//                                                                                                    }
+//                                                                                                } else {
+//                                                                                                    double commission = price2 * comission;
+//                                                                                                    double newDebt = finalDebt + commission;
+//                                                                                                    price.setText(price2 + " MAD");
+//                                                                                                    finalPriceOfCourse = price2;
+//                                                                                                    FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("0");
+//                                                                                                    FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
+//
+//                                                                                                }
+//
+//                                                                                            }
+//
+//                                                                                            @Override
+//                                                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                                                                                            }
+//                                                                                        });
+//
+//                                                                                    }
+//                                                                                }
+//
+//                                                                                @Override
+//                                                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                                                                                }
+//                                                                            });
 //                                                                        }
 //                                                                    }
 //
@@ -1014,159 +1153,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //
 //                                                                    }
 //                                                                });
-
-
-                                                                FirebaseDatabase.getInstance().getReference("clientUSERS").
-                                                                        child(userId).child("PROMOCODE").addValueEventListener(new ValueEventListener() {
-                                                                    @Override
-                                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                                        if (dataSnapshot.exists()) {
-
-                                                                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").
-                                                                                    addListenerForSingleValueEvent(new ValueEventListener() {
-                                                                                        @Override
-                                                                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                                                            double debt = 0;
-                                                                                            if (dataSnapshot.exists()) {
-                                                                                                debt = Double.parseDouble(dataSnapshot.getValue(String.class));
-
-                                                                                                final double finalDebt = debt;
-                                                                                                FirebaseDatabase.getInstance().getReference("clientUSERS").child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
-                                                                                                    @Override
-                                                                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                                                                        if (dataSnapshot.child("SOLDE").exists()) {
-                                                                                                            double oldSold = Double.parseDouble(dataSnapshot.child("SOLDE").getValue(String.class));
-                                                                                                            if (dataSnapshot.child("USECREDIT").getValue(String.class).equals("1") && Integer.parseInt(dataSnapshot.child("SOLDE").getValue(String.class)) >= (int) price3) {
-                                                                                                                double newSolde = oldSold - price3;
-                                                                                                                FirebaseDatabase.getInstance().getReference("clientUSERS").child(userId).child("SOLDE").setValue("" + newSolde);
-                                                                                                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("1");
-                                                                                                                double commission = price3 * comission;
-                                                                                                                double driverIncome = price3 - commission;
-                                                                                                                double newDebt = finalDebt + driverIncome;
-//                                                                                                                price.setText(0 + " MAD");
-                                                                                                                finalPriceOfCourse = 0.0;
-                                                                                                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
-                                                                                                            } else {
-                                                                                                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("0");
-                                                                                                                double commission = price3 * comission;
-                                                                                                                double userDue = price3 - oldSold;
-//                                                                                                                price.setText(userDue + " MAD");
-                                                                                                                finalPriceOfCourse = userDue;
-                                                                                                                double newDebt = finalDebt + (price3 - userDue - commission);
-                                                                                                                FirebaseDatabase.getInstance().getReference("clientUSERS").child(userId).child("SOLDE").setValue("" + 0);
-                                                                                                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
-                                                                                                            }
-                                                                                                        } else {
-                                                                                                            double commission = price3 * comission;
-                                                                                                            double newDebt = finalDebt + commission;
-//                                                                                                            price.setText(price3 + " MAD");
-                                                                                                            finalPriceOfCourse = price3;
-                                                                                                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("0");
-                                                                                                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
-
-                                                                                                        }
-
-                                                                                                    }
-
-                                                                                                    @Override
-                                                                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                                                                                    }
-                                                                                                });
-
-                                                                                            }
-                                                                                        }
-
-                                                                                        @Override
-                                                                                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                                                                        }
-                                                                                    });
-
-
-                                                                        } else {
-                                                                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").addListenerForSingleValueEvent(new ValueEventListener() {
-                                                                                @Override
-                                                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                                                    double debt = 0;
-                                                                                    if (dataSnapshot.exists()) {
-                                                                                        debt = Double.parseDouble(dataSnapshot.getValue(String.class));
-
-                                                                                        final double finalDebt = debt;
-                                                                                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
-                                                                                            @Override
-                                                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                                                                if (dataSnapshot.child("SOLDE").exists()) {
-                                                                                                    double oldSold = Double.parseDouble(dataSnapshot.child("SOLDE").getValue(String.class));
-                                                                                                    if (dataSnapshot.child("USECREDIT").getValue(String.class).equals("1") && Integer.parseInt(dataSnapshot.child("SOLDE").getValue(String.class)) >= (int) price2) {
-                                                                                                        double newSolde = oldSold - price2;
-                                                                                                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(userId).child("SOLDE").setValue("" + newSolde);
-                                                                                                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("1");
-                                                                                                        double commission = price2 * comission;
-                                                                                                        double driverIncome = price2 - commission;
-                                                                                                        double newDebt = finalDebt + driverIncome;
-                                                                                                        price.setText(0 + " MAD");
-                                                                                                        finalPriceOfCourse = 0.0;
-                                                                                                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
-                                                                                                    } else {
-                                                                                                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("0");
-                                                                                                        double commission = price2 * comission;
-                                                                                                        double userDue = price2 - oldSold;
-                                                                                                        price.setText(userDue + " MAD");
-                                                                                                        finalPriceOfCourse = userDue;
-                                                                                                        double newDebt = finalDebt + (price2 - userDue - commission);
-                                                                                                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(userId).child("SOLDE").setValue("" + 0);
-                                                                                                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
-                                                                                                    }
-                                                                                                } else {
-                                                                                                    double commission = price2 * comission;
-                                                                                                    double newDebt = finalDebt + commission;
-                                                                                                    price.setText(price2 + " MAD");
-                                                                                                    finalPriceOfCourse = price2;
-                                                                                                    FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("0");
-                                                                                                    FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
-
-                                                                                                }
-
-                                                                                            }
-
-                                                                                            @Override
-                                                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                                                                            }
-                                                                                        });
-
-                                                                                    }
-                                                                                }
-
-                                                                                @Override
-                                                                                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                                                                }
-                                                                            });
-                                                                        }
-                                                                    }
-
-                                                                    @Override
-                                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                                                    }
-                                                                });
-
-
-                                                            }
-                                                        } catch (NullPointerException e) {
-                                                            e.printStackTrace();
-                                                        } catch (Exception e) {
-                                                            e.printStackTrace();
-                                                        }
-                                                    }
-
-                                                    @Override
-                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                                    }
-                                                });*/
+//
+//
+//                                                            }
+//                                                        } catch (NullPointerException e) {
+//                                                            e.printStackTrace();
+//                                                        } catch (Exception e) {
+//                                                            e.printStackTrace();
+//                                                        }
+//                                                    }
+//
+//                                                    @Override
+//                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                                                    }
+//                                                });*/
 
 
                                         gotMoney.setOnClickListener(new View.OnClickListener() {
