@@ -66,7 +66,6 @@ public class CourseService extends Service implements GoogleApiClient.Connection
     private List<Location> travelLocations = new ArrayList<>();
     private Double distanceTraveled = 0.0;
 
-
     private ValueEventListener listener;
 
     private double time = 0;
@@ -541,9 +540,7 @@ public class CourseService extends Service implements GoogleApiClient.Connection
             if (state == 5) {
                 countingPreWait = false;
                 countingDistance = false;
-
                 FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).removeValue();
-
             }
 
 
@@ -566,8 +563,7 @@ public class CourseService extends Service implements GoogleApiClient.Connection
             // Do things like hide the progress bar or change a TextView
         }
     }
-
-
+    
     public double GetDistanceFromLatLonInKm(double lat1, double lon1, double lat2, double lon2) {
         final int R = 6371;
         // Radius of the earth in km
