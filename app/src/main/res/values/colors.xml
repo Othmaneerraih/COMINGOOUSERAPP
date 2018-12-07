@@ -6,4 +6,5 @@
     <color name="primaryLight">#3a96fd</color>
     <color name="transp">#00000000</color>
     <color name="gradiantEnd2">#0C57B1</color>
+    <color name="back_part">#fbe3e0ea</color>
 </resources>

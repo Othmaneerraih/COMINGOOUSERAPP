@@ -13,6 +13,7 @@ import android.os.CountDownTimer;
 import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
@@ -130,19 +131,28 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         final TextView clientLevel = (TextView) findViewById(R.id.textView6);
         final Intent intent = getIntent();
         int dist = 0;
+        double Dist;
         try {
-            double Dist = Double.parseDouble(intent.getStringExtra("distance"));
-            dist = (int) Dist;
+            String gatedDistance = "";
+            gatedDistance = intent.getStringExtra("distance");
+            if (gatedDistance != "") {
+                Dist = Double.parseDouble(intent.getStringExtra("distance"));
+                dist = (int) Math.round(Dist);
+                double time = Dist * 1.5;
+                distance.setText(intent.getStringExtra("distance") + "Km,  " + time + " min");
+            }
+            Log.e("Commandac", "onCreate: distance " + intent.getStringExtra("distance"));
         } catch (NumberFormatException e) {
             e.printStackTrace();
+            Log.e("Commandac", "onCreate: " + e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
+            Log.e("Commandac", "onCreate:1111111 " + e.getMessage());
+            dist = 0;
         }
         clientID = intent.getStringExtra("name");
         userId = intent.getStringExtra("userId");
 
-        double time = Double.parseDouble(intent.getStringExtra("distance")) * 1.5;
-        distance.setText(intent.getStringExtra("distance") + "Km,  " + time + " min");
 
         try {
             FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("rating").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -371,7 +381,6 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
 
                                     data.put("startAddress", intent.getStringExtra("start"));
                                     data.put("endAddress", intent.getStringExtra("arrival"));
-
 
                                     //default Values
                                     data.put("state", "0");
