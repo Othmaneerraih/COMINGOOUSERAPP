@@ -1,4 +1,4 @@
-package com.comingoo.driver.fousa;
+package com.comingoo.driver.fousa.activity;
 
 import android.Manifest;
 import android.content.Intent;
@@ -13,13 +13,15 @@ import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.comingoo.driver.fousa.async.UpdateInfoAideTask;
+import com.comingoo.driver.fousa.utility.CustomAnimation;
+import com.comingoo.driver.fousa.R;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -54,29 +56,22 @@ public class aideActivity extends AppCompatActivity {
         final SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
         userId = prefs.getString("userId", null);
 
-        message = (EditText) findViewById(R.id.message);
-        selectImage = (TextView) findViewById(R.id.image_text);
+        message = findViewById(R.id.message);
+        selectImage = findViewById(R.id.image_text);
 
-        Q1 =  findViewById(R.id.Q1);
-        A1 = (ConstraintLayout) findViewById(R.id.A1);
-        Q2 = (ConstraintLayout) findViewById(R.id.Q2);
-        A2 = (ConstraintLayout) findViewById(R.id.A2);
+        Q1 = findViewById(R.id.Q1);
+        A1 = findViewById(R.id.A1);
+        Q2 = findViewById(R.id.Q2);
+        A2 = findViewById(R.id.A2);
 
         ivArrawOne = findViewById(R.id.iv_aide_expn_one);
         ivArrawTwo = findViewById(R.id.iv_aide_expn_two);
-        fc = (ConstraintLayout) findViewById(R.id.fc);
-        content = (ConstraintLayout) findViewById(R.id.content);
+        fc = findViewById(R.id.fc);
+        content = findViewById(R.id.content);
 
-        image = (ConstraintLayout) findViewById(R.id.add_image);
+        image = findViewById(R.id.add_image);
 
         CustomAnimation.animate(aideActivity.this, content, 250, 1, 0);
-
-//        fc.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                CustomAnimation.animate(aideActivity.this, content, 70, 1, 500);
-//            }
-//        });
 
         findViewById(R.id.add_voice).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -98,8 +93,8 @@ public class aideActivity extends AppCompatActivity {
         image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(ContextCompat.checkSelfPermission(aideActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-                    ActivityCompat.requestPermissions(aideActivity.this, new String[] {Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+                if (ContextCompat.checkSelfPermission(aideActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(aideActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
 
 
                 } else {
@@ -113,7 +108,7 @@ public class aideActivity extends AppCompatActivity {
         findViewById(R.id.send).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               new UpdateInfoTask().execute();
+                new UpdateInfoAideTask(userId,imageUri,message,aideActivity.this,selectImage).execute();
                 CustomAnimation.animate(aideActivity.this, content, 1, 250, 500);
             }
         });
@@ -122,11 +117,11 @@ public class aideActivity extends AppCompatActivity {
         Q1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!a1) {
+                if (!a1) {
                     CustomAnimation.animate(aideActivity.this, A1, 100, 2, 500);
                     a1 = true;
                     ivArrawOne.setImageResource(R.drawable.ic_arraw_up);
-                }else{
+                } else {
                     CustomAnimation.animate(aideActivity.this, A1, 2, 100, 500);
                     a1 = false;
                     ivArrawOne.setImageResource(R.drawable.expand);
@@ -137,11 +132,11 @@ public class aideActivity extends AppCompatActivity {
         Q2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!a2) {
+                if (!a2) {
                     CustomAnimation.animate(aideActivity.this, A2, 70, 2, 500);
                     a2 = true;
                     ivArrawTwo.setImageResource(R.drawable.ic_arraw_up);
-                }else{
+                } else {
                     CustomAnimation.animate(aideActivity.this, A2, 2, 70, 500);
                     a2 = false;
                     ivArrawTwo.setImageResource(R.drawable.expand);
@@ -158,10 +153,10 @@ public class aideActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResult){
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResult) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResult);
 
-        if(grantResult.length > 0 && grantResult[0] == PackageManager.PERMISSION_GRANTED){
+        if (grantResult.length > 0 && grantResult[0] == PackageManager.PERMISSION_GRANTED) {
 
             Intent intent = new Intent(Intent.ACTION_PICK);
             intent.setType("image/*");
@@ -171,85 +166,18 @@ public class aideActivity extends AppCompatActivity {
 
     }
 
-    private boolean finished;
-    private class UpdateInfoTask extends AsyncTask<String, Integer, String> {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            finished = false;
-        }
-
-        // This is run in a background thread
-        @Override
-        protected String doInBackground(String... params) {
-
-            final Map<String, String> data = new HashMap<>();
-            data.put("user", userId);
-            data.put("message", message.getText().toString());
-            if(imageUri != null) {
-
-                final StorageReference filepath= FirebaseStorage.getInstance().getReference("DRIVERCONTACTUS").child(userId);
-                filepath.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        filepath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                            @Override
-                            public void onSuccess(Uri uri) {
-                                data.put("image", uri.toString());
-                                FirebaseDatabase.getInstance().getReference("CONTACTUSDRIVER").push().setValue(data);
-                            }
-                        });
-                        finished = true;
-                    }
-                });
-
-                data.put("image", imageUri.toString());
-
-            }else {
-                data.put("image", "");
-                FirebaseDatabase.getInstance().getReference("CONTACTUSDRIVER").push().setValue(data);
-                finished = true;
-            }
-
-            while(!finished){
-
-            }
-
-            return "this string is passed to onPostExecute";
-        }
-
-        // This is called from background thread but runs in UI
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            super.onProgressUpdate(values);
-
-            // Do things like update the progress bar
-        }
-
-        // This runs in UI when background thread finishes
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            // Do things like hide the progress bar or change a TextView
-
-            Toast.makeText(aideActivity.this, "message envoyé.", Toast.LENGTH_SHORT).show();
-            message.setText("");
-            selectImage.setText("Ajouter une image");
-        }
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode == 2 && resultCode == RESULT_OK){
+        if (requestCode == 2 && resultCode == RESULT_OK) {
 
             imageUri = data.getData();
             //image.setBackgroundResource();
             selectImage.setText("image choisi");
         }
 
-        if(requestCode ==10 && resultCode == RESULT_OK){
+        if (requestCode == 10 && resultCode == RESULT_OK) {
             ArrayList<String> result = data
                     .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
             message.setText(result.get(0));

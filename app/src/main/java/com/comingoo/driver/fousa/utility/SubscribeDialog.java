@@ -1,4 +1,4 @@
-package com.comingoo.driver.fousa;
+package com.comingoo.driver.fousa.utility;
 
 
 import android.app.AlertDialog;
@@ -10,6 +10,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.comingoo.driver.fousa.R;
 
 public class SubscribeDialog extends AppCompatDialogFragment {
 

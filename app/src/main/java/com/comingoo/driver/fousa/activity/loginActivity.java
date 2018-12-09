@@ -1,4 +1,4 @@
-package com.comingoo.driver.fousa;
+package com.comingoo.driver.fousa.activity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,6 +10,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.comingoo.driver.fousa.R;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
@@ -28,9 +29,9 @@ public class loginActivity extends AppCompatActivity {
 
         checkLogin();
 
-        phoneNumber = (EditText) findViewById(R.id.phoneNumber);
-        password = (EditText) findViewById(R.id.password);
-        loginBtn = (ImageButton) findViewById(R.id.loginBtn);
+        phoneNumber = findViewById(R.id.phoneNumber);
+        password = findViewById(R.id.password);
+        loginBtn = findViewById(R.id.loginBtn);
 
 
 
@@ -43,11 +44,6 @@ public class loginActivity extends AppCompatActivity {
                 }else{
 
                     login(phoneNumber.getText().toString(), password.getText().toString());
-//                    if(phoneNumberValidation(phoneNumber.getText().toString())){
-//                        login(phoneNumber.getText().toString(), password.getText().toString());
-//                    }else{
-//                        Toast.makeText(loginActivity.this, "Veuillez entrer un numéro de téléphone valide 0612345678", Toast.LENGTH_SHORT).show();
-//                    }
                 }
 
             }
@@ -62,13 +58,7 @@ public class loginActivity extends AppCompatActivity {
         if(x != '0' && y != '6'){
             return false;
         }
-        else if(number.length()>10){
-            return false;
-        }
-//        if(android.util.Patterns.PHONE.matcher(number).matches()){
-//            return true;
-//        }
-        return true;
+        else return number.length() <= 10;
     }
 
 

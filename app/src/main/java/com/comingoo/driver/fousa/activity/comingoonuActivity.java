@@ -1,4 +1,4 @@
-package com.comingoo.driver.fousa;
+package com.comingoo.driver.fousa.activity;
 
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -10,7 +10,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +20,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.comingoo.driver.fousa.adapters.ComingooUAdapter;
+import com.comingoo.driver.fousa.async.CheckUserComingoUTask;
+import com.comingoo.driver.fousa.model.Car;
+import com.comingoo.driver.fousa.utility.CustomAnimation;
+import com.comingoo.driver.fousa.R;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -61,7 +65,7 @@ public class comingoonuActivity extends AppCompatActivity {
 
     private RecyclerView mLocationView;
     private DatabaseReference mLocation;
-    private MyAdapter cAdapter;
+    private ComingooUAdapter cAdapter;
     private List<Car> carsData;
 
     private EditText typeCar, modelCar, immCar, colorCar;
@@ -132,14 +136,14 @@ public class comingoonuActivity extends AppCompatActivity {
         mLocation.keepSynced(true);
 
         carsData = new ArrayList<>();
-        mLocationView = (RecyclerView) findViewById(R.id.RecyclerView);
+        mLocationView = findViewById(R.id.RecyclerView);
         mLocationView.setHasFixedSize(true);
         mLocationView.setLayoutManager(new LinearLayoutManager(this));
 
-        cAdapter = new MyAdapter(carsData);
+        cAdapter = new ComingooUAdapter(carsData,mLocation);
         mLocationView.setAdapter(cAdapter);
 
-        new CheckUserTask().execute();
+        new CheckUserComingoUTask(mLocation,cAdapter,carsData).execute();
 
 
         String Month;
@@ -159,16 +163,16 @@ public class comingoonuActivity extends AppCompatActivity {
         if (Month.equals("11")) Month = "Novembre";
         if (Month.equals("12")) Month = "Décembre";
 
-        TextView d = (TextView) findViewById(R.id.date);
+        TextView d = findViewById(R.id.date);
         d.setText(Month + " " + day);
 
 
         changePassBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                TextView oldPass = (TextView) findViewById(R.id.oldPass);
-                TextView newPass = (TextView) findViewById(R.id.newPass);
-                TextView confirmPass = (TextView) findViewById(R.id.confirmPass);
+                TextView oldPass = findViewById(R.id.oldPass);
+                TextView newPass = findViewById(R.id.newPass);
+                TextView confirmPass = findViewById(R.id.confirmPass);
                 updatePassword(oldPass.getText().toString(), newPass.getText().toString(), confirmPass.getText().toString());
             }
         });
@@ -251,49 +255,49 @@ public class comingoonuActivity extends AppCompatActivity {
 
     private void initialize() {
 
-        changePassBtn = (Button) findViewById(R.id.change_password_btn);
+        changePassBtn = findViewById(R.id.change_password_btn);
 
-        typeCar = (EditText) findViewById(R.id.marque_car);
-        modelCar = (EditText) findViewById(R.id.modele_car);
-        immCar = (EditText) findViewById(R.id.imm_car);
-        colorCar = (EditText) findViewById(R.id.color_car);
-        addCar = (Button) findViewById(R.id.add_car);
+        typeCar = findViewById(R.id.marque_car);
+        modelCar = findViewById(R.id.modele_car);
+        immCar = findViewById(R.id.imm_car);
+        colorCar = findViewById(R.id.color_car);
+        addCar = findViewById(R.id.add_car);
 
-        tarifs = (ConstraintLayout) findViewById(R.id.tarifs);
-        tarifsLayout = (ConstraintLayout) findViewById(R.id.tarifsLayout);
-        parametreLayout = (ConstraintLayout) findViewById(R.id.parametres_layout);
-        profileLayout = (ConstraintLayout) findViewById(R.id.profil_layout);
-        addCarLayout = (ConstraintLayout) findViewById(R.id.add_car_layout);
-        changePasswordLayout = (ConstraintLayout) findViewById(R.id.change_password);
-        carsLayout = (ConstraintLayout) findViewById(R.id.cars_layout);
-        portFeuilleLayout = (ConstraintLayout) findViewById(R.id.porte_feuille_layout);
+        tarifs = findViewById(R.id.tarifs);
+        tarifsLayout = findViewById(R.id.tarifsLayout);
+        parametreLayout = findViewById(R.id.parametres_layout);
+        profileLayout = findViewById(R.id.profil_layout);
+        addCarLayout = findViewById(R.id.add_car_layout);
+        changePasswordLayout = findViewById(R.id.change_password);
+        carsLayout = findViewById(R.id.cars_layout);
+        portFeuilleLayout = findViewById(R.id.porte_feuille_layout);
 
-        paramsImage = (ImageView) findViewById(R.id.imageView13);
-        profilImage = (ImageView) findViewById(R.id.imageView17);
-        portFImage = (ImageView) findViewById(R.id.imageView16);
+        paramsImage = findViewById(R.id.imageView13);
+        profilImage = findViewById(R.id.imageView17);
+        portFImage = findViewById(R.id.imageView16);
 
 
-        pA = (ConstraintLayout) findViewById(R.id.paLayout);
-        pR = (ConstraintLayout) findViewById(R.id.prLayout);
-        pO = (ConstraintLayout) findViewById(R.id.poLayout);
+        pA = findViewById(R.id.paLayout);
+        pR = findViewById(R.id.prLayout);
+        pO = findViewById(R.id.poLayout);
 
         tvTarrif = findViewById(R.id.tv_tarrif);
 
-        changePasswordButton = (ConstraintLayout) findViewById(R.id.change_password_button);
-        backChangePassword = (ImageButton) findViewById(R.id.back_select_password);
+        changePasswordButton = findViewById(R.id.change_password_button);
+        backChangePassword = findViewById(R.id.back_select_password);
 
-        manageCars = (ConstraintLayout) findViewById(R.id.manageCars);
-        backManageCars = (ImageButton) findViewById(R.id.back_select_cars);
+        manageCars = findViewById(R.id.manageCars);
+        backManageCars = findViewById(R.id.back_select_cars);
 
-        addCarButton = (Button) findViewById(R.id.add_car_button);
-        backAddCar = (ImageButton) findViewById(R.id.back_select_add_car);
+        addCarButton = findViewById(R.id.add_car_button);
+        backAddCar = findViewById(R.id.back_select_add_car);
 
 
-        todayEarnings = (TextView) findViewById(R.id.earnings_value);
+        todayEarnings = findViewById(R.id.earnings_value);
         debt = findViewById(R.id.debt_value);
-        courses = (TextView) findViewById(R.id.courses_value);
-        userName = (TextView) findViewById(R.id.name_value);
-        phoneNumber = (TextView) findViewById(R.id.phone_value);
+        courses = findViewById(R.id.courses_value);
+        userName = findViewById(R.id.name_value);
+        phoneNumber = findViewById(R.id.phone_value);
     }
 
     private void addNewCar(String marque, String modele, String imm, String colorCar) {
@@ -315,65 +319,6 @@ public class comingoonuActivity extends AppCompatActivity {
             updateUI();
         } else {
             Toast.makeText(comingoonuActivity.this, "Tous les champs doivent étres remplis!!", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private class CheckUserTask extends AsyncTask<String, Integer, String> {
-        SharedPreferences prefs;
-        String userId;
-
-        // Runs in UI before background thread is called
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
-            userId = prefs.getString("userId", null);
-            // Do something like display a progress bar
-        }
-
-        // This is run in a background thread
-        @Override
-        protected String doInBackground(String... params) {
-
-            mLocation.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    carsData.clear();
-                    for (DataSnapshot data : dataSnapshot.getChildren()) {
-                        Car newCar = new Car(
-                                data.child("name").getValue(String.class),
-                                data.child("description").getValue(String.class),
-                                data.child("selected").getValue(String.class),
-                                data.child("id").getValue(String.class)
-                        );
-                        carsData.add(newCar);
-                    }
-                    cAdapter.notifyDataSetChanged();
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
-
-            return "this string is passed to onPostExecute";
-        }
-
-        // This is called from background thread but runs in UI
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            super.onProgressUpdate(values);
-
-            // Do things like update the progress bar
-        }
-
-        // This runs in UI when background thread finishes
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-
-            // Do things like hide the progress bar or change a TextView
         }
     }
 
@@ -499,91 +444,5 @@ public class comingoonuActivity extends AppCompatActivity {
         return (utc);
 
     }
-
-
-    public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
-        private List<Car> mDataset;
-
-        // Provide a reference to the views for each data item
-        // Complex data items may need more than one view per item, and
-        // you provide access to all the views for a data item in a view holder
-        public class ViewHolder extends RecyclerView.ViewHolder {
-            // each data item is just a string in this case
-
-            public View h;
-            public TextView carName, carDesc;
-            public ImageView selected;
-
-            public ViewHolder(View v) {
-                super(v);
-                h = v;
-
-                carName = v.findViewById(R.id.car_name);
-                carDesc = v.findViewById(R.id.car_desc);
-                selected = v.findViewById(R.id.imageView27);
-
-            }
-        }
-
-        // Provide a suitable constructor (depends on the kind of dataset)
-        public MyAdapter(List<Car> myDataset) {
-            this.mDataset = myDataset;
-        }
-
-        // Create new views (invoked by the layout manager)
-        @Override
-        public MyAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
-                                                       int viewType) {
-            // create a new view
-            View v = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.cars_rows, parent, false);
-            MyAdapter.ViewHolder vh = new MyAdapter.ViewHolder(v);
-            return vh;
-        }
-
-        // Replace the contents of a view (invoked by the layout manager)
-        @Override
-        public void onBindViewHolder(final MyAdapter.ViewHolder holder, int position) {
-            // - get element from your dataset at this position
-            // - replace the contents of the view with that element
-            final Car newCar = mDataset.get(position);
-
-            holder.carName.setText(newCar.getName());
-            holder.carDesc.setText(newCar.getDescription());
-            if (newCar.getSelected().equals("1")) {
-                holder.selected.setBackgroundResource(R.drawable.selected_icon);
-            } else {
-                holder.selected.setBackgroundResource(R.drawable.unselected_icon);
-            }
-
-            holder.selected.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mLocation.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            for (DataSnapshot data : dataSnapshot.getChildren()) {
-                                mLocation.child(data.getKey()).child("selected").setValue("0");
-                            }
-                            mLocation.child(newCar.getId()).child("selected").setValue("1");
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                        }
-                    });
-                }
-            });
-
-        }
-
-        // Return the size of your dataset (invoked by the layout manager)
-        @Override
-        public int getItemCount() {
-            return mDataset.size();
-        }
-    }
-
 
 }

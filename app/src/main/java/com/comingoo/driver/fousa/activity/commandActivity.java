@@ -1,4 +1,4 @@
-package com.comingoo.driver.fousa;
+package com.comingoo.driver.fousa.activity;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -22,6 +22,7 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.comingoo.driver.fousa.R;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -40,8 +41,6 @@ import com.google.android.gms.maps.model.LatLng;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-
-import static java.util.Objects.*;
 
 public class commandActivity extends AppCompatActivity implements OnMapReadyCallback {
     public static Activity clientR;
@@ -120,16 +119,14 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         });
 
 
-        tvUserRating =  findViewById(R.id.textView10);
-        ratingShow = (TextView) findViewById(R.id.rating_txt);
-        distance = (TextView) findViewById(R.id.textView8);
-        startText = (TextView) findViewById(R.id.textView9);
-        decline = (Button) findViewById(R.id.decline);
-        accept = (Button) findViewById(R.id.accept);
-        barTimer = (ProgressBar) findViewById(R.id.barTimer);
+        tvUserRating = findViewById(R.id.textView10);
+        ratingShow = findViewById(R.id.rating_txt);
+        distance = findViewById(R.id.textView8);
+        startText = findViewById(R.id.textView9);
+        decline = findViewById(R.id.decline);
+        accept = findViewById(R.id.accept);
+        barTimer = findViewById(R.id.barTimer);
 
-
-        final TextView clientLevel = (TextView) findViewById(R.id.textView6);
         final Intent intent = getIntent();
         int dist = 0;
         double Dist;
@@ -178,53 +175,53 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         try {
             FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("rating")
                     .addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if (!dataSnapshot.getKey().isEmpty()) {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if (!dataSnapshot.getKey().isEmpty()) {
 
-                        if (dataSnapshot.getValue() == null) {
-                            ratingShow.setText("0");
-                        } else {
-                            int oneStarPerson = 0;
-                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
-                                oneStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("1").getValue(String.class)));
+                                if (dataSnapshot.getValue() == null) {
+                                    ratingShow.setText("0");
+                                } else {
+                                    int oneStarPerson = 0;
+                                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+                                        oneStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("1").getValue(String.class)));
 
-                            int one = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("1").getValue(String.class)));
-                            int twoStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("2").getValue(String.class)));
-                            int two = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("2").getValue(String.class))) * 2;
-                            int threeStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("3").getValue(String.class)));
-                            int three = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("3").getValue(String.class))) * 3;
-                            int fourStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("4").getValue(String.class)));
-                            int four = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("4").getValue(String.class))) * 4;
-                            int fiveStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("5").getValue(String.class)));
-                            int five = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("5").getValue(String.class))) * 5;
+                                        int one = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("1").getValue(String.class)));
+                                        int twoStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("2").getValue(String.class)));
+                                        int two = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("2").getValue(String.class))) * 2;
+                                        int threeStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("3").getValue(String.class)));
+                                        int three = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("3").getValue(String.class))) * 3;
+                                        int fourStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("4").getValue(String.class)));
+                                        int four = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("4").getValue(String.class))) * 4;
+                                        int fiveStarPerson = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("5").getValue(String.class)));
+                                        int five = Integer.parseInt(Objects.requireNonNull(dataSnapshot.child("5").getValue(String.class))) * 5;
 
-                            double totalRating = one + two + three + four + five;
-                            double totalRatingPerson = oneStarPerson + twoStarPerson + threeStarPerson + fourStarPerson + fiveStarPerson;
+                                        double totalRating = one + two + three + four + five;
+                                        double totalRatingPerson = oneStarPerson + twoStarPerson + threeStarPerson + fourStarPerson + fiveStarPerson;
 
-                            try {
-                                double avgRating = totalRating / totalRatingPerson;
-                                String avg = String.format("%.2f", avgRating);
-                                String newString = avg.replace(",", ".");
-                                ratingShow.setText(newString);
-                            } catch (ArithmeticException e) {
-                                e.printStackTrace();
-                            } catch (Exception e) {
-                                e.printStackTrace();
+                                        try {
+                                            double avgRating = totalRating / totalRatingPerson;
+                                            String avg = String.format("%.2f", avgRating);
+                                            String newString = avg.replace(",", ".");
+                                            ratingShow.setText(newString);
+                                        } catch (ArithmeticException e) {
+                                            e.printStackTrace();
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                }
+
+                            } else {
+                                ratingShow.setText(4.5 + "");
                             }
                         }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                            ratingShow.setText(4.5 + "");
                         }
-
-                    } else {
-                        ratingShow.setText(4.5 + "");
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-                    ratingShow.setText(4.5 + "");
-                }
-            });
+                    });
 
 
             FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").
@@ -276,7 +273,7 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
                 .findFragmentById(R.id.map_command));
         map.getMapAsync(this);
 
-        distance.setText(time+" min /" + dist + "km");
+        distance.setText(time + " min /" + dist + "km");
         startText.setText("De : " + intent.getStringExtra("start"));
 
         accept.setClickable(true);
@@ -286,12 +283,12 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
             @Override
             public void onClick(View view) {
                 try {
-                if (mp.isPlaying()) {
-                    mp.stop();
-                }
-                vibrator.cancel();
-                FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
-                commandActivity.this.finish();
+                    if (mp.isPlaying()) {
+                        mp.stop();
+                    }
+                    vibrator.cancel();
+                    FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
+                    commandActivity.this.finish();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -462,7 +459,7 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
         return (rad * 180.0 / Math.PI);
     }
 
-    static boolean active = false;
+    public static boolean active = false;
 
     @Override
     public void onStart() {
@@ -478,10 +475,10 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
                 barTimer.setProgress((int) seconds);
                 if (seconds == 0) {
                     try {
-                        if(mp.isPlaying()){
+                        if (mp.isPlaying()) {
                             mp.stop();
                         }
-                        
+
                         vibrator.cancel();
                         showCustomDialog(commandActivity.this);
                     } catch (Exception e) {
