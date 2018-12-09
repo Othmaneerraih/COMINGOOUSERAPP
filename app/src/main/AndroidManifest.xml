@@ -74,7 +74,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.commandActivity"
+            android:name=".activity.CommandActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait">
 
@@ -84,24 +84,24 @@
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.loginActivity"
+            android:name=".activity.LoginActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".activity.historiqueActivity"
+            android:name=".activity.HistoriqueActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.notificationActivity"
+            android:name=".activity.NotificationActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.aideActivity"
+            android:name=".activity.AideActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.comingoonuActivity"
+            android:name=".activity.ComingooAndYouActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
 

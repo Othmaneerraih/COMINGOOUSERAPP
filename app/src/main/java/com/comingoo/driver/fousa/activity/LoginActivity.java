@@ -16,7 +16,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-public class loginActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity {
 
     private EditText phoneNumber;
     private EditText password;
@@ -40,7 +40,7 @@ public class loginActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 if(phoneNumber.getText().toString().isEmpty() && password.getText().toString().isEmpty()){
-                    Toast.makeText(loginActivity.this, "Fill all the fields", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, "Fill all the fields", Toast.LENGTH_SHORT).show();
                 }else{
 
                     login(phoneNumber.getText().toString(), password.getText().toString());
@@ -72,20 +72,20 @@ public class loginActivity extends AppCompatActivity {
                     for(DataSnapshot data: dataSnapshot.getChildren()){
                         if(data.child("password").getValue(String.class).equals(password)){
                             if(data.child("isVerified").getValue(String.class).equals("0")){
-                                Toast.makeText(loginActivity.this, "This account is currently disabled", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(LoginActivity.this, "This account is currently disabled", Toast.LENGTH_SHORT).show();
                             }else {
 //                                loggedIn("+212"+ number, data.getKey());
                                 loggedIn( number, data.getKey());
                             }
                         }else{
                             //Wrong Password
-                            Toast.makeText(loginActivity.this, "Mot de passe erroné!!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginActivity.this, "Mot de passe erroné!!", Toast.LENGTH_SHORT).show();
                         }
 
                     }
                 }else{
                     // Number/User  Not Found
-                    Toast.makeText(loginActivity.this, "Ce compt n'existe pas!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, "Ce compt n'existe pas!", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -109,7 +109,7 @@ public class loginActivity extends AppCompatActivity {
         String number = prefs.getString("userId", null);
         if(number != null){
             //User Is Logged In
-            Intent intent = new Intent(loginActivity.this, MapsActivity.class);
+            Intent intent = new Intent(LoginActivity.this, MapsActivity.class);
             startActivity(intent);
             finish();
         }

@@ -17,7 +17,7 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.comingoo.driver.fousa.activity.commandActivity;
+import com.comingoo.driver.fousa.activity.CommandActivity;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -258,7 +258,7 @@ public class DriverService extends Service {
                         return;
                     }
 
-                    final Intent intent = new Intent(DriverService.this, commandActivity.class);
+                    final Intent intent = new Intent(DriverService.this, CommandActivity.class);
 
                     intent.putExtra("userId", userId);
                     intent.putExtra("name", requestUsersID.get(counter));
@@ -295,11 +295,11 @@ public class DriverService extends Service {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             if (!dataSnapshot.exists()) {
-                                commandActivity.countDownTimer.cancel();
-                                commandActivity.clientR.finish();
-                                if (commandActivity.mp != null) {
-                                    commandActivity.mp.release();
-                                    commandActivity.vibrator.cancel();
+                                CommandActivity.countDownTimer.cancel();
+                                CommandActivity.clientR.finish();
+                                if (CommandActivity.mp != null) {
+                                    CommandActivity.mp.release();
+                                    CommandActivity.vibrator.cancel();
                                 }
                                 counter++;
                                 checkStop = true;
@@ -331,13 +331,13 @@ public class DriverService extends Service {
                                             if (requestUsersID.size() > 1) {
                                                 requestUsersID.set(counter, "-1");
                                             }
-                                            if (commandActivity.active) {
-                                                commandActivity.countDownTimer.cancel();
-                                                if (commandActivity.mp != null) {
-                                                    commandActivity.mp.release();
-                                                    commandActivity.vibrator.cancel();
+                                            if (CommandActivity.active) {
+                                                CommandActivity.countDownTimer.cancel();
+                                                if (CommandActivity.mp != null) {
+                                                    CommandActivity.mp.release();
+                                                    CommandActivity.vibrator.cancel();
                                                 }
-                                                commandActivity.clientR.finish();
+                                                CommandActivity.clientR.finish();
                                             }
 
                                             clientRequetFollow.removeValue();
@@ -352,12 +352,12 @@ public class DriverService extends Service {
                                     }
                                 });
                             } else {
-                                if (commandActivity.active) {
-                                    commandActivity.countDownTimer.cancel();
-                                    commandActivity.clientR.finish();
-                                    if (commandActivity.mp != null) {
-                                        commandActivity.mp.release();
-                                        commandActivity.vibrator.cancel();
+                                if (CommandActivity.active) {
+                                    CommandActivity.countDownTimer.cancel();
+                                    CommandActivity.clientR.finish();
+                                    if (CommandActivity.mp != null) {
+                                        CommandActivity.mp.release();
+                                        CommandActivity.vibrator.cancel();
                                     }
                                 }
                             }
@@ -430,12 +430,12 @@ public class DriverService extends Service {
 
                         }
                     } else {
-                        if (commandActivity.active) {
-                            commandActivity.countDownTimer.cancel();
-                            commandActivity.clientR.finish();
-                            if (commandActivity.mp != null) {
-                                commandActivity.mp.release();
-                                commandActivity.vibrator.cancel();
+                        if (CommandActivity.active) {
+                            CommandActivity.countDownTimer.cancel();
+                            CommandActivity.clientR.finish();
+                            if (CommandActivity.mp != null) {
+                                CommandActivity.mp.release();
+                                CommandActivity.vibrator.cancel();
                             }
                         }
                     }

@@ -25,7 +25,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class notificationActivity extends AppCompatActivity {
+public class NotificationActivity extends AppCompatActivity {
 
     private RecyclerView mLocationView;
     private DatabaseReference mLocation;

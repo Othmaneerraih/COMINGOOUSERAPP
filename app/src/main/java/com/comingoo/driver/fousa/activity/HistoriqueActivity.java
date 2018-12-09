@@ -25,7 +25,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-public class historiqueActivity extends AppCompatActivity {
+public class HistoriqueActivity extends AppCompatActivity {
 
     private RecyclerView mLocationView;
     private DatabaseReference mLocation;

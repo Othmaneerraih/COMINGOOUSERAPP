@@ -9,7 +9,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.comingoo.driver.fousa.R;
-import com.comingoo.driver.fousa.activity.comingoonuActivity;
 import com.comingoo.driver.fousa.model.Car;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;

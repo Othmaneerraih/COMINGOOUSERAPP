@@ -379,20 +379,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Historique.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    startActivity(new Intent(MapsActivity.this, historiqueActivity.class));
+                    startActivity(new Intent(MapsActivity.this, HistoriqueActivity.class));
                 }
             });
 
             Inbox.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    startActivity(new Intent(MapsActivity.this, notificationActivity.class));
+                    startActivity(new Intent(MapsActivity.this, NotificationActivity.class));
                 }
             });
             Aide.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    startActivity(new Intent(MapsActivity.this, aideActivity.class));
+                    startActivity(new Intent(MapsActivity.this, AideActivity.class));
                 }
             });
             logout.setOnClickListener(new View.OnClickListener() {
@@ -1704,7 +1704,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         ComingoonYou.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MapsActivity.this, comingoonuActivity.class);
+                Intent intent = new Intent(MapsActivity.this, ComingooAndYouActivity.class);
                 intent.putExtra("image", driverImage);
                 intent.putExtra("name", driverName);
                 intent.putExtra("phone", driverNumber);

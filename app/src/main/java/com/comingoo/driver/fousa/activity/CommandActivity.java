@@ -42,7 +42,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class commandActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class CommandActivity extends AppCompatActivity implements OnMapReadyCallback {
     public static Activity clientR;
     private TextView tvUserRating;
     private TextView ratingShow;
@@ -288,7 +288,7 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
                     }
                     vibrator.cancel();
                     FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
-                    commandActivity.this.finish();
+                    CommandActivity.this.finish();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -302,7 +302,7 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (!dataSnapshot.exists()) {
-                            commandActivity.this.finish();
+                            CommandActivity.this.finish();
                         }
                     }
 
@@ -424,7 +424,7 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
                             }
                         }
                         MapsActivity.wazeButton.setVisibility(View.VISIBLE);
-                        commandActivity.this.finish();
+                        CommandActivity.this.finish();
                     }
 
                     @Override
@@ -480,7 +480,7 @@ public class commandActivity extends AppCompatActivity implements OnMapReadyCall
                         }
 
                         vibrator.cancel();
-                        showCustomDialog(commandActivity.this);
+                        showCustomDialog(CommandActivity.this);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

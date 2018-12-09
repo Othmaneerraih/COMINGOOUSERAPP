@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements SubscribeDialog.S
             @Override
             public void onClick(View view) {
 //                throw new RuntimeException("This is a crash");
-                startActivity(new Intent(MainActivity.this, loginActivity.class));
+                startActivity(new Intent(MainActivity.this, LoginActivity.class));
                 finish();
             }
         });

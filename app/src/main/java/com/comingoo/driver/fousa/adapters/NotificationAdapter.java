@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.comingoo.driver.fousa.R;
-import com.comingoo.driver.fousa.activity.notificationActivity;
 import com.comingoo.driver.fousa.model.Notification;
 
 import java.util.List;

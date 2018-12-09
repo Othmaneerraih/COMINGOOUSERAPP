@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.support.annotation.NonNull;
@@ -22,18 +21,11 @@ import android.widget.Toast;
 import com.comingoo.driver.fousa.async.UpdateInfoAideTask;
 import com.comingoo.driver.fousa.utility.CustomAnimation;
 import com.comingoo.driver.fousa.R;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
-public class aideActivity extends AppCompatActivity {
+public class AideActivity extends AppCompatActivity {
 
     private ConstraintLayout Q1, Q2, A1, A2;
     private boolean a1 = false, a2 = false;
@@ -71,7 +63,7 @@ public class aideActivity extends AppCompatActivity {
 
         image = findViewById(R.id.add_image);
 
-        CustomAnimation.animate(aideActivity.this, content, 250, 1, 0);
+        CustomAnimation.animate(AideActivity.this, content, 250, 1, 0);
 
         findViewById(R.id.add_voice).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -84,7 +76,7 @@ public class aideActivity extends AppCompatActivity {
                 if (intent.resolveActivity(getPackageManager()) != null) {
                     startActivityForResult(intent, 10);
                 } else {
-                    Toast.makeText(aideActivity.this, "Your Device Don't Support Speech Input", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AideActivity.this, "Your Device Don't Support Speech Input", Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -93,8 +85,8 @@ public class aideActivity extends AppCompatActivity {
         image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (ContextCompat.checkSelfPermission(aideActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(aideActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+                if (ContextCompat.checkSelfPermission(AideActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(AideActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
 
 
                 } else {
@@ -108,8 +100,8 @@ public class aideActivity extends AppCompatActivity {
         findViewById(R.id.send).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new UpdateInfoAideTask(userId,imageUri,message,aideActivity.this,selectImage).execute();
-                CustomAnimation.animate(aideActivity.this, content, 1, 250, 500);
+                new UpdateInfoAideTask(userId,imageUri,message,AideActivity.this,selectImage).execute();
+                CustomAnimation.animate(AideActivity.this, content, 1, 250, 500);
             }
         });
 
@@ -118,11 +110,11 @@ public class aideActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (!a1) {
-                    CustomAnimation.animate(aideActivity.this, A1, 100, 2, 500);
+                    CustomAnimation.animate(AideActivity.this, A1, 100, 2, 500);
                     a1 = true;
                     ivArrawOne.setImageResource(R.drawable.ic_arraw_up);
                 } else {
-                    CustomAnimation.animate(aideActivity.this, A1, 2, 100, 500);
+                    CustomAnimation.animate(AideActivity.this, A1, 2, 100, 500);
                     a1 = false;
                     ivArrawOne.setImageResource(R.drawable.expand);
                 }
@@ -133,11 +125,11 @@ public class aideActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (!a2) {
-                    CustomAnimation.animate(aideActivity.this, A2, 70, 2, 500);
+                    CustomAnimation.animate(AideActivity.this, A2, 70, 2, 500);
                     a2 = true;
                     ivArrawTwo.setImageResource(R.drawable.ic_arraw_up);
                 } else {
-                    CustomAnimation.animate(aideActivity.this, A2, 2, 70, 500);
+                    CustomAnimation.animate(AideActivity.this, A2, 2, 70, 500);
                     a2 = false;
                     ivArrawTwo.setImageResource(R.drawable.expand);
                 }
