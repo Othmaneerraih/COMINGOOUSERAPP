@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.comingoo.driver.fousa.Course;
+import com.comingoo.driver.fousa.model.Course;
 import com.comingoo.driver.fousa.R;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;

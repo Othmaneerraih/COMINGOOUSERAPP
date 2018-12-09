@@ -1,4 +1,4 @@
-package com.comingoo.driver.fousa;
+package com.comingoo.driver.fousa.model;
 
 public class Car {
     String name, description, selected, id;

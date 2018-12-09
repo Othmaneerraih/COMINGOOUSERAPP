@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".commandActivity">
+    tools:context=".activity.CommandActivity">
 
     <!--<com.skyfishjy.library.RippleBackground xmlns:android="http://schemas.android.com/apk/res/android"-->
     <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
@@ -32,7 +32,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
 
-        <com.comingoo.driver.fousa.RoundedLayout
+        <com.comingoo.driver.fousa.utility.RoundedLayout
             android:layout_width="150dp"
             android:layout_height="150dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -48,7 +48,7 @@
                 android:layout_centerInParent="true"
                 android:layout_margin="3dp"
                 android:background="@drawable/drawable_circle_dark_blue" />
-        </com.comingoo.driver.fousa.RoundedLayout>
+        </com.comingoo.driver.fousa.utility.RoundedLayout>
 
 
         <RelativeLayout

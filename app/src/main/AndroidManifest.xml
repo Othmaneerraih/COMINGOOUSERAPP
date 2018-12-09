@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.comingoo.driver.fousa">
 
     <!--
@@ -10,7 +11,7 @@
 
     <uses-feature
         android:name="android.hardware.microphone"
-        android:required="false"/>
+        android:required="false" />
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -22,7 +23,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
@@ -30,18 +31,20 @@
 
     <application
         android:allowBackup="true"
+        android:fullBackupContent="true"
         android:hardwareAccelerated="false"
         android:icon="@mipmap/logo_driver"
         android:label="@string/app_name"
         android:largeHeap="true"
         android:roundIcon="@mipmap/icon_driver_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+        tools:ignore="GoogleAppIndexingWarning">
         <service
-            android:name="com.comingoo.driver.fousa.DriverService"
+            android:name="com.comingoo.driver.fousa.service.DriverService"
             android:exported="false" />
         <service
-            android:name="com.comingoo.driver.fousa.CourseService"
+            android:name="com.comingoo.driver.fousa.service.CourseService"
             android:exported="false" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -56,13 +59,13 @@
             android:value="@string/google_maps_key" />
 
         <!--<meta-data-->
-            <!--android:name="io.fabric.ApiKey"-->
-            <!--android:value="9d2f04b9fa154d690885532b8443aab2fbe59bb8"-->
-            <!--/>-->
+        <!--android:name="io.fabric.ApiKey"-->
+        <!--android:value="9d2f04b9fa154d690885532b8443aab2fbe59bb8"-->
+        <!--/>-->
 
 
         <activity
-            android:name=".MapsActivity"
+            android:name=".activity.MapsActivity"
             android:label="@string/title_activity_maps">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -71,40 +74,41 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".commandActivity"
+            android:name=".activity.CommandActivity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait">
 
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name=".activity.MainActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".loginActivity"
+            android:name=".activity.LoginActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".historiqueActivity"
+            android:name=".activity.HistoriqueActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".notificationActivity"
+            android:name=".activity.NotificationActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".aideActivity"
+            android:name=".activity.AideActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".comingoonuActivity"
+            android:name=".activity.ComingooAndYouActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
 
-        <activity android:name=".VoipCallingActivity"
+        <activity
+            android:name=".activity.VoipCallingActivity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>
