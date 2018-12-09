@@ -22,7 +22,7 @@
             android:layout_marginRight="8dp"
             android:layout_marginTop="32dp"
             android:background="@drawable/price_tag"
-            android:text="18 MAD"
+            android:text=""
             android:textAllCaps="false"
             android:textColor="@color/colorPrimary"
             android:textSize="17sp"
@@ -153,7 +153,7 @@
 
         <Button
             android:id="@+id/button"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginEnd="40dp"
             android:layout_marginLeft="40dp"
@@ -171,7 +171,7 @@
             app:layout_constraintTop_toBottomOf="@+id/constraintLayout14" />
 
         <android.support.constraint.ConstraintLayout
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="100dp"
             android:layout_marginBottom="20dp"
             android:layout_marginEnd="19sp"
