@@ -834,7 +834,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     double debt = 0;
     private LatLng startPos;
     private LatLng endPos;
-    double ridePrice = 0;
     private boolean isFixed;
     private double fixedPrice, price1, price2, price3, promoCode;
     double currentBil = 0;
@@ -942,49 +941,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                         SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
                                                                         prefs.edit().putString("online", "1").apply();
 
-                                                                        DatabaseReference mCourse = FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(clientID).child(courseID);
-
-                                                                        Map<String, String> data = new HashMap<>();
-                                                                        data.put("client", clientID);
-                                                                        data.put("driver", userId);
-                                                                        data.put("startAddress", startA);
-                                                                        data.put("endAddress", endA);
-                                                                        data.put("distance", Double.toString(distanceTraveled));
-                                                                        data.put("waitTime", Integer.toString(preWait));
-                                                                        data.put("preWaitTime", Integer.toString(preWaitTime / 60));
-                                                                        if (isFixed) {
-                                                                            data.put("fixedDest", "1");
-                                                                            data.put("price", Integer.toString((int) fixedPrice));
-
-                                                                        } else {
-                                                                            data.put("fixedDest", "0");
-                                                                            data.put("price", Double.toString(ridePrice));
-                                                                        }
-                                                                        mCourse.setValue(data);
-                                                                        mCourse.child("date").setValue(timestamp);
-
-                                                                        DatabaseReference dCourse = FirebaseDatabase.getInstance().getReference("DRIVERFINISHEDCOURSES").child(userId).child(courseID);
-
-                                                                        Map<String, String> dData = new HashMap<>();
-                                                                        dData.put("client", clientID);
-                                                                        dData.put("driver", userId);
-                                                                        dData.put("startAddress", startA);
-                                                                        dData.put("endAddress", endA);
-                                                                        dData.put("distance", Double.toString(distanceTraveled));
-                                                                        dData.put("waitTime", Integer.toString(preWait));
-                                                                        dData.put("preWaitTime", Integer.toString(preWaitTime / 60));
-                                                                        if (isFixed) {
-                                                                            dData.put("fixedDest", "1");
-                                                                            dData.put("price", Integer.toString((int) fixedPrice));
-
-                                                                        } else {
-                                                                            dData.put("fixedDest", "0");
-                                                                            dData.put("price", Double.toString(ridePrice));
-                                                                        }
-                                                                        dCourse.setValue(dData);
-                                                                        dCourse.child("date").setValue(timestamp);
-
-
 // *****************************         need to add here commision & promo code calculation   **********************************************************
                                                                         promoCode = 0.20;
                                                                         price1 = base + (distanceTraveled * km) + (att * waitTime);
@@ -1075,11 +1031,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                                     try {
                                                                                                         double oldSold = Double.parseDouble(dataSnapshot.child("SOLDE").getValue(String.class));
 
+                                                                                                        // if user has solde & it is greater then the calculated price
                                                                                                         if (dataSnapshot.child("USECREDIT").getValue(String.class).equals("1") && Double.parseDouble(dataSnapshot.child("SOLDE").getValue(String.class)) >= currentBil) {
-
-                                                                                                            Log.e(TAG, "onDataChange:222222222222222 ");
-                                                                                                            Log.e(TAG, "onDataChange: 222222 old sold: " + oldSold);
-                                                                                                            Log.e(TAG, "onDataChange: 222222 old currentbill: " + currentBil);
 
                                                                                                             double newSolde = oldSold - currentBil;
                                                                                                             FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("SOLDE").setValue("" + newSolde);
@@ -1095,7 +1048,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                                             price.setText("0.0 MAD");
 
                                                                                                         } else {
-                                                                                                            Log.e(TAG, "onDataChange:33333333333333333 ");
+                                                                                                            // if user has solde & it is small then the calculated price
+
                                                                                                             FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("0");
 
                                                                                                             double commission = currentBil * percent;
@@ -1124,6 +1078,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                                         e.printStackTrace();
                                                                                                     }
                                                                                                 } else {
+
+                                                                                                    // if user has  no solde
                                                                                                     try {
                                                                                                         double commission = currentBil * percent * -1;
                                                                                                         Log.e(TAG, "onDataChange: 4444444 commission: " + commission);
@@ -1132,8 +1088,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                                         currentDebt = newDebt;
                                                                                                         FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("0");
                                                                                                         FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
-                                                                                                        FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").setValue(df2.format(ridePrice));
-                                                                                                        price.setText(df2.format(ridePrice) + " MAD");
+                                                                                                        FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").setValue(df2.format(currentBil));
+                                                                                                        price.setText(df2.format(currentBil) + " MAD");
                                                                                                     } catch (NumberFormatException e) {
                                                                                                         e.printStackTrace();
                                                                                                     } catch (Exception e) {
@@ -1196,6 +1152,48 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                         });
 
 
+
+                                                                        DatabaseReference mCourse = FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(clientID).child(courseID);
+
+                                                                        Map<String, String> data = new HashMap<>();
+                                                                        data.put("client", clientID);
+                                                                        data.put("driver", userId);
+                                                                        data.put("startAddress", startA);
+                                                                        data.put("endAddress", endA);
+                                                                        data.put("distance", Double.toString(distanceTraveled));
+                                                                        data.put("waitTime", Integer.toString(preWait));
+                                                                        data.put("preWaitTime", Integer.toString(preWaitTime / 60));
+                                                                        if (isFixed) {
+                                                                            data.put("fixedDest", "1");
+                                                                            data.put("price", Integer.toString((int) fixedPrice));
+
+                                                                        } else {
+                                                                            data.put("fixedDest", "0");
+                                                                            data.put("price", Double.toString(currentBil));
+                                                                        }
+                                                                        mCourse.setValue(data);
+                                                                        mCourse.child("date").setValue(timestamp);
+
+                                                                        DatabaseReference dCourse = FirebaseDatabase.getInstance().getReference("DRIVERFINISHEDCOURSES").child(userId).child(courseID);
+
+                                                                        Map<String, String> dData = new HashMap<>();
+                                                                        dData.put("client", clientID);
+                                                                        dData.put("driver", userId);
+                                                                        dData.put("startAddress", startA);
+                                                                        dData.put("endAddress", endA);
+                                                                        dData.put("distance", Double.toString(distanceTraveled));
+                                                                        dData.put("waitTime", Integer.toString(preWait));
+                                                                        dData.put("preWaitTime", Integer.toString(preWaitTime / 60));
+                                                                        if (isFixed) {
+                                                                            dData.put("fixedDest", "1");
+                                                                            dData.put("price", Integer.toString((int) fixedPrice));
+
+                                                                        } else {
+                                                                            dData.put("fixedDest", "0");
+                                                                            dData.put("price", Double.toString(currentBil));
+                                                                        }
+                                                                        dCourse.setValue(dData);
+                                                                        dCourse.child("date").setValue(timestamp);
                                                                     }
                                                                 }
 
