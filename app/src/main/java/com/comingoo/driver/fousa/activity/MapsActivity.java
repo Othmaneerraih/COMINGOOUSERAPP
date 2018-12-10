@@ -88,12 +88,15 @@ import com.sinch.android.rtc.calling.CallClientListener;
 import com.sinch.android.rtc.calling.CallListener;
 import com.squareup.picasso.Picasso;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -240,7 +243,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             // Obtain the SupportMapFragment and get notified when the map is ready to be used.
             SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.map);
-            mapFragment.getMapAsync(this);
+            if (mapFragment != null) {
+                mapFragment.getMapAsync(this);
+            }
 
             new CheckLoginService().execute();
 
@@ -283,8 +288,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             Intent intent = new Intent(Intent.ACTION_DIAL);
                             intent.setData(Uri.parse("tel:" + callNumber));
                             startActivity(intent);
-                        } catch (NullPointerException e) {
-                            e.printStackTrace();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -409,8 +412,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             smallMarker = Bitmap.createScaledBitmap(bitmapdraw.getBitmap(), width, height, false);
 
             new checkCourseTask().execute();
-        } catch (NullPointerException e) {
-            e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -509,8 +510,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     if (!VoipCallingActivity.activity.isFinishing())
                         VoipCallingActivity.activity.finish();
                 showDialog(MapsActivity.this, call);
-            } catch (NullPointerException e) {
-                e.printStackTrace();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -640,7 +639,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         final AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
-        final int origionalVolume = am.getStreamVolume(AudioManager.STREAM_MUSIC);
+        final int origionalVolume = am != null ? am.getStreamVolume(AudioManager.STREAM_MUSIC) : 0;
         am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
 
         switch (am.getRingerMode()) {
@@ -705,12 +704,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             @Override
             public void onClick(View v) {
-                if (call != null) {
-                    if (mp.isPlaying()) {
-                        mp.stop();
-                    }
-                    call.answer();
+                if (mp.isPlaying()) {
+                    mp.stop();
                 }
+                call.answer();
             }
         });
 
@@ -720,7 +717,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         iv_mute.setCircleBackgroundColor(Color.WHITE);
 
         final AudioManager audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
-        audioManager.setMode(AudioManager.MODE_IN_CALL);
+        if (audioManager != null) {
+            audioManager.setMode(AudioManager.MODE_IN_CALL);
+        }
         audioManager.setSpeakerphoneOn(false);
         audioManager.setMicrophoneMute(false);
 
@@ -748,14 +747,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
         final Window window = dialog.getWindow();
-        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
+        if (window != null) {
+            window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
+        }
         window.setGravity(Gravity.CENTER);
         dialog.show();
 
     }
 
     private void mute(AudioManager audioManager) {
-        if (audioManager.isMicrophoneMute() == false) {
+        if (!audioManager.isMicrophoneMute()) {
             audioManager.setMicrophoneMute(true);
             iv_mute.setImageResource(R.drawable.clicked_mute);
         } else {
@@ -808,22 +809,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private String getDateMonth(long time) {
         Calendar cal = Calendar.getInstance(Locale.ENGLISH);
         cal.setTimeInMillis(time * 1000L);
-        String date = DateFormat.format("MM-yyyy", cal).toString();
-        return date;
+        return DateFormat.format("MM-yyyy", cal).toString();
     }
 
     private String getDateDay(long time) {
         Calendar cal = Calendar.getInstance(Locale.ENGLISH);
         cal.setTimeInMillis(time * 1000L);
-        String date = DateFormat.format("dd", cal).toString();
-        return date;
+        return DateFormat.format("dd", cal).toString();
     }
 
     public int GetUnixTime() {
         Calendar calendar = Calendar.getInstance();
         long now = calendar.getTimeInMillis();
-        int utc = (int) (now / 1000);
-        return (utc);
+        return ((int) (now / 1000));
 
     }
 
@@ -836,7 +834,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     double debt = 0;
     private LatLng startPos;
     private LatLng endPos;
-    double ridePrice = 0;
     private boolean isFixed;
     private double fixedPrice, price1, price2, price3, promoCode;
     double currentBil = 0;
@@ -844,6 +841,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Button price;
     private double currentDebt = 0.0;
     private double currentWallet = 0.0;
+    private DecimalFormat df2 = new DecimalFormat(".##");
 
     private class checkCourseFinished extends AsyncTask<String, Integer, String> {
         @Override
@@ -943,52 +941,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                         SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
                                                                         prefs.edit().putString("online", "1").apply();
 
-                                                                        DatabaseReference mCourse = FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(clientID).child(courseID);
-
-                                                                        Map<String, String> data = new HashMap<>();
-                                                                        data.put("client", clientID);
-                                                                        data.put("driver", userId);
-                                                                        data.put("startAddress", startA);
-                                                                        data.put("endAddress", endA);
-                                                                        data.put("distance", Double.toString(distanceTraveled));
-                                                                        data.put("waitTime", Integer.toString(preWait));
-                                                                        data.put("preWaitTime", Integer.toString(preWaitTime / 60));
-                                                                        if (isFixed) {
-                                                                            data.put("fixedDest", "1");
-                                                                            data.put("price", Integer.toString((int) fixedPrice));
-
-                                                                        } else {
-                                                                            data.put("fixedDest", "0");
-                                                                            data.put("price", Double.toString(ridePrice));
-                                                                        }
-                                                                        mCourse.setValue(data);
-                                                                        mCourse.child("date").setValue(timestamp);
-
-                                                                        DatabaseReference dCourse = FirebaseDatabase.getInstance().getReference("DRIVERFINISHEDCOURSES").child(userId).child(courseID);
-
-                                                                        Map<String, String> dData = new HashMap<>();
-                                                                        dData.put("client", clientID);
-                                                                        dData.put("driver", userId);
-                                                                        dData.put("startAddress", startA);
-                                                                        dData.put("endAddress", endA);
-                                                                        dData.put("distance", Double.toString(distanceTraveled));
-                                                                        dData.put("waitTime", Integer.toString(preWait));
-                                                                        dData.put("preWaitTime", Integer.toString(preWaitTime / 60));
-                                                                        if (isFixed) {
-                                                                            dData.put("fixedDest", "1");
-                                                                            dData.put("price", Integer.toString((int) fixedPrice));
-
-                                                                        } else {
-                                                                            dData.put("fixedDest", "0");
-                                                                            dData.put("price", Double.toString(ridePrice));
-                                                                        }
-                                                                        dCourse.setValue(dData);
-                                                                        dCourse.child("date").setValue(timestamp);
-
-
 // *****************************         need to add here commision & promo code calculation   **********************************************************
                                                                         promoCode = 0.20;
                                                                         price1 = base + (distanceTraveled * km) + (att * waitTime);
+
                                                                         if (price1 < min) {
                                                                             price1 = min;
                                                                         }
@@ -1003,13 +959,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                 Log.e(TAG, "onDataChange: ");
                                                                                 if (dataSnapshot.exists()) {
                                                                                     Log.e(TAG, "PROMOCODE onDataChange: " + dataSnapshot.getValue(String.class));
-//                                                                                    currentBil = price3;
                                                                                     isPromoCode = true;
-//                                                                                    FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").setValue(price3);
                                                                                 } else {
-//                                                                                    currentBil = price2;
                                                                                     isPromoCode = false;
-//                                                                                    FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").setValue(price2);
                                                                                 }
                                                                             }
 
@@ -1053,6 +1005,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                                                                 final double ee = earned;
                                                                                 final int vv = voyages;
+                                                                                df2.setRoundingMode(RoundingMode.UP);
                                                                                 FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").addListenerForSingleValueEvent(new ValueEventListener() {
                                                                                     @Override
                                                                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -1079,11 +1032,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                                     try {
                                                                                                         double oldSold = Double.parseDouble(dataSnapshot.child("SOLDE").getValue(String.class));
 
+                                                                                                        // if user has solde & it is greater then the calculated price
                                                                                                         if (dataSnapshot.child("USECREDIT").getValue(String.class).equals("1") && Double.parseDouble(dataSnapshot.child("SOLDE").getValue(String.class)) >= currentBil) {
-
-                                                                                                            Log.e(TAG, "onDataChange:222222222222222 ");
-                                                                                                            Log.e(TAG, "onDataChange: 222222 old sold: " + oldSold);
-                                                                                                            Log.e(TAG, "onDataChange: 222222 old currentbill: " + currentBil);
 
                                                                                                             double newSolde = oldSold - currentBil;
                                                                                                             FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("SOLDE").setValue("" + newSolde);
@@ -1099,7 +1049,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                                             price.setText("0.0 MAD");
 
                                                                                                         } else {
-                                                                                                            Log.e(TAG, "onDataChange:33333333333333333 ");
+                                                                                                            // if user has solde & it is small then the calculated price
+
                                                                                                             FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("0");
 
                                                                                                             double commission = currentBil * percent;
@@ -1112,9 +1063,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                                             FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("SOLDE").setValue("" + 0);
                                                                                                             FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("USECREDIT").setValue("0");
 
-                                                                                                            FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").setValue(Double.toString(userDue));
+                                                                                                            FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").setValue(df2.format(userDue));
 
-                                                                                                            price.setText(String.format("%.2f", userDue) + " MAD");
+
+                                                                                                            price.setText(df2.format(userDue) + " MAD");
 
                                                                                                             FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
                                                                                                             Log.e(TAG, "onDataChange: new Debt" + newDebt);
@@ -1127,6 +1079,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                                         e.printStackTrace();
                                                                                                     }
                                                                                                 } else {
+
+                                                                                                    // if user has  no solde
                                                                                                     try {
                                                                                                         double commission = currentBil * percent * -1;
                                                                                                         Log.e(TAG, "onDataChange: 4444444 commission: " + commission);
@@ -1135,8 +1089,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                                         currentDebt = newDebt;
                                                                                                         FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("0");
                                                                                                         FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
-                                                                                                        FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").setValue(Double.toString(ridePrice));
-                                                                                                        price.setText(String.format("%.2f", ridePrice) + " MAD");
+                                                                                                        FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").setValue(df2.format(currentBil));
+                                                                                                        price.setText(df2.format(currentBil) + " MAD");
                                                                                                     } catch (NumberFormatException e) {
                                                                                                         e.printStackTrace();
                                                                                                     } catch (Exception e) {
@@ -1199,6 +1153,48 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                         });
 
 
+
+                                                                        DatabaseReference mCourse = FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(clientID).child(courseID);
+
+                                                                        Map<String, String> data = new HashMap<>();
+                                                                        data.put("client", clientID);
+                                                                        data.put("driver", userId);
+                                                                        data.put("startAddress", startA);
+                                                                        data.put("endAddress", endA);
+                                                                        data.put("distance", Double.toString(distanceTraveled));
+                                                                        data.put("waitTime", Integer.toString(preWait));
+                                                                        data.put("preWaitTime", Integer.toString(preWaitTime / 60));
+                                                                        if (isFixed) {
+                                                                            data.put("fixedDest", "1");
+                                                                            data.put("price", Integer.toString((int) fixedPrice));
+
+                                                                        } else {
+                                                                            data.put("fixedDest", "0");
+                                                                            data.put("price", Double.toString(currentBil));
+                                                                        }
+                                                                        mCourse.setValue(data);
+                                                                        mCourse.child("date").setValue(timestamp);
+
+                                                                        DatabaseReference dCourse = FirebaseDatabase.getInstance().getReference("DRIVERFINISHEDCOURSES").child(userId).child(courseID);
+
+                                                                        Map<String, String> dData = new HashMap<>();
+                                                                        dData.put("client", clientID);
+                                                                        dData.put("driver", userId);
+                                                                        dData.put("startAddress", startA);
+                                                                        dData.put("endAddress", endA);
+                                                                        dData.put("distance", Double.toString(distanceTraveled));
+                                                                        dData.put("waitTime", Integer.toString(preWait));
+                                                                        dData.put("preWaitTime", Integer.toString(preWaitTime / 60));
+                                                                        if (isFixed) {
+                                                                            dData.put("fixedDest", "1");
+                                                                            dData.put("price", Integer.toString((int) fixedPrice));
+
+                                                                        } else {
+                                                                            dData.put("fixedDest", "0");
+                                                                            dData.put("price", Double.toString(currentBil));
+                                                                        }
+                                                                        dCourse.setValue(dData);
+                                                                        dCourse.child("date").setValue(timestamp);
                                                                     }
                                                                 }
 
@@ -1229,8 +1225,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                     final int userProvidedRecharge = Integer.parseInt(value);
 
                                                     if (userProvidedRecharge < 100) {
-//                                                        final int money = (userProvidedRecharge - Integer.parseInt(dataSnapshott.child("price").getValue(String.class)));
-//                                                        if (money > 0) {
                                                         final String riderId = dataSnapshott.child("client").getValue(String.class);
 
                                                         FirebaseDatabase.getInstance().getReference("clientUSERS").
@@ -1245,7 +1239,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                                                         FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(riderId).addValueEventListener(new ValueEventListener() {
                                                                             @Override
-                                                                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                                                 if (dataSnapshot.exists()) {
 
                                                                                     Log.e(TAG, "onDataChange driver already have: " + debt);
@@ -1263,8 +1257,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                             Log.e(TAG, "onDataChange: " + debt);
                                                                                             Log.e(TAG, "onDataChange: " + newSold);
                                                                                             FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue("" + newdebt);
-                                                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(dataSnapshott.child("client").getValue(String.class)).child("SOLDE").setValue("" + newSold);
-                                                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(dataSnapshott.child("client").getValue(String.class)).child("USECREDIT").setValue("1");
+                                                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(Objects.requireNonNull(dataSnapshott.child("client").getValue(String.class))).child("SOLDE").setValue("" + newSold);
+                                                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(Objects.requireNonNull(dataSnapshott.child("client").getValue(String.class))).child("USECREDIT").setValue("1");
                                                                                             dialog.dismiss();
                                                                                         } else {
                                                                                             Toast.makeText(MapsActivity.this, "Vous ne pouvez pas dépasser 100 MAD de recharge pour ce client.", Toast.LENGTH_LONG).show();
@@ -1276,8 +1270,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                             Log.e(TAG, "onDataChange: " + debt);
                                                                                             Log.e(TAG, "onDataChange: " + newSold);
                                                                                             FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(/*Double.toString(*/"" + newdebt/*)*/);
-                                                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(dataSnapshott.child("client").getValue(String.class)).child("SOLDE").setValue("" + newSold);
-                                                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(dataSnapshott.child("client").getValue(String.class)).child("USECREDIT").setValue("1");
+                                                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(Objects.requireNonNull(dataSnapshott.child("client").getValue(String.class))).child("SOLDE").setValue("" + newSold);
+                                                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(Objects.requireNonNull(dataSnapshott.child("client").getValue(String.class))).child("USECREDIT").setValue("1");
                                                                                             dialog.dismiss();
                                                                                         } else {
                                                                                             Toast.makeText(MapsActivity.this, "Vous ne pouvez pas dépasser 10 MAD de recharge pour ce client.", Toast.LENGTH_LONG).show();
@@ -1287,7 +1281,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                             }
 
                                                                             @Override
-                                                                            public void onCancelled(DatabaseError databaseError) {
+                                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
                                                                                 dialog.dismiss();
                                                                             }
                                                                         });
@@ -1364,11 +1358,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                             isRatingPopupShowed = true;
                                                         }
                                                     });
-                                                } catch (NumberFormatException e) {
-                                                    e.printStackTrace();
-                                                    dialog.dismiss();
-                                                    isRatingPopupShowed = true;
-
                                                 } catch (Exception e) {
                                                     e.printStackTrace();
                                                     dialog.dismiss();
@@ -1463,7 +1452,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         dialog.findViewById(R.id.body).getLayoutParams().width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (int) (dpWidth), MapsActivity.this.getResources().getDisplayMetrics());
 
 
-                                        WindowManager.LayoutParams lp = dialog.getWindow().getAttributes();
+                                        WindowManager.LayoutParams lp = Objects.requireNonNull(dialog.getWindow()).getAttributes();
                                         lp.dimAmount = 0.5f;
                                         dialog.getWindow().setAttributes(lp);
                                         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -1575,7 +1564,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         if (dataSnapshot.exists()) {
 
                             String isVerified = dataSnapshot.child("isVerified").getValue(String.class);
-                            if (isVerified.equals("0")) {
+                            if (isVerified != null && isVerified.equals("0")) {
                                 prefs.edit().remove("phoneNumber").apply();
                                 prefs.edit().remove("userId").apply();
                                 Intent intent = new Intent(MapsActivity.this, MainActivity.class);
@@ -1791,7 +1780,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                             clientId = data.child("client").getValue(String.class);
                             if (driverData.child("endLat").getValue(String.class) != null) {
-                                if (driverData.child("endLat").getValue(String.class).equals("")) {
+                                if (Objects.equals(driverData.child("endLat").getValue(String.class), "")) {
                                     drawRouteArrival = null;
                                 } else {
                                     drawRouteArrival = new LatLng(Double.parseDouble(data.child("endLat").getValue(String.class)),
@@ -1822,7 +1811,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             }
                         }
                     } else {
-                        //stopCourseService();
                         courseState = "4";
                         courseHandle();
 
@@ -1938,13 +1926,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(clientId)/*.child(userId)
                 .orderByKey()*/.limitToLast(1).addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     try {
                         for (DataSnapshot child : dataSnapshot.getChildren()) {
-                            Log.e(TAG, "date of ride: " + child.child("date").getValue().toString());
+                            Log.e(TAG, "date of ride: " + Objects.requireNonNull(child.child("date").getValue()).toString());
 
-                            String longV = child.child("date").getValue().toString();
+                            String longV = Objects.requireNonNull(child.child("date").getValue()).toString();
                             String dateString = convertDate(longV, "dd/MM/yyyy hh:mm:ss");
 
                             date.setText(dateString);
@@ -1957,7 +1945,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
+            public void onCancelled(@NonNull DatabaseError databaseError) {
                 //Handle possible errors.
             }
         });
@@ -1971,13 +1959,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(clientId).
                     addValueEventListener(new ValueEventListener() {
                         @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             totalCourse.setText("Courses:" + dataSnapshot.getChildrenCount());
                             userInfoLayout.setBackgroundColor(Color.WHITE);
                         }
 
                         @Override
-                        public void onCancelled(DatabaseError databaseError) {
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
                         }
                     });
         } else {
@@ -2116,7 +2104,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         LatLng start;
         LatLng arrival;
-        List<LatLng> thePath;
+        ArrayList<LatLng> thePath;
         LatLng mid;
         LatLngBounds.Builder builder;
 
@@ -2192,8 +2180,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         }
                     }
                 }
-            } catch (NullPointerException e) {
-                e.printStackTrace();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -2218,7 +2204,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     if (mid != null) {
                         thePath.add(arrival);
                         //drawPolyGradiant(thePath, "#f9ad81" ,"#aba100",9, 6);
-                        drawPolyGradiant(thePath, "#76b5f9", "#1c549d", 9, 4);
+                        drawPolyGradiant(thePath, "#76b5f9", "#1c549d");
                         builder.include(arrival);
                         int padding = 200;
                         LatLngBounds bounds = builder.build();
@@ -2234,7 +2220,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    private void drawPolyGradiant(List<LatLng> thePath, String startColor, String endColor, int width, int quality) {
+    private void drawPolyGradiant(List<LatLng> thePath, String startColor, String endColor) {
 
         int Size = thePath.size();
 
@@ -2245,25 +2231,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         int finalGreen = Integer.valueOf(endColor.substring(3, 5), 16);
         int finalBlue = Integer.valueOf(endColor.substring(5, 7), 16);
 
-        for (int i = 0; i < quality - 1; i++) {
+        for (int i = 0; i < 4 - 1; i++) {
 
-            float percent = 1 / (float) (2 * quality) + (float) i / (float) quality;
+            float percent = 1 / (float) (2 * 4) + (float) i / (float) 4;
             int color = Color.argb(255,
                     (Red > finalRed) ? (int) (Red - ((Red - finalRed) * percent)) : (int) (Red + ((finalRed - Red) * percent)),
                     (Green > finalGreen) ? (int) (Green - ((Green - finalGreen) * percent)) : (int) (Green + ((finalGreen - Green) * percent)),
                     (Blue > finalBlue) ? (int) (Blue - ((Blue - finalBlue) * percent)) : (int) (Blue + ((finalBlue - Blue) * percent)));
 
-            PolylineOptions opts = new PolylineOptions().geodesic(false).addAll(thePath.subList((Size / quality) * i, Size / quality * (i + 2))).color(color).width(width + 1);
+            PolylineOptions opts = new PolylineOptions().geodesic(false).addAll(thePath.subList((Size / 4) * i, Size / 4 * (i + 2))).color(color).width(9 + 1);
             mMap.addPolyline(opts);
         }
 
-        float percentage = 1 / (float) (2 * quality) + (float) (quality - 1) / (float) quality;
+        float percentage = 1 / (float) (2 * 4) + (float) (4 - 1) / (float) 4;
         int color = Color.argb(255,
                 (Red > finalRed) ? (int) (Red - ((Red - finalRed) * percentage)) : (int) (Red + ((finalRed - Red) * percentage)),
                 (Green > finalGreen) ? (int) (Green - ((Green - finalGreen) * percentage)) : (int) (Green + ((finalGreen - Green) * percentage)),
                 (Blue > finalBlue) ? (int) (Blue - ((Blue - finalBlue) * percentage)) : (int) (Blue + ((finalBlue - Blue) * percentage)));
 
-        PolylineOptions opts = new PolylineOptions().geodesic(false).addAll(thePath.subList((Size / quality) * (quality - 1), Size / quality * (quality))).color(color).width(width + 1);
+        PolylineOptions opts = new PolylineOptions().geodesic(false).addAll(thePath.subList((Size / 4) * (4 - 1), Size / 4 * (4))).color(color).width(9 + 1);
         mMap.addPolyline(opts);
 
         for (int i = 0; i < (Size - 1); i++) {
@@ -2274,7 +2260,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     (Green > finalGreen) ? (int) (Green - ((Green - finalGreen) * percent)) : (int) (Green + ((finalGreen - Green) * percent)),
                     (Blue > finalBlue) ? (int) (Blue - ((Blue - finalBlue) * percent)) : (int) (Blue + ((finalBlue - Blue) * percent)));
 
-            opts = new PolylineOptions().add(thePath.get(i)).geodesic(false).add(thePath.get(i + 1)).color(usedColor).width(width);
+            opts = new PolylineOptions().add(thePath.get(i)).geodesic(false).add(thePath.get(i + 1)).color(usedColor).width(9);
             mMap.addPolyline(opts);
         }
     }
