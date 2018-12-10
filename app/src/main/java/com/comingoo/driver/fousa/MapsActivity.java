@@ -674,7 +674,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     mp.stop();
                 }
                 mp.release();
-                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, origionalVolume, 0);
+                am.setStreamVolume(AudioManager.STREAM_MUSIC, origionalVolume, 0);
 
             }
         });
