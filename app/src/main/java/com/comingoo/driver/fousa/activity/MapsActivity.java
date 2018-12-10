@@ -944,6 +944,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 // *****************************         need to add here commision & promo code calculation   **********************************************************
                                                                         promoCode = 0.20;
                                                                         price1 = base + (distanceTraveled * km) + (att * waitTime);
+
+                                                                        if (price1 < min) {
+                                                                            price1 = min;
+                                                                        }
                                                                         price2 = price1 * percent;
                                                                         price3 = price2 * (1 - promoCode);
 
@@ -975,10 +979,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                         if (isPromoCode)
                                                                             currentBil = price3;
                                                                         else currentBil = price2;
-
-                                                                        if (currentBil < min) {
-                                                                            currentBil = min;
-                                                                        }
 
                                                                         Log.e(TAG, "onDataChange: final currentBil Ujjwal:  " + currentBil);
 
