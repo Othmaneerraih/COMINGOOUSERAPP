@@ -1,6 +1,7 @@
 package com.comingoo.driver.fousa.activity;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -21,6 +22,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
@@ -127,6 +129,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private Button courseActionButton;
     private RelativeLayout cancel_view;
+    private ImageView ivCancelCourse;
 
     private Button money;
 
@@ -411,6 +414,74 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        ivCancelCourse.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                rideCancelDialog();
+            }
+        });
+    }
+
+    private void rideCancelDialog() {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        final AlertDialog alertDialog = dialogBuilder.create();
+        alertDialog.show();
+        alertDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        LayoutInflater inflater = this.getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.content_cancel_ride_dialog, null);
+        alertDialog.getWindow().setContentView(dialogView);
+
+        final Button btnYesCancelRide = dialogView.findViewById(R.id.btn_yes_cancel_ride);
+        final Button btnNoDontCancelRide = dialogView.findViewById(R.id.btn_dont_cancel_ride);
+
+        btnYesCancelRide.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                btnYesCancelRide.setBackgroundColor(Color.WHITE);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    btnYesCancelRide.setTextColor(getApplicationContext().getColor(R.color.primaryLight));
+                } else {
+                    btnYesCancelRide.setTextColor(getApplicationContext().getResources().getColor(R.color.primaryLight));
+                }
+
+                btnNoDontCancelRide.setBackgroundColor(Color.TRANSPARENT);
+                btnNoDontCancelRide.setTextColor(Color.WHITE);
+
+
+                FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("state").setValue("5");
+
+                final Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        //Do something after 3000ms
+                        FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).removeValue();
+                    }
+                }, 3000);
+
+
+                voip_view.setVisibility(View.GONE);
+                alertDialog.dismiss();
+            }
+        });
+
+        btnNoDontCancelRide.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                alertDialog.dismiss();
+                btnYesCancelRide.setBackgroundColor(Color.TRANSPARENT);
+                btnYesCancelRide.setTextColor(Color.WHITE);
+
+                btnNoDontCancelRide.setBackgroundColor(Color.WHITE);
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    btnNoDontCancelRide.setTextColor(getApplicationContext().getColor(R.color.primaryLight));
+                } else {
+                    btnNoDontCancelRide.setTextColor(getApplicationContext().getResources().getColor(R.color.primaryLight));
+                }
+            }
+        });
     }
 
     private void initializeViews() {
@@ -436,6 +507,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         courseActionButton = findViewById(R.id.course_action_button);
         cancel_view = findViewById(R.id.cancel_view);
+        ivCancelCourse = findViewById(R.id.iv_cancel_ride);
 
         mDrawer = findViewById(R.id.drawerlayout);
 
@@ -789,6 +861,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         findViewById(R.id.money).setVisibility(View.GONE);
         menuButton.setVisibility(View.GONE);
         clientInfoLayout.setVisibility(View.VISIBLE);
+        ivCancelCourse.setVisibility(View.VISIBLE);
         destinationLayout.setVisibility(View.VISIBLE);
         userInfoLayout.setBackgroundColor(Color.WHITE);
     }
@@ -798,6 +871,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         findViewById(R.id.money).setVisibility(View.VISIBLE);
         menuButton.setVisibility(View.VISIBLE);
         clientInfoLayout.setVisibility(View.GONE);
+        ivCancelCourse.setVisibility(View.GONE);
         destinationLayout.setVisibility(View.GONE);
     }
 
@@ -1149,7 +1223,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                                                             }
                                                                         });
-
 
 
                                                                         DatabaseReference mCourse = FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(clientID).child(courseID);
@@ -2065,6 +2138,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         clientInfoLayout.setVisibility(View.GONE);
         destinationLayout.setVisibility(View.GONE);
         menuButton.setVisibility(View.VISIBLE);
+        ivCancelCourse.setVisibility(View.GONE);
     }
 
     public void startCourseService(String id) {

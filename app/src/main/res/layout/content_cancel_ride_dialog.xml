@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/layout_round_background"
+    android:gravity="center"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/tv_sure_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:text="Are you sure you want to cancel the ride?"
+        android:textColor="@android:color/white"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/tv_addition_charge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_sure_text"
+        android:layout_centerHorizontal="true"
+        android:textColor="@android:color/white"
+        android:layout_margin="10dp"
+        android:text="Addition charges may apply"
+        android:textSize="12sp" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_addition_charge"
+        android:gravity="center"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="10dp">
+
+        <Button
+            android:id="@+id/btn_dont_cancel_ride"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No, i don't want to Cancel"
+            android:textSize="12sp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:textColor="@android:color/white"
+            android:background="@android:color/transparent"/>
+
+        <Button
+            android:id="@+id/btn_yes_cancel_ride"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:paddingLeft="20dp"
+            android:textSize="12sp"
+            android:paddingRight="20dp"
+            android:layout_toRightOf="@id/btn_dont_cancel_ride"
+            android:text="Yes, I am sure"
+            android:textColor="@android:color/white"
+            android:background="@android:color/transparent"/>
+
+    </RelativeLayout>
+</RelativeLayout>
