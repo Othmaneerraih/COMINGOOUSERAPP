@@ -1867,16 +1867,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 }
             };
-            try {
-                if (userId != null) {
-                    FirebaseDatabase.getInstance().getReference("COURSES").child(userId).
-                            addChildEventListener(childEventListener);
-                }
-            } catch (NullPointerException e) {
-                e.printStackTrace();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+//            try {
+//                if (userId != null) {
+//                    FirebaseDatabase.getInstance().getReference("COURSES").child(userId).
+//                            addChildEventListener(childEventListener);
+//                }
+//            } catch (NullPointerException e) {
+//                e.printStackTrace();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
 
             return "this string is passed to onPostExecute";
         }
