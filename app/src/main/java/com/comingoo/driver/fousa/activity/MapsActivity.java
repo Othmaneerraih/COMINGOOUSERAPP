@@ -1835,38 +1835,38 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             });
 
-            final ChildEventListener childEventListener = new ChildEventListener() {
-                @Override
-                public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-                }
-
-                @Override
-                public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-                }
-
-                @Override
-                public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-                    try {
-                        MapsActivity.this.recreate();
-                    } catch (NullPointerException e) {
-                        e.printStackTrace();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                @Override
-                public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            };
+//            final ChildEventListener childEventListener = new ChildEventListener() {
+//                @Override
+//                public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+//
+//                }
+//
+//                @Override
+//                public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+//
+//                }
+//
+//                @Override
+//                public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+//                    try {
+//                        MapsActivity.this.recreate();
+//                    } catch (NullPointerException e) {
+//                        e.printStackTrace();
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//
+//                @Override
+//                public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+//
+//                }
+//
+//                @Override
+//                public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                }
+//            };
 //            try {
 //                if (userId != null) {
 //                    FirebaseDatabase.getInstance().getReference("COURSES").child(userId).
