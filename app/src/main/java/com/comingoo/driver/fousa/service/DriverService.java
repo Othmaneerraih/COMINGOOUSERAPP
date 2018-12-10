@@ -296,7 +296,7 @@ public class DriverService extends Service {
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             if (!dataSnapshot.exists()) {
                                 CommandActivity.countDownTimer.cancel();
-                                CommandActivity.clientR.finish();
+//                                CommandActivity.clientR.finish();
                                 if (CommandActivity.mp != null) {
                                     CommandActivity.mp.release();
                                     CommandActivity.vibrator.cancel();
@@ -337,7 +337,7 @@ public class DriverService extends Service {
                                                     CommandActivity.mp.release();
                                                     CommandActivity.vibrator.cancel();
                                                 }
-                                                CommandActivity.clientR.finish();
+//                                                CommandActivity.clientR.finish();
                                             }
 
                                             clientRequetFollow.removeValue();
@@ -354,7 +354,7 @@ public class DriverService extends Service {
                             } else {
                                 if (CommandActivity.active) {
                                     CommandActivity.countDownTimer.cancel();
-                                    CommandActivity.clientR.finish();
+//                                    CommandActivity.clientR.finish();
                                     if (CommandActivity.mp != null) {
                                         CommandActivity.mp.release();
                                         CommandActivity.vibrator.cancel();
@@ -432,7 +432,7 @@ public class DriverService extends Service {
                     } else {
                         if (CommandActivity.active) {
                             CommandActivity.countDownTimer.cancel();
-                            CommandActivity.clientR.finish();
+//                            CommandActivity.clientR.finish();
                             if (CommandActivity.mp != null) {
                                 CommandActivity.mp.release();
                                 CommandActivity.vibrator.cancel();

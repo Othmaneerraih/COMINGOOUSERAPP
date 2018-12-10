@@ -110,8 +110,8 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
             public void onCompletion(MediaPlayer mediaPlayer) {
                 if (mp.isPlaying()) {
                     mp.stop();
+                    mp.release();
                 }
-//                mp.release();
                 vibrator.cancel();
                 am.setStreamVolume(AudioManager.STREAM_MUSIC, origionalVolume, 0);
 
@@ -302,7 +302,7 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (!dataSnapshot.exists()) {
-                            CommandActivity.this.finish();
+//                            CommandActivity.this.finish();
                         }
                     }
 
@@ -489,7 +489,6 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
 
             @Override
             public void onFinish() {
-//                showCustomDialog(getApplicationContext());
             }
         }.start();
 

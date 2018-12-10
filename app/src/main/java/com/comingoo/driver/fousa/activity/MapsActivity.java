@@ -986,7 +986,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                         dCourse.child("date").setValue(timestamp);
 
 
-// *****************************         need to add here commision & promo code calculation   **********************************************************
+// *****************************   need to add here commision & promo code calculation   **********************************************************
                                                                         promoCode = 0.20;
                                                                         price1 = base + (distanceTraveled * km) + (att * waitTime);
                                                                         if (price1 < min) {
