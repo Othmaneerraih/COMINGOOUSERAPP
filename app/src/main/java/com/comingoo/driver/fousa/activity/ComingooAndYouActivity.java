@@ -28,6 +28,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -70,6 +72,7 @@ public class ComingooAndYouActivity extends AppCompatActivity {
 
     private ConstraintLayout tarifs;
     private ConstraintLayout tarifsLayout;
+    private DecimalFormat df2 = new DecimalFormat(".##");
 
 
     @Override
@@ -79,10 +82,14 @@ public class ComingooAndYouActivity extends AppCompatActivity {
 
         initialize();
 
+        df2.setRoundingMode(RoundingMode.UP);
+
+
         todayEarnings.setText(getIntent().getStringExtra("earnings") + " MAD");
+
         todayEarnings.setTextColor(Color.GREEN);
         double debtPrice = Double.parseDouble(getIntent().getStringExtra("debt"));
-        debt.setText(debtPrice + "MAD");
+        debt.setText(df2.format(debtPrice) + "MAD");
 
         if (debtPrice > 0) {
             debt.setTextColor(Color.GREEN);
