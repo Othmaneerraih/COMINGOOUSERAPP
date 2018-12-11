@@ -45,9 +45,12 @@ public class VoipCallingActivity extends AppCompatActivity {
     private CountDownTimer countDownTimer;
     private AudioManager audioManager;
     private SinchClient sinchClient;
-    private ImageView iv_back_voip_one;
-    private TextView callState, caller_name, tv_name_voip_one;
-    private CircleImageView iv_user_image_voip_one, iv_cancel_call_voip_one, iv_mute, iv_loud, iv_recv_call_voip_one;
+    private TextView callState;
+    private TextView caller_name;
+    private CircleImageView iv_cancel_call_voip_one;
+    private CircleImageView iv_mute;
+    private CircleImageView iv_loud;
+    private CircleImageView iv_recv_call_voip_one;
 
     private static final String APP_KEY = "185d9822-a953-4af6-a780-b0af1fd31bf7";
     private static final String APP_SECRET = "ZiJ6FqH5UEWYbkMZd1rWbw==";
@@ -82,8 +85,8 @@ public class VoipCallingActivity extends AppCompatActivity {
         setContentView(R.layout.content_voip_one);
         activity = this;
 
-        iv_back_voip_one = findViewById(R.id.iv_back_voip_one);
-        iv_user_image_voip_one = findViewById(R.id.iv_user_image_voip_one);
+        ImageView iv_back_voip_one = findViewById(R.id.iv_back_voip_one);
+        CircleImageView iv_user_image_voip_one = findViewById(R.id.iv_user_image_voip_one);
         iv_cancel_call_voip_one = findViewById(R.id.iv_cancel_call_voip_one);
         iv_recv_call_voip_one = findViewById(R.id.iv_recv_call_voip_one);
         caller_name = findViewById(R.id.callerName);
@@ -91,7 +94,7 @@ public class VoipCallingActivity extends AppCompatActivity {
 
         iv_mute = findViewById(R.id.iv_mute);
         iv_loud = findViewById(R.id.iv_loud);
-        tv_name_voip_one = findViewById(R.id.tv_name_voip_one);
+        TextView tv_name_voip_one = findViewById(R.id.tv_name_voip_one);
 
         iv_loud.setBackgroundColor(Color.WHITE);
         iv_loud.setCircleBackgroundColor(Color.WHITE);
@@ -162,8 +165,6 @@ public class VoipCallingActivity extends AppCompatActivity {
                     try {
                         call = sinchClient.getCallClient().callUser(clientId);
                         if (call != null) call.answer();
-                    } catch (NullPointerException e) {
-                        e.printStackTrace();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -172,9 +173,15 @@ public class VoipCallingActivity extends AppCompatActivity {
         });
 
         audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
-        audioManager.setMode(AudioManager.MODE_IN_CALL);
-        audioManager.setSpeakerphoneOn(false);
-        audioManager.setMicrophoneMute(false);
+        if (audioManager != null) {
+            audioManager.setMode(AudioManager.MODE_IN_CALL);
+        }
+        if (audioManager != null) {
+            audioManager.setSpeakerphoneOn(false);
+        }
+        if (audioManager != null) {
+            audioManager.setMicrophoneMute(false);
+        }
 
         iv_loud.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -226,15 +233,11 @@ public class VoipCallingActivity extends AppCompatActivity {
                                     params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
                                     params.setMargins(0, 0, 150, 60);
                                 }
-                            } catch (NullPointerException e) {
-                                e.printStackTrace();
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
                         }
                     }
-                } catch (NullPointerException e) {
-                    e.printStackTrace();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -244,7 +247,7 @@ public class VoipCallingActivity extends AppCompatActivity {
     }
 
     private void mute() {
-        if (audioManager.isMicrophoneMute() == false) {
+        if (!audioManager.isMicrophoneMute()) {
             audioManager.setMicrophoneMute(true);
             iv_mute.setImageResource(R.drawable.clicked_mute);
         } else {
