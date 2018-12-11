@@ -23,6 +23,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.comingoo.driver.fousa.R;
+import com.comingoo.driver.fousa.service.DriverService;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -48,13 +49,14 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
     private TextView ratingShow;
     private TextView distance;
     private TextView startText;
+    private TextView tvDestination;
     private TextView arrivalText;
     private Button decline;
     private Button accept;
     public static MediaPlayer mp;
     public static Vibrator vibrator;
     private SupportMapFragment map;
-    private String lat, lng;
+    private String lat, lng, destinatinLat, destinationLong;
     private String clientID, userId;
     private ProgressBar barTimer;
     public static CountDownTimer countDownTimer;
@@ -123,6 +125,7 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
         ratingShow = findViewById(R.id.rating_txt);
         distance = findViewById(R.id.textView8);
         startText = findViewById(R.id.textView9);
+        tvDestination = findViewById(R.id.tv_destination);
         decline = findViewById(R.id.decline);
         accept = findViewById(R.id.accept);
         barTimer = findViewById(R.id.barTimer);
@@ -134,6 +137,9 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
 
         lat = intent.getStringExtra("startLat");
         lng = intent.getStringExtra("startLong");
+
+        destinatinLat = intent.getStringExtra("endLat");
+        destinationLong = intent.getStringExtra("endLong");
 
         driverPosLat = intent.getDoubleExtra("driverPosLat", 0.0);
         driverPosLong = intent.getDoubleExtra("driverPosLong", 0.0);
@@ -275,6 +281,7 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
 
         distance.setText(time + " min /" + dist + "km");
         startText.setText("De : " + intent.getStringExtra("start"));
+        tvDestination.setText("à : " + intent.getStringExtra("arrival"));
 
         accept.setClickable(true);
         accept.setEnabled(true);
@@ -302,7 +309,7 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (!dataSnapshot.exists()) {
-//                            CommandActivity.this.finish();
+                            CommandActivity.this.finish();
                         }
                     }
 
@@ -320,8 +327,11 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
             public void onClick(View view) {
                 accept.setClickable(false);
                 accept.setEnabled(false);
-                if (mp.isPlaying()) {
-                    mp.stop();
+                if (mp != null) {
+                    if (mp.isPlaying()) {
+                        mp.stop();
+                        mp.release();
+                    }
                 }
                 vibrator.cancel();
                 FirebaseDatabase.getInstance().getReference("COURSES").orderByChild("client").
@@ -359,19 +369,19 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
                             courseDatabase.setValue(data);
                             FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
 
-                            FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                    for (DataSnapshot data : dataSnapshot.getChildren()) {
-                                        FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(data.getKey()).child(clientID).removeValue();
-                                    }
-                                }
-
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                }
-                            });
+//                            FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").addListenerForSingleValueEvent(new ValueEventListener() {
+//                                @Override
+//                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                    for (DataSnapshot data : dataSnapshot.getChildren()) {
+//                                        FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(data.getKey()).child(clientID).removeValue();
+//                                    }
+//                                }
+//
+//                                @Override
+//                                public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                                }
+//                            });
 
                         } else {
 
@@ -407,19 +417,19 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
                                     FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
 
 
-                                    FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                            for (DataSnapshot data : dataSnapshot.getChildren()) {
-                                                FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(data.getKey()).child(clientID).removeValue();
-                                            }
-                                        }
-
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                        }
-                                    });
+//                                    FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").addListenerForSingleValueEvent(new ValueEventListener() {
+//                                        @Override
+//                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                            for (DataSnapshot data : dataSnapshot.getChildren()) {
+//                                                FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(data.getKey()).child(clientID).removeValue();
+//                                            }
+//                                        }
+//
+//                                        @Override
+//                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                                        }
+//                                    });
                                 }
                             }
                         }
@@ -527,6 +537,7 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
             public void onClick(View view) {
                 dialog.dismiss();
                 FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
+                stopService(new Intent(CommandActivity.this, DriverService.class));
             }
         });
 
@@ -534,6 +545,7 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
         btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
                 dialog.dismiss();
                 finish();
             }
