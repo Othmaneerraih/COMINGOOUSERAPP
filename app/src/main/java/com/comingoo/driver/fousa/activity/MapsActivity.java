@@ -573,14 +573,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             call = incomingCall;
 
             Toast.makeText(MapsActivity.this, "incoming call", Toast.LENGTH_SHORT).show();
-            try {
-                if (VoipCallingActivity.activity != null)
-                    if (!VoipCallingActivity.activity.isFinishing())
-                        VoipCallingActivity.activity.finish();
-                showDialog(MapsActivity.this, call);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+//            try {
+//                if (VoipCallingActivity.activity != null)
+//                    if (!VoipCallingActivity.activity.isFinishing())
+//                        VoipCallingActivity.activity.finish();
+//                showDialog(MapsActivity.this, call);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+            showDialog(MapsActivity.this, call);
         }
     }
 
