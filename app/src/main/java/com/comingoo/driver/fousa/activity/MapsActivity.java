@@ -660,6 +660,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 //incoming call was picked up
                 dialog.findViewById(R.id.incoming_call_view).setVisibility(View.VISIBLE);
                 setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
+                mp.stop();
                 callState.setText("connected");
                 iv_mute.setVisibility(View.VISIBLE);
                 iv_loud.setVisibility(View.VISIBLE);
@@ -671,9 +672,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
                 params.addRule(RelativeLayout.CENTER_HORIZONTAL);
                 iv_cancel_call_voip_one.setLayoutParams(params);
-                mp.stop();
 
-//                    Calendar c = Calendar.getInstance();
                 mHour = 00;//c.get(Calendar.HOUR_OF_DAY);
                 mMinute = 00;//c.get(Calendar.MINUTE);
                 caller_name.setText(mHour + ":" + mMinute);
@@ -683,6 +682,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onCallProgressing(Call progressingCall) {
                 //call is ringing
+                mp.stop();
                 dialog.findViewById(R.id.incoming_call_view).setVisibility(View.VISIBLE);
                 caller_name.setText(progressingCall.getDetails().getDuration() + "");
                 caller_name.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
@@ -696,7 +696,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
                 params.addRule(RelativeLayout.CENTER_HORIZONTAL);
                 iv_cancel_call_voip_one.setLayoutParams(params);
-                mp.stop();
             }
 
             @Override
@@ -708,7 +707,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         final AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
         final int origionalVolume = am != null ? am.getStreamVolume(AudioManager.STREAM_MUSIC) : 0;
-        am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
+        if (am != null) {
+            am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
+        }
 
         switch (am.getRingerMode()) {
             case 0:
@@ -729,7 +730,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if (mp.isPlaying()) {
                     mp.stop();
                 }
-                mp.release();
                 am.setStreamVolume(AudioManager.STREAM_MUSIC, origionalVolume, 0);
 
             }
@@ -788,7 +788,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (audioManager != null) {
             audioManager.setMode(AudioManager.MODE_IN_CALL);
         }
-        audioManager.setSpeakerphoneOn(false);
+        if (audioManager != null) {
+            audioManager.setSpeakerphoneOn(false);
+        }
         audioManager.setMicrophoneMute(false);
 
         iv_loud.setOnClickListener(new View.OnClickListener() {
@@ -818,7 +820,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (window != null) {
             window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
         }
-        window.setGravity(Gravity.CENTER);
+        if (window != null) {
+            window.setGravity(Gravity.CENTER);
+        }
         dialog.show();
 
     }
@@ -851,7 +855,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         prefs.edit().putString("online", "0").apply();
         stopService(intent);
         if (params.length > 0) {
-            if (params[0] == true)
+            if (params[0])
                 switchOnlineUI();
         }
     }
@@ -933,7 +937,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
                     if (dataSnapshot.exists()) {
                         FirebaseDatabase.getInstance().getReference("DRIVERFINISHEDCOURSES").
-                                child(userId).child(dataSnapshot.getValue(String.class)).addListenerForSingleValueEvent(new ValueEventListener() {
+                                child(userId).child(Objects.requireNonNull(dataSnapshot.getValue(String.class))).addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull final DataSnapshot dataSnapshott) {
                                 if (dataSnapshott.exists()) {
@@ -983,7 +987,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                                             startPos = new LatLng(Double.parseDouble(dataSnapshot.child("startLat").getValue(String.class)),
                                                                     Double.parseDouble(dataSnapshot.child("startLong").getValue(String.class)));
-                                                            if (dataSnapshot.child("endLat").getValue(String.class).length() > 0)
+                                                            if (Objects.requireNonNull(dataSnapshot.child("endLat").getValue(String.class)).length() > 0)
                                                                 endPos = new LatLng(Double.parseDouble(dataSnapshot.child("endLat").getValue(String.class)),
                                                                         Double.parseDouble(dataSnapshot.child("endLong").getValue(String.class)));
 
@@ -1024,24 +1028,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                         price3 = price2 * (1 - promoCode);
 
                                                                         // need to get promo code here
-                                                                        FirebaseDatabase.getInstance().getReference("clientUSERS").
-                                                                                child(clientID).child("PROMOCODE").addValueEventListener(new ValueEventListener() {
-                                                                            @Override
-                                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                                                Log.e(TAG, "onDataChange: ");
-                                                                                if (dataSnapshot.exists()) {
-                                                                                    Log.e(TAG, "PROMOCODE onDataChange: " + dataSnapshot.getValue(String.class));
-                                                                                    isPromoCode = true;
-                                                                                } else {
-                                                                                    isPromoCode = false;
+                                                                        if (clientID != null) {
+                                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").
+                                                                                    child(clientID).child("PROMOCODE").addValueEventListener(new ValueEventListener() {
+                                                                                @Override
+                                                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                                    Log.e(TAG, "onDataChange: ");
+                                                                                    if (dataSnapshot.exists()) {
+                                                                                        Log.e(TAG, "PROMOCODE onDataChange: " + dataSnapshot.getValue(String.class));
+                                                                                        isPromoCode = true;
+                                                                                    } else {
+                                                                                        isPromoCode = false;
+                                                                                    }
                                                                                 }
-                                                                            }
 
-                                                                            @Override
-                                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                                                @Override
+                                                                                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                                                                            }
-                                                                        });
+                                                                                }
+                                                                            });
+                                                                        }
 
                                                                         Log.e(TAG, "onDataChange: " + price1);
                                                                         Log.e(TAG, "onDataChange: " + price2);
@@ -1097,101 +1103,102 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                         Log.e(TAG, "onDataChange:clientID in calculation: currentBill: " + currentBil);
 
                                                                                         final double priviousDebt = debt;
-                                                                                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).addListenerForSingleValueEvent(new ValueEventListener() {
-                                                                                            @Override
-                                                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                                                                if (dataSnapshot.child("SOLDE").exists()) {
-                                                                                                    try {
-                                                                                                        double oldSold = Double.parseDouble(dataSnapshot.child("SOLDE").getValue(String.class));
+                                                                                        if (clientID != null) {
+                                                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                                                @Override
+                                                                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                                                    if (dataSnapshot.child("SOLDE").exists()) {
+                                                                                                        try {
+                                                                                                            double oldSold = Double.parseDouble(dataSnapshot.child("SOLDE").getValue(String.class));
 
-                                                                                                        // if user has solde & it is greater then the calculated price
-                                                                                                        if (dataSnapshot.child("USECREDIT").getValue(String.class).equals("1") && Double.parseDouble(dataSnapshot.child("SOLDE").getValue(String.class)) >= currentBil) {
+                                                                                                            // if user has solde & it is greater then the calculated price
+                                                                                                            if (dataSnapshot.child("USECREDIT").getValue(String.class).equals("1") && Double.parseDouble(dataSnapshot.child("SOLDE").getValue(String.class)) >= currentBil) {
 
-                                                                                                            double newSolde = oldSold - currentBil;
-                                                                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("SOLDE").setValue("" + newSolde);
-                                                                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("USECREDIT").setValue("1");
-                                                                                                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("1");
-                                                                                                            double commission = currentBil * percent;
-                                                                                                            double driverIncome = currentBil - commission;
-                                                                                                            double newDebt = priviousDebt + driverIncome;
-                                                                                                            currentDebt = newDebt;
-                                                                                                            currentWallet = newSolde;
-                                                                                                            FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").setValue("0.0");
-                                                                                                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
-                                                                                                            price.setText("0.0 MAD");
+                                                                                                                double newSolde = oldSold - currentBil;
+                                                                                                                FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("SOLDE").setValue("" + newSolde);
+                                                                                                                FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("USECREDIT").setValue("1");
+                                                                                                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("1");
+                                                                                                                double commission = currentBil * percent;
+                                                                                                                double driverIncome = currentBil - commission;
+                                                                                                                double newDebt = priviousDebt + driverIncome;
+                                                                                                                currentDebt = newDebt;
+                                                                                                                currentWallet = newSolde;
+                                                                                                                FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").setValue("0.0");
+                                                                                                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
+                                                                                                                price.setText("0.0 MAD");
 
-                                                                                                        } else {
-                                                                                                            // if user has solde & it is small then the calculated price
+                                                                                                            } else {
+                                                                                                                // if user has solde & it is small then the calculated price
 
-                                                                                                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("0");
+                                                                                                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("0");
 
-                                                                                                            double commission = currentBil * percent;
-                                                                                                            double userDue = currentBil - oldSold;
-                                                                                                            double newDebt = priviousDebt + (currentBil - userDue - commission);
-                                                                                                            currentDebt = newDebt;
-                                                                                                            Log.e(TAG, "onDataChange: 3333333 old sold: " + commission);
-                                                                                                            Log.e(TAG, "onDataChange: 3333333 old currentbill: " + userDue);
-                                                                                                            currentWallet = 0.0;
-                                                                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("SOLDE").setValue("" + 0);
-                                                                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("USECREDIT").setValue("0");
+                                                                                                                double commission = currentBil * percent;
+                                                                                                                double userDue = currentBil - oldSold;
+                                                                                                                double newDebt = priviousDebt + (currentBil - userDue - commission);
+                                                                                                                currentDebt = newDebt;
+                                                                                                                Log.e(TAG, "onDataChange: 3333333 old sold: " + commission);
+                                                                                                                Log.e(TAG, "onDataChange: 3333333 old currentbill: " + userDue);
+                                                                                                                currentWallet = 0.0;
+                                                                                                                FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("SOLDE").setValue(""+currentWallet);
+                                                                                                                FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("USECREDIT").setValue("0");
+                                                                                                                FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").setValue(df2.format(userDue));
 
-                                                                                                            FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").setValue(df2.format(userDue));
 
+                                                                                                                price.setText(df2.format(userDue) + " MAD");
 
-                                                                                                            price.setText(df2.format(userDue) + " MAD");
-
-                                                                                                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
-                                                                                                            Log.e(TAG, "onDataChange: new Debt" + newDebt);
+                                                                                                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
+                                                                                                                Log.e(TAG, "onDataChange: new Debt" + newDebt);
+                                                                                                            }
+                                                                                                        } catch (NumberFormatException e) {
+                                                                                                            e.printStackTrace();
+                                                                                                            Log.e(TAG, "onDataChange:NumberFormatException " + e.getMessage());
+                                                                                                        } catch (Exception e) {
+                                                                                                            Log.e(TAG, "onDataChange:Exception " + e.getMessage());
+                                                                                                            e.printStackTrace();
                                                                                                         }
-                                                                                                    } catch (NumberFormatException e) {
-                                                                                                        e.printStackTrace();
-                                                                                                        Log.e(TAG, "onDataChange:NumberFormatException " + e.getMessage());
-                                                                                                    } catch (Exception e) {
-                                                                                                        Log.e(TAG, "onDataChange:Exception " + e.getMessage());
-                                                                                                        e.printStackTrace();
-                                                                                                    }
-                                                                                                } else {
+                                                                                                    } else {
 
-                                                                                                    // if user has  no solde
-                                                                                                    try {
-                                                                                                        double commission = currentBil * percent * -1;
-                                                                                                        Log.e(TAG, "onDataChange: 4444444 commission: " + commission);
+                                                                                                        // if user has  no solde
+                                                                                                        try {
+                                                                                                            double commission = currentBil * percent * -1;
+                                                                                                            Log.e(TAG, "onDataChange: 4444444 commission: " + commission);
 
-                                                                                                        double newDebt = (priviousDebt + commission);
-                                                                                                        currentDebt = newDebt;
-                                                                                                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("0");
-                                                                                                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
-                                                                                                        FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").setValue(df2.format(currentBil));
-                                                                                                        price.setText(df2.format(currentBil) + " MAD");
-                                                                                                    } catch (NumberFormatException e) {
-                                                                                                        e.printStackTrace();
-                                                                                                    } catch (Exception e) {
-                                                                                                        e.printStackTrace();
+                                                                                                            double newDebt = (priviousDebt + commission);
+                                                                                                            currentDebt = newDebt;
+                                                                                                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("0");
+                                                                                                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
+                                                                                                            FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").setValue(df2.format(currentBil));
+                                                                                                            price.setText(df2.format(currentBil) + " MAD");
+                                                                                                        } catch (Exception e) {
+                                                                                                            e.printStackTrace();
+                                                                                                        }
                                                                                                     }
+
                                                                                                 }
 
-                                                                                            }
+                                                                                                @Override
+                                                                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                                                                }
+                                                                                            });
+                                                                                        }
 
-                                                                                            @Override
-                                                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
-                                                                                            }
-                                                                                        });
 
+                                                                                        if (clientID != null) {
+                                                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("level").addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                                                @Override
+                                                                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                                                    if (Objects.requireNonNull(dataSnapshot.getValue(String.class)).equals("2"))
+                                                                                                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("level").setValue("1");
 
-                                                                                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("level").addListenerForSingleValueEvent(new ValueEventListener() {
-                                                                                            @Override
-                                                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                                                                if (dataSnapshot.getValue(String.class).equals("2"))
-                                                                                                    FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("level").setValue("1");
+                                                                                                    if (Objects.requireNonNull(dataSnapshot.getValue(String.class)).equals("1"))
+                                                                                                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("level").setValue("0");
+                                                                                                }
 
-                                                                                                if (dataSnapshot.getValue(String.class).equals("1"))
-                                                                                                    FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("level").setValue("0");
-                                                                                            }
-
-                                                                                            @Override
-                                                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
-                                                                                            }
-                                                                                        });
+                                                                                                @Override
+                                                                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                                                                }
+                                                                                            });
+                                                                                        }
 
 
                                                                                         FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("LASTCOURSE").setValue("Derniére course : Captain " + driverName + " / " + currentBil + " MAD");
@@ -1225,7 +1232,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                         });
 
 
-                                                                        DatabaseReference mCourse = FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(clientID).child(courseID);
+                                                                        DatabaseReference mCourse = null;
+                                                                        if (clientID != null) {
+                                                                            mCourse = FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(clientID).child(courseID);
+                                                                        }
 
                                                                         Map<String, String> data = new HashMap<>();
                                                                         data.put("client", clientID);
@@ -1298,73 +1308,75 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                     if (userProvidedRecharge < 100) {
                                                         final String riderId = dataSnapshott.child("client").getValue(String.class);
 
-                                                        FirebaseDatabase.getInstance().getReference("clientUSERS").
-                                                                child(riderId).child("SOLDE").
-                                                                addValueEventListener(new ValueEventListener() {
-                                                                    @Override
-                                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                                        cM = userProvidedRecharge;
-                                                                        if (dataSnapshot.exists()) {
-                                                                            cM += Double.parseDouble(dataSnapshot.getValue(String.class));
-                                                                        }
+                                                        if (riderId != null) {
+                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").
+                                                                    child(riderId).child("SOLDE").
+                                                                    addValueEventListener(new ValueEventListener() {
+                                                                        @Override
+                                                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                            cM = userProvidedRecharge;
+                                                                            if (dataSnapshot.exists()) {
+                                                                                cM += Double.parseDouble(dataSnapshot.getValue(String.class));
+                                                                            }
 
-                                                                        FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(riderId).addValueEventListener(new ValueEventListener() {
-                                                                            @Override
-                                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                                                if (dataSnapshot.exists()) {
+                                                                            FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(riderId).addValueEventListener(new ValueEventListener() {
+                                                                                @Override
+                                                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                                    if (dataSnapshot.exists()) {
 
-                                                                                    Log.e(TAG, "onDataChange driver already have: " + debt);
-                                                                                    Log.e(TAG, "onDataChange wants user input: " + cM);
+                                                                                        Log.e(TAG, "onDataChange driver already have: " + debt);
+                                                                                        Log.e(TAG, "onDataChange wants user input: " + cM);
 
-                                                                                    double newdebt = currentDebt - userProvidedRecharge;
-                                                                                    currentDebt = newdebt;
-                                                                                    double newSold = currentWallet + userProvidedRecharge;
-                                                                                    Log.e(TAG, "onDataChange after calculation: " + debt);
+                                                                                        double newdebt = currentDebt - userProvidedRecharge;
+                                                                                        currentDebt = newdebt;
+                                                                                        double newSold = currentWallet + userProvidedRecharge;
+                                                                                        Log.e(TAG, "onDataChange after calculation: " + debt);
 
-                                                                                    if (dataSnapshot.getChildrenCount() >= 3) {
-                                                                                        rideMorethanThree = true;
-                                                                                        if (cM <= 100) {
-                                                                                            // Enter the value into driver wallet here
-                                                                                            Log.e(TAG, "onDataChange: " + debt);
-                                                                                            Log.e(TAG, "onDataChange: " + newSold);
-                                                                                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue("" + newdebt);
-                                                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(Objects.requireNonNull(dataSnapshott.child("client").getValue(String.class))).child("SOLDE").setValue("" + newSold);
-                                                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(Objects.requireNonNull(dataSnapshott.child("client").getValue(String.class))).child("USECREDIT").setValue("1");
-                                                                                            dialog.dismiss();
+                                                                                        if (dataSnapshot.getChildrenCount() >= 3) {
+                                                                                            rideMorethanThree = true;
+                                                                                            if (cM <= 100) {
+                                                                                                // Enter the value into driver wallet here
+                                                                                                Log.e(TAG, "onDataChange: " + debt);
+                                                                                                Log.e(TAG, "onDataChange: " + newSold);
+                                                                                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue("" + newdebt);
+                                                                                                FirebaseDatabase.getInstance().getReference("clientUSERS").child(Objects.requireNonNull(dataSnapshott.child("client").getValue(String.class))).child("SOLDE").setValue("" + newSold);
+                                                                                                FirebaseDatabase.getInstance().getReference("clientUSERS").child(Objects.requireNonNull(dataSnapshott.child("client").getValue(String.class))).child("USECREDIT").setValue("1");
+                                                                                                dialog.dismiss();
+                                                                                            } else {
+                                                                                                Toast.makeText(MapsActivity.this, "Vous ne pouvez pas dépasser 100 MAD de recharge pour ce client.", Toast.LENGTH_LONG).show();
+                                                                                            }
                                                                                         } else {
-                                                                                            Toast.makeText(MapsActivity.this, "Vous ne pouvez pas dépasser 100 MAD de recharge pour ce client.", Toast.LENGTH_LONG).show();
-                                                                                        }
-                                                                                    } else {
-                                                                                        rideMorethanThree = false;
-                                                                                        if (cM <= 10) {
-                                                                                            // Enter the value into driver wallet here
-                                                                                            Log.e(TAG, "onDataChange: " + debt);
-                                                                                            Log.e(TAG, "onDataChange: " + newSold);
-                                                                                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(/*Double.toString(*/"" + newdebt/*)*/);
-                                                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(Objects.requireNonNull(dataSnapshott.child("client").getValue(String.class))).child("SOLDE").setValue("" + newSold);
-                                                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(Objects.requireNonNull(dataSnapshott.child("client").getValue(String.class))).child("USECREDIT").setValue("1");
-                                                                                            dialog.dismiss();
-                                                                                        } else {
-                                                                                            Toast.makeText(MapsActivity.this, "Vous ne pouvez pas dépasser 10 MAD de recharge pour ce client.", Toast.LENGTH_LONG).show();
+                                                                                            rideMorethanThree = false;
+                                                                                            if (cM <= 10) {
+                                                                                                // Enter the value into driver wallet here
+                                                                                                Log.e(TAG, "onDataChange: " + debt);
+                                                                                                Log.e(TAG, "onDataChange: " + newSold);
+                                                                                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(/*Double.toString(*/"" + newdebt/*)*/);
+                                                                                                FirebaseDatabase.getInstance().getReference("clientUSERS").child(Objects.requireNonNull(dataSnapshott.child("client").getValue(String.class))).child("SOLDE").setValue("" + newSold);
+                                                                                                FirebaseDatabase.getInstance().getReference("clientUSERS").child(Objects.requireNonNull(dataSnapshott.child("client").getValue(String.class))).child("USECREDIT").setValue("1");
+                                                                                                dialog.dismiss();
+                                                                                            } else {
+                                                                                                Toast.makeText(MapsActivity.this, "Vous ne pouvez pas dépasser 10 MAD de recharge pour ce client.", Toast.LENGTH_LONG).show();
+                                                                                            }
                                                                                         }
                                                                                     }
                                                                                 }
-                                                                            }
 
-                                                                            @Override
-                                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
-                                                                                dialog.dismiss();
-                                                                            }
-                                                                        });
+                                                                                @Override
+                                                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                                                    dialog.dismiss();
+                                                                                }
+                                                                            });
 
 
-                                                                    }
+                                                                        }
 
-                                                                    @Override
-                                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                                                                        dialog.dismiss();
-                                                                    }
-                                                                });
+                                                                        @Override
+                                                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                                            dialog.dismiss();
+                                                                        }
+                                                                    });
+                                                        }
                                                     } else
                                                         Toast.makeText(MapsActivity.this, "Vous ne pouvez pas dépasser 100 MAD de recharge pour ce client.", Toast.LENGTH_LONG).show();
 
