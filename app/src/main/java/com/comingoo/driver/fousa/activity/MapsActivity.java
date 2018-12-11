@@ -1067,9 +1067,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                                                 Log.e(TAG, "onDataChange: 3333333 old sold: " + commission);
                                                                                                                 Log.e(TAG, "onDataChange: 3333333 old currentbill: " + userDue);
                                                                                                                 currentWallet = 0.0;
-                                                                                                                FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("SOLDE").setValue("" + 0);
+                                                                                                                FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("SOLDE").setValue(""+currentWallet);
                                                                                                                 FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("USECREDIT").setValue("0");
-
                                                                                                                 FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").setValue(df2.format(userDue));
 
 
@@ -1098,8 +1097,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                                             FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(Double.toString(newDebt));
                                                                                                             FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").setValue(df2.format(currentBil));
                                                                                                             price.setText(df2.format(currentBil) + " MAD");
-                                                                                                        } catch (NumberFormatException e) {
-                                                                                                            e.printStackTrace();
                                                                                                         } catch (Exception e) {
                                                                                                             e.printStackTrace();
                                                                                                         }
