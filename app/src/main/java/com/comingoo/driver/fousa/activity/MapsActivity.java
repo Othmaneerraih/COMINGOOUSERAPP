@@ -636,7 +636,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         iv_loud.setVisibility(View.GONE);
 
         mp = MediaPlayer.create(this, R.raw.ring);
-        mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
+//        mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
         mp.start();
 
         call.addCallListener(new CallListener() {
@@ -791,7 +791,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (audioManager != null) {
             audioManager.setSpeakerphoneOn(false);
         }
-        audioManager.setMicrophoneMute(false);
+        if (audioManager != null) {
+            audioManager.setMicrophoneMute(false);
+        }
 
         iv_loud.setOnClickListener(new View.OnClickListener() {
             @Override
