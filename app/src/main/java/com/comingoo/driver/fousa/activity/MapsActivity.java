@@ -415,6 +415,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             e.printStackTrace();
         }
 
+
+
         ivCancelCourse.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -524,7 +526,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         userInfoLayout.setBackgroundColor(Color.WHITE);
     }
 
-
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -555,6 +556,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         } else {
             getLastLocation();
         }
+
+
+        FirebaseDatabase.getInstance().getReference("ONLINEDRIVERS").child(driverId).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (!dataSnapshot.exists()) {
+                    switchOfflineUI();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     @Override
@@ -855,10 +871,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
         prefs.edit().putString("online", "0").apply();
         stopService(intent);
-        if (params.length > 0) {
-            if (params[0])
-                switchOnlineUI();
-        }
+//        if (params.length > 0) {
+//            if (params[0])
+//                switchOnlineUI();
+//        }
     }
 
     private void switchToCourseUI() {
@@ -1140,7 +1156,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                                                 Log.e(TAG, "onDataChange: 3333333 old sold: " + commission);
                                                                                                                 Log.e(TAG, "onDataChange: 3333333 old currentbill: " + userDue);
                                                                                                                 currentWallet = 0.0;
-                                                                                                                FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("SOLDE").setValue(""+currentWallet);
+                                                                                                                FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("SOLDE").setValue("" + currentWallet);
                                                                                                                 FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("USECREDIT").setValue("0");
                                                                                                                 FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("price").setValue(df2.format(userDue));
 

@@ -183,7 +183,6 @@ public class DriverService extends Service {
         @Override
         protected String doInBackground(String... params) {
 
-
             mDatabase = FirebaseDatabase.getInstance().getReference().child("DRIVERUSERS");
             driverLcoationDatabase = FirebaseDatabase.getInstance().getReference().child("ONLINEDRIVERS");
             driverPickupRequests = FirebaseDatabase.getInstance().getReference().child("PICKUPREQUEST");
@@ -582,7 +581,6 @@ public class DriverService extends Service {
         SharedPreferences prefs;
         String userId;
 
-        // Runs in UI before background thread is called
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
