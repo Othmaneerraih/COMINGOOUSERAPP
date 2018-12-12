@@ -340,8 +340,8 @@ public class DriverService extends Service {
 //                                                CommandActivity.clientR.finish();
                                             }
 
-                                            clientRequetFollow.removeValue();
-                                            clientRequetFollow.removeEventListener(this);
+//                                            clientRequetFollow.removeValue();
+//                                            clientRequetFollow.removeEventListener(this);
 
                                         }
                                     }
