@@ -1,4 +1,4 @@
-package com.comingoo.driver.fousa;
+package com.comingoo.driver.fousa.utility;
 
 import android.content.Context;
 import android.graphics.Canvas;

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/login_bg"
-    tools:context=".loginActivity">
+    tools:context=".activity.LoginActivity">
     <TextView
         android:id="@+id/textView5"
         android:layout_width="wrap_content"
@@ -40,7 +40,7 @@
             android:layout_marginStart="20dp"
             android:background="@drawable/number_field"
             android:ems="10"
-            android:hint="0612345678"
+            android:hint="612345678"
             android:inputType="phone"
             android:paddingBottom="10dp"
             android:paddingLeft="10dp"

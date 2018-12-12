@@ -1,4 +1,4 @@
-package com.comingoo.driver.fousa;
+package com.comingoo.driver.fousa.activity;
 
 import android.app.Activity;
 import android.content.Context;
@@ -19,6 +19,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.comingoo.driver.fousa.R;
 import com.sinch.android.rtc.PushPair;
 import com.sinch.android.rtc.Sinch;
 import com.sinch.android.rtc.SinchClient;
@@ -44,9 +45,12 @@ public class VoipCallingActivity extends AppCompatActivity {
     private CountDownTimer countDownTimer;
     private AudioManager audioManager;
     private SinchClient sinchClient;
-    private ImageView iv_back_voip_one;
-    private TextView callState,caller_name,tv_name_voip_one;
-    private CircleImageView iv_user_image_voip_one,iv_cancel_call_voip_one,iv_mute,iv_loud,iv_recv_call_voip_one;
+    private TextView callState;
+    private TextView caller_name;
+    private CircleImageView iv_cancel_call_voip_one;
+    private CircleImageView iv_mute;
+    private CircleImageView iv_loud;
+    private CircleImageView iv_recv_call_voip_one;
 
     private static final String APP_KEY = "185d9822-a953-4af6-a780-b0af1fd31bf7";
     private static final String APP_SECRET = "ZiJ6FqH5UEWYbkMZd1rWbw==";
@@ -81,16 +85,16 @@ public class VoipCallingActivity extends AppCompatActivity {
         setContentView(R.layout.content_voip_one);
         activity = this;
 
-        iv_back_voip_one = (ImageView)findViewById(R.id.iv_back_voip_one);
-        iv_user_image_voip_one = (CircleImageView)findViewById(R.id.iv_user_image_voip_one);
-        iv_cancel_call_voip_one = (CircleImageView)findViewById(R.id.iv_cancel_call_voip_one);
-        iv_recv_call_voip_one = (CircleImageView)findViewById(R.id.iv_recv_call_voip_one);
-        caller_name = (TextView)findViewById(R.id.callerName);
-        callState = (TextView)findViewById(R.id.callState);
+        ImageView iv_back_voip_one = findViewById(R.id.iv_back_voip_one);
+        CircleImageView iv_user_image_voip_one = findViewById(R.id.iv_user_image_voip_one);
+        iv_cancel_call_voip_one = findViewById(R.id.iv_cancel_call_voip_one);
+        iv_recv_call_voip_one = findViewById(R.id.iv_recv_call_voip_one);
+        caller_name = findViewById(R.id.callerName);
+        callState = findViewById(R.id.callState);
 
-        iv_mute = (CircleImageView)findViewById(R.id.iv_mute);
-        iv_loud = (CircleImageView)findViewById(R.id.iv_loud);
-        tv_name_voip_one = (TextView)findViewById(R.id.tv_name_voip_one);
+        iv_mute = findViewById(R.id.iv_mute);
+        iv_loud = findViewById(R.id.iv_loud);
+        TextView tv_name_voip_one = findViewById(R.id.tv_name_voip_one);
 
         iv_loud.setBackgroundColor(Color.WHITE);
         iv_loud.setCircleBackgroundColor(Color.WHITE);
@@ -114,14 +118,13 @@ public class VoipCallingActivity extends AppCompatActivity {
         }
 
         caller_name.setVisibility(View.VISIBLE);
-        caller_name.setTextSize(TypedValue.COMPLEX_UNIT_SP,16);
+        caller_name.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         caller_name.setTypeface(null, Typeface.NORMAL);      // for Normal Text
 
-//        caller_name.setText(callerName+ " vous appelle");
         tv_name_voip_one.setText(callerName);
-        if(clientImage != null ){
+        if (clientImage != null) {
             if (!clientImage.isEmpty())
-            Picasso.get().load(clientImage).into(iv_user_image_voip_one);
+                Picasso.get().load(clientImage).into(iv_user_image_voip_one);
         }
         sinchClient = Sinch.getSinchClientBuilder()
                 .context(this)
@@ -147,12 +150,8 @@ public class VoipCallingActivity extends AppCompatActivity {
         iv_cancel_call_voip_one.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(call != null){
+                if (call != null) {
                     call.hangup();
-//                    iv_recv_call_voip_one.setVisibility(View.VISIBLE);
-//                    RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) iv_cancel_call_voip_one.getLayoutParams();
-//                    params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
-//                    params.setMargins(0,0,150,60);
                     finish();
                 }
 
@@ -162,34 +161,27 @@ public class VoipCallingActivity extends AppCompatActivity {
         iv_recv_call_voip_one.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!clientId.isEmpty() && !driverId.isEmpty()){
-                    try{
-//                        if (call == null) {
-                            call = sinchClient.getCallClient().callUser(clientId);
-//                            call.addCallListener(new SinchCallListener());
+                if (!clientId.isEmpty() && !driverId.isEmpty()) {
+                    try {
+                        call = sinchClient.getCallClient().callUser(clientId);
                         if (call != null) call.answer();
-//                        } else {
-//                            call.hangup();
-//                            iv_recv_call_voip_one.setVisibility(View.VISIBLE);
-//                            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) iv_cancel_call_voip_one.getLayoutParams();
-//                            params.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
-//                            params.setMargins(0,0,150,60);
-//                        }
-                    }catch(NullPointerException e){
-                        e.printStackTrace();
-                    } catch(Exception e){
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
-
-
             }
         });
 
         audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
-        audioManager.setMode(AudioManager.MODE_IN_CALL);
-        audioManager.setSpeakerphoneOn(false);
-        audioManager.setMicrophoneMute(false);
+        if (audioManager != null) {
+            audioManager.setMode(AudioManager.MODE_IN_CALL);
+        }
+        if (audioManager != null) {
+            audioManager.setSpeakerphoneOn(false);
+        }
+        if (audioManager != null) {
+            audioManager.setMicrophoneMute(false);
+        }
 
         iv_loud.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -224,12 +216,13 @@ public class VoipCallingActivity extends AppCompatActivity {
             public void onTick(long leftTimeInMilliseconds) {
 
             }
+
             @Override
             public void onFinish() {
-                try{
-                    if(sinchClient != null){
-                        if(!clientId.isEmpty() && !driverId.isEmpty()){
-                            try{
+                try {
+                    if (sinchClient != null) {
+                        if (!clientId.isEmpty() && !driverId.isEmpty()) {
+                            try {
                                 if (call == null) {
                                     call = sinchClient.getCallClient().callUser(clientId);
                                     call.addCallListener(new VoipCallingActivity.SinchCallListener());
@@ -238,18 +231,14 @@ public class VoipCallingActivity extends AppCompatActivity {
                                     iv_recv_call_voip_one.setVisibility(View.VISIBLE);
                                     RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) iv_cancel_call_voip_one.getLayoutParams();
                                     params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
-                                    params.setMargins(0,0,150,60);
+                                    params.setMargins(0, 0, 150, 60);
                                 }
-                            }catch(NullPointerException e){
-                                e.printStackTrace();
-                            } catch(Exception e){
+                            } catch (Exception e) {
                                 e.printStackTrace();
                             }
                         }
                     }
-                } catch(NullPointerException e){
-                    e.printStackTrace();
-                } catch(Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -257,8 +246,8 @@ public class VoipCallingActivity extends AppCompatActivity {
 
     }
 
-    private void mute(){
-        if (audioManager.isMicrophoneMute() == false) {
+    private void mute() {
+        if (!audioManager.isMicrophoneMute()) {
             audioManager.setMicrophoneMute(true);
             iv_mute.setImageResource(R.drawable.clicked_mute);
         } else {
@@ -271,17 +260,6 @@ public class VoipCallingActivity extends AppCompatActivity {
         @Override
         public void onCallEnded(Call endedCall) {
             call = null;
-            SinchError a = endedCall.getDetails().getError();
-//            iv_mute.setVisibility(View.GONE);
-//            iv_loud.setVisibility(View.GONE);
-//            caller_name.setVisibility(View.GONE);
-//            callState.setText("");
-//            iv_recv_call_voip_one.setVisibility(View.VISIBLE);
-//            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) iv_cancel_call_voip_one.getLayoutParams();
-//            params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
-//            params.setMargins(0,0,150,60);
-//            setVolumeControlStream(AudioManager.USE_DEFAULT_STREAM_TYPE);
-//            mute();
             mHandler.removeCallbacks(mUpdate);
             finish();
         }
@@ -298,7 +276,7 @@ public class VoipCallingActivity extends AppCompatActivity {
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) iv_cancel_call_voip_one.getLayoutParams();
             params.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
             params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-            params.setMargins(0,0,450,60);
+            params.setMargins(0, 0, 450, 60);
 
 
             mHandler.postDelayed(mUpdate, 1000);
@@ -306,19 +284,7 @@ public class VoipCallingActivity extends AppCompatActivity {
 
         @Override
         public void onCallProgressing(Call progressingCall) {
-//            caller_name.setText("0 : "+progressingCall.getDetails().getDuration()+"");
-//            caller_name.setTextSize(TypedValue.COMPLEX_UNIT_SP,20);
-//            iv_mute.setVisibility(View.VISIBLE);
-//            iv_loud.setVisibility(View.VISIBLE);
-//            caller_name.setTypeface(null, Typeface.BOLD);
-//            iv_recv_call_voip_one.setVisibility(View.GONE);
-
-//            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) iv_cancel_call_voip_one.getLayoutParams();
-//            params.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
-//            params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-//            params.setMargins(0,0,450,60);
-
-caller_name.setVisibility(View.GONE);
+            caller_name.setVisibility(View.GONE);
             callState.setText("ringing");
         }
 
@@ -332,7 +298,6 @@ caller_name.setVisibility(View.GONE);
         public void onIncomingCall(CallClient callClient, Call incomingCall) {
             call = incomingCall;
             Toast.makeText(VoipCallingActivity.this, "incoming call", Toast.LENGTH_SHORT).show();
-//            call.answer();
             call.addCallListener(new SinchCallListener());
         }
     }

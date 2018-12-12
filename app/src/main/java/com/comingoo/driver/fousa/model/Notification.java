@@ -1,7 +1,7 @@
-package com.comingoo.driver.fousa;
+package com.comingoo.driver.fousa.model;
 
 public class Notification {
-    String title, content;
+    public String title, content;
 
     public Notification() {
     }

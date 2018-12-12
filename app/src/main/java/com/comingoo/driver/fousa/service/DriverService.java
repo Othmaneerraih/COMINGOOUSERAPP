@@ -1,4 +1,4 @@
-package com.comingoo.driver.fousa;
+package com.comingoo.driver.fousa.service;
 
 import android.app.Service;
 import android.content.Context;
@@ -17,6 +17,7 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.comingoo.driver.fousa.activity.CommandActivity;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -182,7 +183,6 @@ public class DriverService extends Service {
         @Override
         protected String doInBackground(String... params) {
 
-
             mDatabase = FirebaseDatabase.getInstance().getReference().child("DRIVERUSERS");
             driverLcoationDatabase = FirebaseDatabase.getInstance().getReference().child("ONLINEDRIVERS");
             driverPickupRequests = FirebaseDatabase.getInstance().getReference().child("PICKUPREQUEST");
@@ -257,7 +257,7 @@ public class DriverService extends Service {
                         return;
                     }
 
-                    final Intent intent = new Intent(DriverService.this, commandActivity.class);
+                    final Intent intent = new Intent(DriverService.this, CommandActivity.class);
 
                     intent.putExtra("userId", userId);
                     intent.putExtra("name", requestUsersID.get(counter));
@@ -294,11 +294,11 @@ public class DriverService extends Service {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             if (!dataSnapshot.exists()) {
-                                commandActivity.countDownTimer.cancel();
-                                commandActivity.clientR.finish();
-                                if (commandActivity.mp != null) {
-                                    commandActivity.mp.release();
-                                    commandActivity.vibrator.cancel();
+                                CommandActivity.countDownTimer.cancel();
+//                                CommandActivity.clientR.finish();
+                                if (CommandActivity.mp != null) {
+                                    CommandActivity.mp.release();
+                                    CommandActivity.vibrator.cancel();
                                 }
                                 counter++;
                                 checkStop = true;
@@ -330,17 +330,17 @@ public class DriverService extends Service {
                                             if (requestUsersID.size() > 1) {
                                                 requestUsersID.set(counter, "-1");
                                             }
-                                            if (commandActivity.active) {
-                                                commandActivity.countDownTimer.cancel();
-                                                if (commandActivity.mp != null) {
-                                                    commandActivity.mp.release();
-                                                    commandActivity.vibrator.cancel();
+                                            if (CommandActivity.active) {
+                                                CommandActivity.countDownTimer.cancel();
+                                                if (CommandActivity.mp != null) {
+                                                    CommandActivity.mp.release();
+                                                    CommandActivity.vibrator.cancel();
                                                 }
-                                                commandActivity.clientR.finish();
+//                                                CommandActivity.clientR.finish();
                                             }
 
-                                            clientRequetFollow.removeValue();
-                                            clientRequetFollow.removeEventListener(this);
+//                                            clientRequetFollow.removeValue();
+//                                            clientRequetFollow.removeEventListener(this);
 
                                         }
                                     }
@@ -351,12 +351,12 @@ public class DriverService extends Service {
                                     }
                                 });
                             } else {
-                                if (commandActivity.active) {
-                                    commandActivity.countDownTimer.cancel();
-                                    commandActivity.clientR.finish();
-                                    if (commandActivity.mp != null) {
-                                        commandActivity.mp.release();
-                                        commandActivity.vibrator.cancel();
+                                if (CommandActivity.active) {
+                                    CommandActivity.countDownTimer.cancel();
+//                                    CommandActivity.clientR.finish();
+                                    if (CommandActivity.mp != null) {
+                                        CommandActivity.mp.release();
+                                        CommandActivity.vibrator.cancel();
                                     }
                                 }
                             }
@@ -429,12 +429,12 @@ public class DriverService extends Service {
 
                         }
                     } else {
-                        if (commandActivity.active) {
-                            commandActivity.countDownTimer.cancel();
-                            commandActivity.clientR.finish();
-                            if (commandActivity.mp != null) {
-                                commandActivity.mp.release();
-                                commandActivity.vibrator.cancel();
+                        if (CommandActivity.active) {
+                            CommandActivity.countDownTimer.cancel();
+//                            CommandActivity.clientR.finish();
+                            if (CommandActivity.mp != null) {
+                                CommandActivity.mp.release();
+                                CommandActivity.vibrator.cancel();
                             }
                         }
                     }
@@ -581,7 +581,6 @@ public class DriverService extends Service {
         SharedPreferences prefs;
         String userId;
 
-        // Runs in UI before background thread is called
         @Override
         protected void onPreExecute() {
             super.onPreExecute();

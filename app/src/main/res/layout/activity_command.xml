@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".commandActivity">
+    tools:context=".activity.CommandActivity">
 
     <!--<com.skyfishjy.library.RippleBackground xmlns:android="http://schemas.android.com/apk/res/android"-->
     <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
@@ -32,7 +32,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
 
-        <com.comingoo.driver.fousa.RoundedLayout
+        <com.comingoo.driver.fousa.utility.RoundedLayout
             android:layout_width="150dp"
             android:layout_height="150dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -48,7 +48,7 @@
                 android:layout_centerInParent="true"
                 android:layout_margin="3dp"
                 android:background="@drawable/drawable_circle_dark_blue" />
-        </com.comingoo.driver.fousa.RoundedLayout>
+        </com.comingoo.driver.fousa.utility.RoundedLayout>
 
 
         <RelativeLayout
@@ -112,15 +112,27 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
+        android:text="Start tet"
         android:textColor="@android:color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView8" />
 
+    <TextView
+        android:id="@+id/tv_destination"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="End tet"
+        android:layout_marginTop="7dp"
+        android:textColor="@android:color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView9" />
+
     <android.support.constraint.ConstraintLayout
         android:layout_width="336dp"
         android:layout_height="100dp"
-        android:layout_marginBottom="48dp"
+        android:layout_marginBottom="18dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">

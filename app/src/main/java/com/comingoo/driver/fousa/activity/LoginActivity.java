@@ -1,4 +1,4 @@
-package com.comingoo.driver.fousa;
+package com.comingoo.driver.fousa.activity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,12 +10,13 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.comingoo.driver.fousa.R;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-public class loginActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity {
 
     private EditText phoneNumber;
     private EditText password;
@@ -28,9 +29,9 @@ public class loginActivity extends AppCompatActivity {
 
         checkLogin();
 
-        phoneNumber = (EditText) findViewById(R.id.phoneNumber);
-        password = (EditText) findViewById(R.id.password);
-        loginBtn = (ImageButton) findViewById(R.id.loginBtn);
+        phoneNumber = findViewById(R.id.phoneNumber);
+        password = findViewById(R.id.password);
+        loginBtn = findViewById(R.id.loginBtn);
 
 
 
@@ -39,14 +40,12 @@ public class loginActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 if(phoneNumber.getText().toString().isEmpty() && password.getText().toString().isEmpty()){
-                    Toast.makeText(loginActivity.this, "Fill all the fields", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, "Fill all the fields", Toast.LENGTH_SHORT).show();
                 }else{
-
-//                    login(phoneNumber.getText().toString(), password.getText().toString());
                     if(phoneNumberValidation(phoneNumber.getText().toString())){
                         login(phoneNumber.getText().toString(), password.getText().toString());
                     }else{
-                        Toast.makeText(loginActivity.this, "Veuillez entrer un numéro de téléphone valide 0612345678", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, "Veuillez entrer un numéro de téléphone valide 612345678", Toast.LENGTH_SHORT).show();
                     }
                 }
 
@@ -56,18 +55,25 @@ public class loginActivity extends AppCompatActivity {
 
     }
 
+//    private Boolean phoneNumberValidation(String number){
+//        char x = number.charAt(0);
+//        char y = number.charAt(1);
+//        if(x != '0' && y != '6'){
+//            return false;
+//        }
+//        else return number.length() <= 10;
+//    }
+
     private Boolean phoneNumberValidation(String number){
         char x = number.charAt(0);
-        char y = number.charAt(1);
-        if(x != '0' && y != '6'){
+        if(x == '0'){
             return false;
         }
-        else if(number.length()>10){
+
+        if(number.length()!= 9){
             return false;
         }
-//        if(android.util.Patterns.PHONE.matcher(number).matches()){
-//            return true;
-//        }
+
         return true;
     }
 
@@ -82,20 +88,20 @@ public class loginActivity extends AppCompatActivity {
                     for(DataSnapshot data: dataSnapshot.getChildren()){
                         if(data.child("password").getValue(String.class).equals(password)){
                             if(data.child("isVerified").getValue(String.class).equals("0")){
-                                Toast.makeText(loginActivity.this, "This account is currently disabled", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(LoginActivity.this, "This account is currently disabled", Toast.LENGTH_SHORT).show();
                             }else {
                                 loggedIn("+212"+ number, data.getKey());
 //                                loggedIn( number, data.getKey());
                             }
                         }else{
                             //Wrong Password
-                            Toast.makeText(loginActivity.this, "Mot de passe erroné!!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginActivity.this, "Mot de passe erroné!!", Toast.LENGTH_SHORT).show();
                         }
 
                     }
                 }else{
                     // Number/User  Not Found
-                    Toast.makeText(loginActivity.this, "Ce compt n'existe pas!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, "Ce compt n'existe pas!", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -119,7 +125,7 @@ public class loginActivity extends AppCompatActivity {
         String number = prefs.getString("userId", null);
         if(number != null){
             //User Is Logged In
-            Intent intent = new Intent(loginActivity.this, MapsActivity.class);
+            Intent intent = new Intent(LoginActivity.this, MapsActivity.class);
             startActivity(intent);
             finish();
         }
