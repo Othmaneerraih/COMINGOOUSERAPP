@@ -22,11 +22,9 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -49,7 +47,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.comingoo.driver.fousa.service.CourseService;
 import com.comingoo.driver.fousa.utility.CustomAnimation;
 import com.comingoo.driver.fousa.service.DriverService;
@@ -66,7 +63,6 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -89,7 +85,6 @@ import com.sinch.android.rtc.calling.CallClient;
 import com.sinch.android.rtc.calling.CallClientListener;
 import com.sinch.android.rtc.calling.CallListener;
 import com.squareup.picasso.Picasso;
-
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -99,7 +94,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-
 import de.hdodenhof.circleimageview.CircleImageView;
 
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
@@ -653,7 +647,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         iv_loud.setVisibility(View.GONE);
 
         mp = MediaPlayer.create(this, R.raw.ring);
-        mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
+//        mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
         mp.start();
 
         call.addCallListener(new CallListener() {
@@ -808,7 +802,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (audioManager != null) {
             audioManager.setSpeakerphoneOn(false);
         }
-        audioManager.setMicrophoneMute(false);
+        if (audioManager != null) {
+            audioManager.setMicrophoneMute(false);
+        }
 
         iv_loud.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -1787,7 +1783,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         fullName.setText(driverName);
         ratingR.setText(Rating + "");
-        money.setText(todayEarnings + " MAD");
+
+        money.setText(df2.format(Double.parseDouble(todayEarnings)) + " MAD");
 
 
         ComingoonYou.setOnClickListener(new View.OnClickListener() {
