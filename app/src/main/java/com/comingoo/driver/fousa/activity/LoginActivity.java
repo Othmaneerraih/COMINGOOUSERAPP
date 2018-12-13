@@ -16,11 +16,12 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Objects;
+
 public class LoginActivity extends AppCompatActivity {
 
     private EditText phoneNumber;
     private EditText password;
-    private ImageButton loginBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +32,7 @@ public class LoginActivity extends AppCompatActivity {
 
         phoneNumber = findViewById(R.id.phoneNumber);
         password = findViewById(R.id.password);
-        loginBtn = findViewById(R.id.loginBtn);
+        ImageButton loginBtn = findViewById(R.id.loginBtn);
 
 
 
@@ -70,8 +71,8 @@ public class LoginActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists()){
                     for(DataSnapshot data: dataSnapshot.getChildren()){
-                        if(data.child("password").getValue(String.class).equals(password)){
-                            if(data.child("isVerified").getValue(String.class).equals("0")){
+                        if(Objects.requireNonNull(data.child("password").getValue(String.class)).equals(password)){
+                            if(Objects.requireNonNull(data.child("isVerified").getValue(String.class)).equals("0")){
                                 Toast.makeText(LoginActivity.this, "This account is currently disabled", Toast.LENGTH_SHORT).show();
                             }else {
 //                                loggedIn("+212"+ number, data.getKey());
