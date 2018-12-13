@@ -1787,7 +1787,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         fullName.setText(driverName);
         ratingR.setText(Rating + "");
-        money.setText(todayEarnings + " MAD");
+
+        money.setText(df2.format(Double.parseDouble(todayEarnings)) + " MAD");
 
 
         ComingoonYou.setOnClickListener(new View.OnClickListener() {
