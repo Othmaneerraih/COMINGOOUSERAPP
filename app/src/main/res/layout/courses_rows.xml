@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:folding-cell="http://schemas.android.com/tools"
     android:layout_marginStart="5dp"
     android:layout_marginLeft="5dp"
     android:layout_marginTop="5dp"
@@ -14,7 +14,6 @@
     android:clipToPadding="false">
 
     <com.ramotion.foldingcell.FoldingCell xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:folding-cell="http://schemas.android.com/apk/res-auto"
         android:id="@+id/folding_cell"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -405,7 +404,7 @@
                 <android.support.constraint.ConstraintLayout
                     android:id="@+id/constraintLayout2"
                     android:layout_width="110dp"
-                    android:layout_height="182dp"
+                    android:layout_height="187dp"
                     android:background="@color/colorPrimary"
                     android:visibility="visible"
                     app:layout_constraintBottom_toBottomOf="parent"
