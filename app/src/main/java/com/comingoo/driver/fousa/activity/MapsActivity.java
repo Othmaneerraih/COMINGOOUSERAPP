@@ -425,7 +425,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void rideCancelDialog() {
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MapsActivity.this);
         final AlertDialog alertDialog = dialogBuilder.create();
         alertDialog.show();
         alertDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
