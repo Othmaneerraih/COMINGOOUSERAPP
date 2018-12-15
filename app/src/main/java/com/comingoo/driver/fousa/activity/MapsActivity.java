@@ -290,8 +290,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     }
                 }
             });
-            tv_appelle_voip.setClickable(true);
-            tv_appelle_voip.setEnabled(true);
+
             tv_appelle_voip.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -880,6 +879,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //            if (params[0])
 //                switchOnlineUI();
 //        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // TODO Auto-generated method stub
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 1 && RESULT_OK == -1 && data.hasExtra("result")) {
+            tv_appelle_voip.setClickable(true);
+            tv_appelle_voip.setEnabled(true);
+        }
     }
 
     private void switchToCourseUI() {
