@@ -164,7 +164,6 @@ public class VoipCallingActivity extends AppCompatActivity {
                 if (!clientId.isEmpty() && !driverId.isEmpty()) {
                     try {
                         call = sinchClient.getCallClient().callUser(clientId);
-                        if (call != null) call.answer();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
