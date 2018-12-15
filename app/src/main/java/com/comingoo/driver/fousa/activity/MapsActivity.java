@@ -1351,6 +1351,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                                 // Enter the value into driver wallet here
                                                                                                 Log.e(TAG, "onDataChange: " + debt);
                                                                                                 Log.e(TAG, "onDataChange: " + newSold);
+                                                                                                Toast.makeText(MapsActivity.this, getString(R.string.txt_successfully_recharged), Toast.LENGTH_LONG).show();
                                                                                                 FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue("" + newdebt);
                                                                                                 FirebaseDatabase.getInstance().getReference("clientUSERS").child(Objects.requireNonNull(dataSnapshott.child("client").getValue(String.class))).child("SOLDE").setValue("" + newSold);
                                                                                                 FirebaseDatabase.getInstance().getReference("clientUSERS").child(Objects.requireNonNull(dataSnapshott.child("client").getValue(String.class))).child("USECREDIT").setValue("1");
@@ -1364,6 +1365,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                                 // Enter the value into driver wallet here
                                                                                                 Log.e(TAG, "onDataChange: " + debt);
                                                                                                 Log.e(TAG, "onDataChange: " + newSold);
+                                                                                                Toast.makeText(MapsActivity.this, getString(R.string.txt_successfully_recharged), Toast.LENGTH_LONG).show();
                                                                                                 FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(/*Double.toString(*/"" + newdebt/*)*/);
                                                                                                 FirebaseDatabase.getInstance().getReference("clientUSERS").child(Objects.requireNonNull(dataSnapshott.child("client").getValue(String.class))).child("SOLDE").setValue("" + newSold);
                                                                                                 FirebaseDatabase.getInstance().getReference("clientUSERS").child(Objects.requireNonNull(dataSnapshott.child("client").getValue(String.class))).child("USECREDIT").setValue("1");
