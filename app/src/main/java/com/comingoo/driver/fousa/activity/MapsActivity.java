@@ -47,6 +47,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.comingoo.driver.fousa.service.CourseService;
 import com.comingoo.driver.fousa.utility.CustomAnimation;
 import com.comingoo.driver.fousa.service.DriverService;
@@ -85,6 +86,7 @@ import com.sinch.android.rtc.calling.CallClient;
 import com.sinch.android.rtc.calling.CallClientListener;
 import com.sinch.android.rtc.calling.CallListener;
 import com.squareup.picasso.Picasso;
+
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -94,6 +96,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+
 import de.hdodenhof.circleimageview.CircleImageView;
 
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
@@ -413,7 +416,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         } catch (Exception e) {
             e.printStackTrace();
         }
-
 
 
         ivCancelCourse.setOnClickListener(new View.OnClickListener() {
@@ -947,7 +949,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Button price;
     private double currentDebt = 0.0;
     private double currentWallet = 0.0;
-    private DecimalFormat df2 = new DecimalFormat(".##");
+    private DecimalFormat df2 = new DecimalFormat("0.##");
 
     private class checkCourseFinished extends AsyncTask<String, Integer, String> {
         @Override
@@ -1096,15 +1098,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                 child(userId).child("EARNINGS").child(getDateMonth(GetUnixTime())).child(getDateDay(GetUnixTime())).addListenerForSingleValueEvent(new ValueEventListener() {
                                                                             @Override
                                                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+
                                                                                 double earned = 0;
-                                                                                int voyages = 0;
+                                                                                double voyages = 0;
                                                                                 if (dataSnapshot.exists()) {
-
-                                                                                    earned = Double.parseDouble(dataSnapshot.child("earnings").getValue(String.class));
-                                                                                    voyages = Integer.parseInt(dataSnapshot.child("voyages").getValue(String.class));
-
+                                                                                    try {
+                                                                                        earned = dataSnapshot.child("earnings").getValue(Double.class);
+                                                                                        voyages = dataSnapshot.child("voyages").getValue(Double.class);
+                                                                                    } catch (NumberFormatException e) {
+                                                                                        Log.e(TAG, "onDataChange: NumberFOrmat: "+ e.getMessage());
+                                                                                        e.printStackTrace();
+                                                                                    } catch (Exception e) {
+                                                                                        Log.e(TAG, "onDataChange: excp: "+ e.getMessage());
+                                                                                        e.printStackTrace();
+                                                                                    }
                                                                                 }
-
                                                                                 if (isFixed)
                                                                                     earned += fixedPrice;
                                                                                 else
@@ -1114,7 +1123,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
                                                                                 final double ee = earned;
-                                                                                final int vv = voyages;
+                                                                                final double vv = voyages;
                                                                                 df2.setRoundingMode(RoundingMode.UP);
                                                                                 FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").addListenerForSingleValueEvent(new ValueEventListener() {
                                                                                     @Override
@@ -1742,8 +1751,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             });
 
                             setUserUi();
-
-
                         } else {
                             Toast.makeText(MapsActivity.this, number, Toast.LENGTH_SHORT).show();
                             prefs.edit().remove("phoneNumber").apply();
