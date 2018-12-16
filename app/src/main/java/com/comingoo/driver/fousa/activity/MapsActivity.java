@@ -1101,19 +1101,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
                                                                                 double earned = 0;
-                                                                                double voyages = 0;
+                                                                                int voyages = 0;
                                                                                 if (dataSnapshot.exists()) {
                                                                                     try {
-                                                                                        earned = dataSnapshot.child("earnings").getValue(Double.class);
-                                                                                        voyages = dataSnapshot.child("voyages").getValue(Double.class);
+                                                                                        earned = Double.parseDouble(dataSnapshot.child("earnings").getValue(String.class));
+                                                                                        voyages = Integer.parseInt(dataSnapshot.child("voyages").getValue(String.class));
                                                                                     } catch (NumberFormatException e) {
-                                                                                        Log.e(TAG, "onDataChange: NumberFOrmat: "+ e.getMessage());
                                                                                         e.printStackTrace();
                                                                                     } catch (Exception e) {
-                                                                                        Log.e(TAG, "onDataChange: excp: "+ e.getMessage());
-                                                                                        e.printStackTrace();
+e.printStackTrace();
                                                                                     }
                                                                                 }
+
                                                                                 if (isFixed)
                                                                                     earned += fixedPrice;
                                                                                 else
@@ -1123,7 +1122,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
                                                                                 final double ee = earned;
-                                                                                final double vv = voyages;
+                                                                                final int vv = voyages;
                                                                                 df2.setRoundingMode(RoundingMode.UP);
                                                                                 FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").addListenerForSingleValueEvent(new ValueEventListener() {
                                                                                     @Override
