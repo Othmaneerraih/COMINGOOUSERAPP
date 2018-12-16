@@ -1,4 +1,4 @@
-package com.comingoo.driver.fousa;
+package com.comingoo.driver.fousa.utility;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -18,7 +18,7 @@ import android.view.animation.TranslateAnimation;
 public class CustomAnimation {
 
 
-    static void animate(final Context context, final View constraintLayout, final float reachedHeigth, final float currentHeight, int duration){
+    public static void animate(final Context context, final View constraintLayout, final float reachedHeigth, final float currentHeight, int duration){
 
         constraintLayout.setVisibility(View.VISIBLE);
 
@@ -38,7 +38,7 @@ public class CustomAnimation {
         anim.start();
 
     }
-    static void animateWidth(final Context context, final View constraintLayout, final float reachedHeigth, final float currentHeight, int duration){
+    public static void animateWidth(final Context context, final View constraintLayout, final float reachedHeigth, final float currentHeight, int duration){
 
         constraintLayout.setVisibility(View.VISIBLE);
 
@@ -58,7 +58,7 @@ public class CustomAnimation {
         anim.start();
 
     }
-    static void fadeIn(Context context,final View constraintLayout, final int duration, final int howSmooth){
+    public static void fadeIn(Context context,final View constraintLayout, final int duration, final int howSmooth){
         constraintLayout.setVisibility(View.VISIBLE);
 
         ObjectAnimator fadeIn = ObjectAnimator.ofFloat(constraintLayout, "alpha", 0f, 1f);
@@ -68,7 +68,7 @@ public class CustomAnimation {
         mAnimationSet.play(fadeIn);
         mAnimationSet.start();
     }
-    static void fadeOut(Context context,final View constraintLayout, final int duration, final int howSmooth){
+    public static void fadeOut(Context context,final View constraintLayout, final int duration, final int howSmooth){
         constraintLayout.setVisibility(View.VISIBLE);
 
         ObjectAnimator fadeIn = ObjectAnimator.ofFloat(constraintLayout, "alpha", 1f, 0f);
@@ -85,7 +85,7 @@ public class CustomAnimation {
         });
         mAnimationSet.start();
     }
-    static void animateCollapse(final Context context, final View constraintLayout, final float reachedHeigth, final float currentHeight, int duration){
+    public static void animateCollapse(final Context context, final View constraintLayout, final float reachedHeigth, final float currentHeight, int duration){
 
         constraintLayout.setVisibility(View.VISIBLE);
 
@@ -105,7 +105,7 @@ public class CustomAnimation {
         anim.setDuration(duration);
         anim.start();
     }
-    static void resideAnimation(final Context context, final View constraintLayout, final View contentBlocker, final int screenWidth, final int screenHeight, final int duration){
+    public static void resideAnimation(final Context context, final View constraintLayout, final View contentBlocker, final int screenWidth, final int screenHeight, final int duration){
 
         final int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (int) screenHeight, context.getResources().getDisplayMetrics());
         final int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (int) screenWidth, context.getResources().getDisplayMetrics());
@@ -173,77 +173,8 @@ public class CustomAnimation {
             }
         });
 
-/*
-        final double percentageScale = (1 - 0.65)/(duration / 20);
-        final double percentageTranslation = (xTranslation)/(duration / 20);
-
-        final Handler handler = new Handler();
-        Runnable runnable = new Runnable() {
-            int i = 1;
-
-            @Override
-            public void run() {
-                double value = 1 - (percentageScale * i);
-
-                if((percentageTranslation*i) <= xTranslation){
-                constraintLayout.setTranslationX((int) (percentageTranslation*i));
-                contentBlocker.setTranslationX((int) (percentageTranslation*i));
-                }
-                if(value >= 0.65) {
-                    constraintLayout.setScaleY((float) value);
-                    constraintLayout.setScaleX((float) value);
-                }
-                i++;
-                if(value > 0.65 || (percentageTranslation*i) < xTranslation ) {
-                    handler.postDelayed(this, 20);
-                }else{
-                    contentBlocker.setScaleY((float) (value + 0.12));
-                    contentBlocker.setScaleX((float) (value + 0.215));
-
-                    contentBlocker.setVisibility(View.VISIBLE);
-                    contentBlocker.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            contentBlocker.setVisibility(View.GONE);
-                            contentBlocker.setOnClickListener(null);
-                            final Handler handler = new Handler();
-                            Runnable runnable = new Runnable() {
-                                int i = 1;
-                                @Override
-                                public void run() {
-                                    double value = 0.65 + (percentageScale * i);
-
-                                    if((percentageTranslation*i) <= xTranslation){
-                                        constraintLayout.setTranslationX((int) (xTranslation-(percentageTranslation*i)));
-                                        contentBlocker.setTranslationX((int) (xTranslation-(percentageTranslation*i)));
-                                    }
-                                    if(value <= 1) {
-                                        constraintLayout.setScaleY((float) value);
-                                        constraintLayout.setScaleX((float) value);
-                                        contentBlocker.setScaleY((float) value);
-                                        contentBlocker.setScaleX((float) value);
-                                    }
-
-
-                                    i++;
-                                    if(value < 1 || (percentageTranslation*i) > xTranslation )
-                                        handler.postDelayed(this, 20);
-                                }
-                            };
-                            runnable.run();
-                        }
-                    });
-
-                }
-            }
-        };
-        runnable.run();
-
-*/
-
-
     }
-    static void expandCircleAnimation(final Context context, final View constraintLayout, float maxHeight, float maxWidth){
+    public static void expandCircleAnimation(final Context context, final View constraintLayout, float maxHeight, float maxWidth){
         double Height = maxHeight + (maxHeight * 0.5) + maxHeight;
         double Width = maxWidth + (maxWidth * 0.5);
         animate(context, constraintLayout, (float) Height, 1, 650);

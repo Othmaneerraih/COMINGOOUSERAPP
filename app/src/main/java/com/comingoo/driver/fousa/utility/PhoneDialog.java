@@ -1,4 +1,4 @@
-package com.comingoo.driver.fousa;
+package com.comingoo.driver.fousa.utility;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -8,6 +8,8 @@ import android.support.v7.app.AppCompatDialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+
+import com.comingoo.driver.fousa.R;
 
 public class PhoneDialog  extends AppCompatDialogFragment {
 

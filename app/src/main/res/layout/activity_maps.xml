@@ -16,6 +16,7 @@
         android:layout_height="match_parent"
         android:visibility="visible">
 
+
         <fragment xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:map="http://schemas.android.com/apk/res-auto"
             xmlns:tools="http://schemas.android.com/tools"
@@ -27,7 +28,7 @@
             map:layout_constraintHorizontal_bias="0.0"
             map:layout_constraintStart_toStartOf="parent"
             map:layout_constraintTop_toTopOf="parent"
-            tools:context=".MapsActivity" />
+            tools:context=".activity.MapsActivity" />
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
@@ -41,7 +42,7 @@
         </android.support.constraint.ConstraintLayout>
 
         <android.support.constraint.ConstraintLayout
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="100dp"
             android:background="@drawable/transp_fade"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -78,7 +79,7 @@
             android:layout_marginEnd="20dp"
             android:layout_marginRight="20dp"
             android:background="@drawable/dest_const"
-            android:visibility="gone"
+            android:visibility="visible"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -86,7 +87,7 @@
             <Button
                 android:id="@+id/button9"
                 android:layout_width="65dp"
-                android:layout_height="fill_parent"
+                android:layout_height="match_parent"
                 android:layout_marginTop="0dp"
                 android:layout_marginBottom="0dp"
                 android:background="@drawable/dest_button"
@@ -140,7 +141,7 @@
             <TextView
                 android:id="@+id/addressText"
                 android:layout_width="200dp"
-                android:layout_height="fill_parent"
+                android:layout_height="match_parent"
                 android:layout_marginStart="8dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginTop="8dp"
@@ -158,9 +159,24 @@
 
         </android.support.constraint.ConstraintLayout>
 
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/iv_cancel_ride"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_margin="15dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:src="@drawable/ic_cancel_ride"
+            android:visibility="gone"
+            app:civ_border_color="@android:color/black"
+            app:civ_border_width="2dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/destination_layout" />
+
         <android.support.constraint.ConstraintLayout
             android:id="@+id/statusConstraint"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="80dp"
             android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
@@ -207,7 +223,7 @@
 
             <Button
                 android:id="@+id/online_button"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="45dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginLeft="8dp"
@@ -221,12 +237,14 @@
                 android:textAllCaps="false"
                 android:textColor="@android:color/white"
                 android:textSize="18sp"
-                android:visibility="gone"
+                android:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
         </android.support.constraint.ConstraintLayout>
+
+
 
         <RelativeLayout
             android:id="@+id/clientInfo"
@@ -264,19 +282,6 @@
                     android:elevation="10dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent">
-
-                    <!--<com.github.rjsvieira:circularView-->
-                    <!--android:id="@+id/clientImage"-->
-                    <!--android:layout_width="70dp"-->
-                    <!--android:layout_height="70dp"-->
-                    <!--android:layout_marginStart="8dp"-->
-                    <!--android:layout_marginLeft="8dp"-->
-                    <!--android:layout_marginTop="8dp"-->
-                    <!--android:layout_marginBottom="8dp"-->
-                    <!--android:src="@color/colorPrimary"-->
-                    <!--app:layout_constraintBottom_toBottomOf="parent"-->
-                    <!--app:layout_constraintStart_toStartOf="parent"-->
-                    <!--app:layout_constraintTop_toTopOf="parent" />-->
 
                     <com.mikhaellopez.circularimageview.CircularImageView
                         android:id="@+id/clientImage"
@@ -381,48 +386,29 @@
                     android:layout_marginStart="8dp"
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="8dp"
+                    android:gravity="center"
                     android:layout_marginBottom="8dp"
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/constraintLayout">
 
-                    <ImageView
-                        android:id="@+id/iv_course_action"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:layout_centerVertical="true"
-                        android:layout_marginLeft="15dp"
-                        android:background="@drawable/online_button"
-                        android:clickable="false"
-                        android:src="@drawable/cancel_x" />
-
-                    <View
-                        android:id="@+id/view"
-                        android:layout_width="1dp"
-                        android:layout_height="35dp"
-                        android:layout_centerVertical="true"
-                        android:layout_marginLeft="20dp"
-                        android:layout_toRightOf="@+id/iv_course_action"
-                        android:background="@android:color/white" />
-
                     <Button
                         android:id="@+id/course_action_button"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="40dp"
-                        android:layout_marginLeft="40dp"
                         android:layout_marginEnd="8dp"
                         android:layout_marginRight="8dp"
-                        android:layout_toRightOf="@+id/view"
                         android:background="@color/transp"
                         android:clickable="false"
                         android:elevation="10dp"
-                        android:gravity="left|center_vertical"
+                        android:gravity="center"
+                        android:layout_centerInParent="true"
                         android:text="Appuyez pour arriver"
                         android:textAllCaps="false"
                         android:textColor="@android:color/white" />
                 </RelativeLayout>
             </android.support.constraint.ConstraintLayout>
+
 
             <LinearLayout
                 android:id="@+id/voip_view"
@@ -721,7 +707,7 @@
 
             <android.support.constraint.ConstraintLayout
                 android:id="@+id/aide"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="60dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
@@ -758,7 +744,7 @@
 
             <android.support.constraint.ConstraintLayout
                 android:id="@+id/logout"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:background="@drawable/top_border"
                 app:layout_constraintBottom_toBottomOf="parent"
