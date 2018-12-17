@@ -2257,7 +2257,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             //Execute Directions API request
             GeoApiContext context = new GeoApiContext.Builder()
-                    .apiKey("AIzaSyDKndcnw3IXjPPsP1gmkFLbeuLDfHXxc4o")
+                    .apiKey(getResources().getString(R.string.google_maps_key))
                     .build();
             DirectionsApiRequest req = DirectionsApi.getDirections(context, start.latitude + "," + start.longitude, arrival.latitude + "," + arrival.longitude);
             try {
