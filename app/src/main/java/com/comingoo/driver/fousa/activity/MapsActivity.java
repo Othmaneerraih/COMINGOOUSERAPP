@@ -932,7 +932,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Button price;
     private double currentDebt = 0.0;
     private double currentWallet = 0.0;
-    private DecimalFormat df2 = new DecimalFormat(".##");
+    private DecimalFormat df2 = new DecimalFormat("0.##");
 
     private class checkCourseFinished extends AsyncTask<String, Integer, String> {
         @Override

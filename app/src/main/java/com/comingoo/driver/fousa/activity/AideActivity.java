@@ -68,7 +68,6 @@ public class AideActivity extends AppCompatActivity {
         findViewById(R.id.add_voice).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
                 intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
                 intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
@@ -87,8 +86,6 @@ public class AideActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (ContextCompat.checkSelfPermission(AideActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(AideActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
-
-
                 } else {
                     Intent intent = new Intent(Intent.ACTION_PICK);
                     intent.setType("image/*");
@@ -104,7 +101,6 @@ public class AideActivity extends AppCompatActivity {
                 CustomAnimation.animate(AideActivity.this, content, 1, 250, 500);
             }
         });
-
 
         Q1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -149,11 +145,9 @@ public class AideActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResult);
 
         if (grantResult.length > 0 && grantResult[0] == PackageManager.PERMISSION_GRANTED) {
-
             Intent intent = new Intent(Intent.ACTION_PICK);
             intent.setType("image/*");
             startActivityForResult(intent, 2);
-
         }
 
     }
@@ -163,7 +157,6 @@ public class AideActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == 2 && resultCode == RESULT_OK) {
-
             imageUri = data.getData();
             //image.setBackgroundResource();
             selectImage.setText("image choisi");

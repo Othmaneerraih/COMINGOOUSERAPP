@@ -72,7 +72,7 @@ public class ComingooAndYouActivity extends AppCompatActivity {
 
     private ConstraintLayout tarifs;
     private ConstraintLayout tarifsLayout;
-    private DecimalFormat df2 = new DecimalFormat(".##");
+    private DecimalFormat df2 = new DecimalFormat("0.##");
 
 
     @Override
