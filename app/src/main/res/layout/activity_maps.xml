@@ -62,7 +62,7 @@
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
             android:background="@drawable/money_button"
-            android:text="218 MAD"
+            android:text="0.0 MAD"
             android:textColor="@color/colorPrimarySecond"
             android:visibility="visible"
             app:layout_constraintEnd_toEndOf="parent"
@@ -249,7 +249,7 @@
         <RelativeLayout
             android:id="@+id/clientInfo"
             android:layout_width="match_parent"
-            android:layout_height="250dp"
+            android:layout_height="270dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
@@ -414,9 +414,6 @@
                 android:id="@+id/voip_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
                 android:layout_marginStart="70dp"
                 android:layout_marginLeft="70dp"
                 android:layout_marginEnd="70dp"
@@ -424,13 +421,13 @@
                 android:background="@drawable/layout_background_rounded_corner"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:visibility="gone"
-                app:layout_constraintStart_toStartOf="parent">
+                android:visibility="gone">
 
                 <TextView
                     android:id="@+id/tv_appelle_telephone"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
+                    android:layout_alignStart="@+id/voip_view"
                     android:layout_marginBottom="5dp"
                     android:gravity="center"
                     android:text="Appelle telephonique"
@@ -596,7 +593,7 @@
 
             <android.support.constraint.ConstraintLayout
                 android:id="@+id/historique"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="60dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
@@ -633,7 +630,7 @@
 
             <android.support.constraint.ConstraintLayout
                 android:id="@+id/inbox"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="60dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
@@ -670,7 +667,7 @@
 
             <android.support.constraint.ConstraintLayout
                 android:id="@+id/comingoonyou"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="60dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
