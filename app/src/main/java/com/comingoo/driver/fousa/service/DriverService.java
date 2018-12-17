@@ -236,7 +236,6 @@ public class DriverService extends Service {
             final Handler handler = new Handler(Looper.getMainLooper());
             runnable = new Runnable() {
                 int counter = 0;
-
                 Handler checkHandler = new Handler(Looper.getMainLooper());
                 Runnable checkRunnable;
 
@@ -258,7 +257,6 @@ public class DriverService extends Service {
                     }
 
                     final Intent intent = new Intent(DriverService.this, CommandActivity.class);
-
                     intent.putExtra("userId", userId);
                     intent.putExtra("name", requestUsersID.get(counter));
                     intent.putExtra("start", "" + startingText.get(counter));
@@ -295,6 +293,8 @@ public class DriverService extends Service {
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             if (!dataSnapshot.exists()) {
                                 CommandActivity.countDownTimer.cancel();
+
+                                startService(new Intent(DriverService.this, DriverService.class));
 //                                CommandActivity.clientR.finish();
                                 if (CommandActivity.mp != null) {
                                     CommandActivity.mp.release();
@@ -312,6 +312,8 @@ public class DriverService extends Service {
                         public void onCancelled(@NonNull DatabaseError databaseError) {
                         }
                     });
+
+                    stopSelf();
 
                     checkRunnable = new Runnable() {
                         @Override
@@ -336,11 +338,8 @@ public class DriverService extends Service {
                                                     CommandActivity.mp.release();
                                                     CommandActivity.vibrator.cancel();
                                                 }
-//                                                CommandActivity.clientR.finish();
                                             }
 
-//                                            clientRequetFollow.removeValue();
-//                                            clientRequetFollow.removeEventListener(this);
 
                                         }
                                     }
@@ -353,6 +352,7 @@ public class DriverService extends Service {
                             } else {
                                 if (CommandActivity.active) {
                                     CommandActivity.countDownTimer.cancel();
+                                    startService(new Intent(DriverService.this, DriverService.class));
 //                                    CommandActivity.clientR.finish();
                                     if (CommandActivity.mp != null) {
                                         CommandActivity.mp.release();
@@ -431,6 +431,8 @@ public class DriverService extends Service {
                     } else {
                         if (CommandActivity.active) {
                             CommandActivity.countDownTimer.cancel();
+
+                            startService(new Intent(DriverService.this, DriverService.class));
 //                            CommandActivity.clientR.finish();
                             if (CommandActivity.mp != null) {
                                 CommandActivity.mp.release();
