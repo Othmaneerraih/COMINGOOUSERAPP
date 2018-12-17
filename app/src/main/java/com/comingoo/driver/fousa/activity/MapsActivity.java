@@ -22,11 +22,9 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -66,7 +64,6 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -274,6 +271,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             tv_appelle_voip = findViewById(R.id.tv_appelle_voip);
             tv_appelle_telephone = findViewById(R.id.tv_appelle_telephone);
 
+            tv_appelle_voip.setClickable(true);
+            tv_appelle_voip.setEnabled(true);
+
             tv_appelle_telephone.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -298,6 +298,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 @Override
                 public void onClick(View v) {
                     if (!driverId.isEmpty()) {
+                        tv_appelle_voip.setClickable(false);
+                        tv_appelle_voip.setEnabled(false);
                         Intent intent = new Intent(MapsActivity.this, VoipCallingActivity.class);
                         intent.putExtra("driverId", driverId);
                         intent.putExtra("clientId", clientId);
@@ -416,7 +418,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
 
-
         ivCancelCourse.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -426,7 +427,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void rideCancelDialog() {
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MapsActivity.this);
         final AlertDialog alertDialog = dialogBuilder.create();
         alertDialog.show();
         alertDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
@@ -648,12 +649,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         iv_loud = dialog.findViewById(R.id.iv_loud);
         tv_name_voip_one = dialog.findViewById(R.id.tv_name_voip_one);
 
-
+        iv_recv_call_voip_one.setClickable(true);
+        iv_recv_call_voip_one.setEnabled(true);
         iv_mute.setVisibility(View.GONE);
         iv_loud.setVisibility(View.GONE);
 
         mp = MediaPlayer.create(this, R.raw.ring);
-        mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
+//        mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
         mp.start();
 
         call.addCallListener(new CallListener() {
@@ -793,6 +795,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     mp.stop();
                 }
                 call.answer();
+                iv_recv_call_voip_one.setClickable(false);
+                iv_recv_call_voip_one.setEnabled(false);
             }
         });
 
@@ -808,7 +812,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (audioManager != null) {
             audioManager.setSpeakerphoneOn(false);
         }
-        audioManager.setMicrophoneMute(false);
+        if (audioManager != null) {
+            audioManager.setMicrophoneMute(false);
+        }
 
         iv_loud.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -875,6 +881,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //            if (params[0])
 //                switchOnlineUI();
 //        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // TODO Auto-generated method stub
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 1 && RESULT_OK == -1 && data.hasExtra("result")) {
+            tv_appelle_voip.setClickable(true);
+            tv_appelle_voip.setEnabled(true);
+        }
     }
 
     private void switchToCourseUI() {
@@ -1081,15 +1098,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                 child(userId).child("EARNINGS").child(getDateMonth(GetUnixTime())).child(getDateDay(GetUnixTime())).addListenerForSingleValueEvent(new ValueEventListener() {
                                                                             @Override
                                                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+
                                                                                 double earned = 0;
-                                                                                int voyages = 0;
+                                                                                double voyages = 0;
                                                                                 if (dataSnapshot.exists()) {
-
-                                                                                    earned = Double.parseDouble(dataSnapshot.child("earnings").getValue(String.class));
-                                                                                    voyages = Integer.parseInt(dataSnapshot.child("voyages").getValue(String.class));
-
+                                                                                    try {
+                                                                                        earned = dataSnapshot.child("earnings").getValue(Double.class);
+                                                                                        voyages = dataSnapshot.child("voyages").getValue(Double.class);
+                                                                                    } catch (NumberFormatException e) {
+                                                                                        Log.e(TAG, "onDataChange: NumberFOrmat: "+ e.getMessage());
+                                                                                        e.printStackTrace();
+                                                                                    } catch (Exception e) {
+                                                                                        Log.e(TAG, "onDataChange: excp: "+ e.getMessage());
+                                                                                        e.printStackTrace();
+                                                                                    }
                                                                                 }
-
                                                                                 if (isFixed)
                                                                                     earned += fixedPrice;
                                                                                 else
@@ -1099,7 +1123,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
                                                                                 final double ee = earned;
-                                                                                final int vv = voyages;
+                                                                                final double vv = voyages;
                                                                                 df2.setRoundingMode(RoundingMode.UP);
                                                                                 FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").addListenerForSingleValueEvent(new ValueEventListener() {
                                                                                     @Override
@@ -1355,6 +1379,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                                 // Enter the value into driver wallet here
                                                                                                 Log.e(TAG, "onDataChange: " + debt);
                                                                                                 Log.e(TAG, "onDataChange: " + newSold);
+                                                                                                Toast.makeText(MapsActivity.this, getString(R.string.txt_successfully_recharged), Toast.LENGTH_LONG).show();
                                                                                                 FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue("" + newdebt);
                                                                                                 FirebaseDatabase.getInstance().getReference("clientUSERS").child(Objects.requireNonNull(dataSnapshott.child("client").getValue(String.class))).child("SOLDE").setValue("" + newSold);
                                                                                                 FirebaseDatabase.getInstance().getReference("clientUSERS").child(Objects.requireNonNull(dataSnapshott.child("client").getValue(String.class))).child("USECREDIT").setValue("1");
@@ -1368,6 +1393,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                                 // Enter the value into driver wallet here
                                                                                                 Log.e(TAG, "onDataChange: " + debt);
                                                                                                 Log.e(TAG, "onDataChange: " + newSold);
+                                                                                                Toast.makeText(MapsActivity.this, getString(R.string.txt_successfully_recharged), Toast.LENGTH_LONG).show();
                                                                                                 FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").setValue(/*Double.toString(*/"" + newdebt/*)*/);
                                                                                                 FirebaseDatabase.getInstance().getReference("clientUSERS").child(Objects.requireNonNull(dataSnapshott.child("client").getValue(String.class))).child("SOLDE").setValue("" + newSold);
                                                                                                 FirebaseDatabase.getInstance().getReference("clientUSERS").child(Objects.requireNonNull(dataSnapshott.child("client").getValue(String.class))).child("USECREDIT").setValue("1");
@@ -1725,8 +1751,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             });
 
                             setUserUi();
-
-
                         } else {
                             Toast.makeText(MapsActivity.this, number, Toast.LENGTH_SHORT).show();
                             prefs.edit().remove("phoneNumber").apply();

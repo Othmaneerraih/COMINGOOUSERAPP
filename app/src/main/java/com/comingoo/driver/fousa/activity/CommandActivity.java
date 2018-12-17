@@ -112,7 +112,6 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
             public void onCompletion(MediaPlayer mediaPlayer) {
                 if (mp.isPlaying()) {
                     mp.stop();
-                    mp.release();
                 }
                 vibrator.cancel();
                 am.setStreamVolume(AudioManager.STREAM_MUSIC, origionalVolume, 0);
@@ -330,7 +329,6 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
                 if (mp != null) {
                     if (mp.isPlaying()) {
                         mp.stop();
-                        mp.release();
                     }
                 }
                 vibrator.cancel();
