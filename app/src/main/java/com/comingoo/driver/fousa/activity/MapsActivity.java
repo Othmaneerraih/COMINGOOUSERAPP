@@ -102,9 +102,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
-
     private GoogleMap mMap;
-
     private Button offlineButton;
     private Button onlineButton;
     private Button switchOnlineButton;
@@ -271,8 +269,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             tv_appelle_voip = findViewById(R.id.tv_appelle_voip);
             tv_appelle_telephone = findViewById(R.id.tv_appelle_telephone);
 
-            tv_appelle_voip.setClickable(true);
-            tv_appelle_voip.setEnabled(true);
 
             tv_appelle_telephone.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -552,6 +548,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onResume() {
         super.onResume();
+
+        tv_appelle_voip.setClickable(true);
+        tv_appelle_voip.setEnabled(true);
+
         if (ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(MapsActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
         } else {
