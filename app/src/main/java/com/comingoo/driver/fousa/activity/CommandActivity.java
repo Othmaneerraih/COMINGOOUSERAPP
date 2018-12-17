@@ -112,7 +112,6 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
             public void onCompletion(MediaPlayer mediaPlayer) {
                 if (mp.isPlaying()) {
                     mp.stop();
-                    mp.release();
                 }
                 vibrator.cancel();
                 am.setStreamVolume(AudioManager.STREAM_MUSIC, origionalVolume, 0);
@@ -294,6 +293,7 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
                         mp.stop();
                     }
                     vibrator.cancel();
+                   startDriverService();
                     FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
                     CommandActivity.this.finish();
                 } catch (Exception e) {
@@ -309,6 +309,7 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (!dataSnapshot.exists()) {
+                            startDriverService();
                             CommandActivity.this.finish();
                         }
                     }
@@ -330,7 +331,6 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
                 if (mp != null) {
                     if (mp.isPlaying()) {
                         mp.stop();
-                        mp.release();
                     }
                 }
                 vibrator.cancel();
@@ -369,20 +369,6 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
                             courseDatabase.setValue(data);
                             FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
 
-//                            FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").addListenerForSingleValueEvent(new ValueEventListener() {
-//                                @Override
-//                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                                    for (DataSnapshot data : dataSnapshot.getChildren()) {
-//                                        FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(data.getKey()).child(clientID).removeValue();
-//                                    }
-//                                }
-//
-//                                @Override
-//                                public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//                                }
-//                            });
-
                         } else {
 
                             for (DataSnapshot dataS : dataSnapshot.getChildren()) {
@@ -415,21 +401,6 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
 
                                     courseDatabase.setValue(data);
                                     FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
-
-
-//                                    FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").addListenerForSingleValueEvent(new ValueEventListener() {
-//                                        @Override
-//                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                                            for (DataSnapshot data : dataSnapshot.getChildren()) {
-//                                                FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(data.getKey()).child(clientID).removeValue();
-//                                            }
-//                                        }
-//
-//                                        @Override
-//                                        public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//                                        }
-//                                    });
                                 }
                             }
                         }
@@ -445,6 +416,16 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
             }
         });
 
+    }
+
+    private void startDriverService(){
+        Intent intent = new Intent(CommandActivity.this, DriverService.class);
+        startService(intent);
+    }
+
+    private void stopDriverService(){
+        Intent intent = new Intent(CommandActivity.this, DriverService.class);
+        stopService(intent);
     }
 
     // Calculating KM from 2 LatLong

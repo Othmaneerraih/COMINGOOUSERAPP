@@ -2,6 +2,7 @@ package com.comingoo.driver.fousa.activity;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -164,7 +165,6 @@ public class VoipCallingActivity extends AppCompatActivity {
                 if (!clientId.isEmpty() && !driverId.isEmpty()) {
                     try {
                         call = sinchClient.getCallClient().callUser(clientId);
-                        if (call != null) call.answer();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -261,6 +261,9 @@ public class VoipCallingActivity extends AppCompatActivity {
         public void onCallEnded(Call endedCall) {
             call = null;
             mHandler.removeCallbacks(mUpdate);
+            Intent returnIntent = new Intent();
+            returnIntent.putExtra("result",1);
+            setResult(RESULT_OK,returnIntent);
             finish();
         }
 
