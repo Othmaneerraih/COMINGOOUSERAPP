@@ -914,6 +914,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         if (requestCode == 1 && RESULT_OK == -1 && data.hasExtra("result")) {
             tv_appelle_voip.setClickable(true);
+            tv_appelle_voip.setEnabled(true);
         }
 
         switch (requestCode) {
