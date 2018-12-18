@@ -1,10 +1,16 @@
 package com.comingoo.driver.fousa.activity;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -27,7 +33,9 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
+        if(!isNetworkConnectionAvailable()){
+            checkNetworkConnection();
+        }
         checkLogin();
 
         phoneNumber = findViewById(R.id.phoneNumber);
@@ -56,14 +64,37 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
-//    private Boolean phoneNumberValidation(String number){
-//        char x = number.charAt(0);
-//        char y = number.charAt(1);
-//        if(x != '0' && y != '6'){
-//            return false;
-//        }
-//        else return number.length() <= 10;
-//    }
+    public void checkNetworkConnection(){
+        AlertDialog.Builder builder =new AlertDialog.Builder(this);
+        builder.setTitle("No internet Connection");
+        builder.setMessage("Please turn on internet connection to continue");
+        builder.setNegativeButton("close", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                finish();
+            }
+        });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    public boolean isNetworkConnectionAvailable(){
+        ConnectivityManager cm =
+                (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = Objects.requireNonNull(cm).getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnected();
+        if(isConnected) {
+            Log.d("Network", "Connected");
+            return true;
+        }
+        else{
+            Log.d("Network","Not Connected");
+            return false;
+        }
+    }
 
     private Boolean phoneNumberValidation(String number){
         char x = number.charAt(0);

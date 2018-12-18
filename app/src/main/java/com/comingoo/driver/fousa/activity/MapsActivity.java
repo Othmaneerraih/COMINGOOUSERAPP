@@ -21,6 +21,8 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -251,6 +253,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 //        statusCheck();
+        if(!isNetworkConnectionAvailable()){
+            checkNetworkConnection();
+        }
         displayLocationSettingsRequest(MapsActivity.this);
         try {
             SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -2082,6 +2087,38 @@ e.printStackTrace();
         }
 
 
+    }
+
+    public void checkNetworkConnection(){
+        AlertDialog.Builder builder =new AlertDialog.Builder(this);
+        builder.setTitle("No internet Connection");
+        builder.setMessage("Please turn on internet connection to continue");
+        builder.setNegativeButton("close", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                finish();
+            }
+        });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    public boolean isNetworkConnectionAvailable(){
+        ConnectivityManager cm =
+                (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = Objects.requireNonNull(cm).getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnected();
+        if(isConnected) {
+            Log.d("Network", "Connected");
+            return true;
+        }
+        else{
+            Log.d("Network","Not Connected");
+            return false;
+        }
     }
 
     CircleImageView /*clientImage,*/ close_button, call_button;
