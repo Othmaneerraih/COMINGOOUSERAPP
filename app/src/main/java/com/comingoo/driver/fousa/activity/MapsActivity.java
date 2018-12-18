@@ -281,17 +281,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             initializeViews();
 
-
             SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
             if (prefs.getString("online", "0").equals("1"))
                 switchOnlineUI();
-
 
             loadImages();
 
             tv_appelle_voip = findViewById(R.id.tv_appelle_voip);
             tv_appelle_telephone = findViewById(R.id.tv_appelle_telephone);
-
 
             tv_appelle_telephone.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -316,7 +313,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             tv_appelle_voip.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Log.e(TAG, "onClick: tv call");
                     if (!driverId.isEmpty()) {
                         tv_appelle_voip.setClickable(false);
                         tv_appelle_voip.setEnabled(false);
@@ -483,6 +479,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     }
                 }, 3000);
 
+                switchOnlineUI();
 
                 voip_view.setVisibility(View.GONE);
                 alertDialog.dismiss();
@@ -1357,6 +1354,8 @@ e.printStackTrace();
                                                                                                 FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).removeValue();
                                                                                             }
                                                                                         }, 3000);
+
+                                                                                        switchOnlineUI();
                                                                                     }
 
                                                                                     @Override
@@ -2138,7 +2137,7 @@ e.printStackTrace();
             }
 
             try {
-                startCourseService(courseID);
+                startCourseService();
                 checkCourseState();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -2334,7 +2333,7 @@ e.printStackTrace();
         ivCancelCourse.setVisibility(View.GONE);
     }
 
-    public void startCourseService(String id) {
+    public void startCourseService() {
         Intent intent = new Intent(this, CourseService.class);
         SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
         prefs.edit().putString("courseID", courseID).apply();
@@ -2566,7 +2565,6 @@ e.printStackTrace();
 
     }
 
-
     private void displayLocationSettingsRequest(Context context) {
         GoogleApiClient googleApiClient = new GoogleApiClient.Builder(context)
                 .addApi(LocationServices.API).build();
@@ -2609,7 +2607,5 @@ e.printStackTrace();
             }
         });
     }
-
-
 
 }

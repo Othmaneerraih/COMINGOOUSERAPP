@@ -69,7 +69,6 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
         setContentView(R.layout.activity_command);
         clientR = this;
 
-
         Window window = this.getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
         window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
