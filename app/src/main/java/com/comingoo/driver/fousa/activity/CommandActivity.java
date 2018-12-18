@@ -110,12 +110,18 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
         mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
-                if (mp.isPlaying()) {
-                    mp.stop();
+                try{
+                    if (mp != null) {
+                        if (mp.isPlaying()) {
+                            mp.stop();
+                            mp.release();
+                        }
+                    }
+                    vibrator.cancel();
+                    am.setStreamVolume(AudioManager.STREAM_MUSIC, origionalVolume, 0);
+                }catch(IllegalStateException e){
+                    e.printStackTrace();
                 }
-                vibrator.cancel();
-                am.setStreamVolume(AudioManager.STREAM_MUSIC, origionalVolume, 0);
-
             }
         });
 
@@ -289,14 +295,19 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
             @Override
             public void onClick(View view) {
                 try {
-                    if (mp.isPlaying()) {
-                        mp.stop();
+                    if (mp != null) {
+                        if (mp.isPlaying()) {
+                            mp.stop();
+                            mp.release();
+                        }
                     }
                     vibrator.cancel();
-                   startDriverService();
+                    startDriverService();
                     FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
                     CommandActivity.this.finish();
-                } catch (Exception e) {
+                } catch (IllegalStateException e) {
+                    e.printStackTrace();
+                }catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -328,12 +339,18 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
             public void onClick(View view) {
                 accept.setClickable(false);
                 accept.setEnabled(false);
-                if (mp != null) {
-                    if (mp.isPlaying()) {
-                        mp.stop();
+                try{
+                    if (mp != null) {
+                        if (mp.isPlaying()) {
+                            mp.stop();
+                            mp.release();
+                        }
                     }
+                    vibrator.cancel();
+                }catch (IllegalStateException e){
+                    e.printStackTrace();
                 }
-                vibrator.cancel();
+
                 FirebaseDatabase.getInstance().getReference("COURSES").orderByChild("client").
                         equalTo(clientID).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -418,12 +435,12 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
 
     }
 
-    private void startDriverService(){
+    private void startDriverService() {
         Intent intent = new Intent(CommandActivity.this, DriverService.class);
         startService(intent);
     }
 
-    private void stopDriverService(){
+    private void stopDriverService() {
         Intent intent = new Intent(CommandActivity.this, DriverService.class);
         stopService(intent);
     }
@@ -466,12 +483,17 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
                 barTimer.setProgress((int) seconds);
                 if (seconds == 0) {
                     try {
-                        if (mp.isPlaying()) {
-                            mp.stop();
+                        if (mp != null) {
+                            if (mp.isPlaying()) {
+                                mp.stop();
+                                mp.release();
+                            }
                         }
 
                         vibrator.cancel();
                         showCustomDialog(CommandActivity.this);
+                    }catch (IllegalStateException e) {
+                        e.printStackTrace();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
