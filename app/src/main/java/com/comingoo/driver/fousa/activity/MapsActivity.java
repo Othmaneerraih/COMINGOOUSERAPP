@@ -1989,7 +1989,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                         if (dataSnapshot.exists()) {
-                                            Log.e(TAG, "onDataChange:clientAllInfo: " + dataSnapshot.toString());
                                             clientImageUri = dataSnapshot.child("image").getValue(String.class);
                                             clientName = dataSnapshot.child("fullName").getValue(String.class);
                                             clientPhoneNumber = dataSnapshot.child("phoneNumber").getValue(String.class);
