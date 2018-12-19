@@ -332,7 +332,6 @@ public class CourseService extends Service implements GoogleApiClient.Connection
                 countingPreWait = false;
                 countingDistance = false;
 
-
 //                FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).addListenerForSingleValueEvent(new ValueEventListener() {
 //                    @Override
 //                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -869,19 +868,13 @@ public class CourseService extends Service implements GoogleApiClient.Connection
 //                        });
                 ///////********************END *************************
 
-
-
-
             }
 
             if (state == 5) {
                 countingPreWait = false;
                 countingDistance = false;
-
                 FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).removeValue();
-
             }
-
 
             return "this string is passed to onPostExecute";
         }
