@@ -178,27 +178,8 @@ public class CourseService extends Service implements GoogleApiClient.Connection
                 }
             });
 
-
             //desconnect Driver if still Online
             onlineDriver = FirebaseDatabase.getInstance().getReference("ONLINEDRIVERS").child(userId);
-
-
-//            DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference("COURSES");
-//            DatabaseReference userNameRef = rootRef.child("ujwal");
-//            ValueEventListener eventListener = new ValueEventListener() {
-//                @Override
-//                public void onDataChange(DataSnapshot dataSnapshot) {
-//                    if(dataSnapshot.exists()) {
-//                        Log.e(TAG, "onDataChange: ujjwal exists" );
-//                    } else  Log.e(TAG, "onDataChange: ujjwal not exists" );
-//                }
-//
-//                @Override
-//                public void onCancelled(DatabaseError databaseError) {}
-//            };
-//            userNameRef.addListenerForSingleValueEvent(eventListener);
-
-
             return "this string is passed to onPostExecute";
         }
 
@@ -287,23 +268,6 @@ public class CourseService extends Service implements GoogleApiClient.Connection
         // This is run in a background thread
         @Override
         protected String doInBackground(String... params) {
-
-            ///////////////////////////////////////////////////////////////////////////
-            ///////////////////////////////////////////////////////////////////////////
-            // FINDING USER STATE
-
-
-            if (state == 0) {
-
-            }
-
-            ///////////////////////////////////////////////////////////////////////////
-            ///////////////////////////////////////////////////////////////////////////
-
-            ///////////////////////////////////////////////////////////////////////////
-            ///////////////////////////////////////////////////////////////////////////
-            // WAITING CLIENT STATE
-
 
             final Handler handler = new Handler(Looper.getMainLooper());
             final Runnable runnable = new Runnable() {
