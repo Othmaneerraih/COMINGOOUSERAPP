@@ -253,7 +253,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 //        statusCheck();
-        if(!isNetworkConnectionAvailable()){
+        if (!isNetworkConnectionAvailable()) {
             checkNetworkConnection();
         }
         displayLocationSettingsRequest(MapsActivity.this);
@@ -699,7 +699,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         callState.setText("");
                         mHandler.removeCallbacks(mUpdate);// we need to remove our updates if the activity isn't focused(or even destroyed) or we could get in trouble
                         dialog.dismiss();
-                    }catch (IllegalStateException e) {
+                    } catch (IllegalStateException e) {
                         e.printStackTrace();
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -734,7 +734,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         mMinute = 00;//c.get(Calendar.MINUTE);
                         caller_name.setText(mHour + ":" + mMinute);
                         mHandler.postDelayed(mUpdate, 1000); // 60000 a minute
-                    }catch (IllegalStateException e) {
+                    } catch (IllegalStateException e) {
                         e.printStackTrace();
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -764,7 +764,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         }
                         params.addRule(RelativeLayout.CENTER_HORIZONTAL);
                         iv_cancel_call_voip_one.setLayoutParams(params);
-                    }catch (IllegalStateException e) {
+                    } catch (IllegalStateException e) {
                         e.printStackTrace();
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -808,7 +808,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             }
                         }
                         am.setStreamVolume(AudioManager.STREAM_MUSIC, origionalVolume, 0);
-                    }catch (IllegalStateException e) {
+                    } catch (IllegalStateException e) {
                         e.printStackTrace();
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -847,7 +847,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             }
                         }
                         dialog.dismiss();
-                    }catch (IllegalStateException e) {
+                    } catch (IllegalStateException e) {
                         e.printStackTrace();
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -873,7 +873,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         }
                         call.answer();
                         iv_recv_call_voip_one.setClickable(false);
-                    }catch (IllegalStateException e) {
+                    } catch (IllegalStateException e) {
                         e.printStackTrace();
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -928,9 +928,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 window.setGravity(Gravity.CENTER);
             }
             dialog.show();
-        }catch (WindowManager.BadTokenException e){
+        } catch (WindowManager.BadTokenException e) {
             e.printStackTrace();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -1164,7 +1164,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                         // need to get promo code here
                                                                         if (clientID != null) {
                                                                             FirebaseDatabase.getInstance().getReference("clientUSERS").
-                                                                                    child(clientID).child("PROMOCODE").addValueEventListener(new ValueEventListener() {
+                                                                                    child(clientID).child("PROMOCODE").addListenerForSingleValueEvent(new ValueEventListener() {
                                                                                 @Override
                                                                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                                                     Log.e(TAG, "onDataChange: ");
@@ -1209,7 +1209,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                     } catch (NumberFormatException e) {
                                                                                         e.printStackTrace();
                                                                                     } catch (Exception e) {
-e.printStackTrace();
+                                                                                        e.printStackTrace();
                                                                                     }
                                                                                 }
 
@@ -1453,20 +1453,20 @@ e.printStackTrace();
                                                         if (riderId != null) {
                                                             FirebaseDatabase.getInstance().getReference("clientUSERS").
                                                                     child(riderId).child("SOLDE").
-                                                                    addValueEventListener(new ValueEventListener() {
+                                                                    addListenerForSingleValueEvent(new ValueEventListener() {
                                                                         @Override
                                                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                                             cM = userProvidedRecharge;
                                                                             if (dataSnapshot.exists()) {
-                                                                                if(Objects.requireNonNull(dataSnapshot.getValue(String.class)).equals("")){
+                                                                                if (Objects.requireNonNull(dataSnapshot.getValue(String.class)).equals("")) {
                                                                                     cM += 0.0;
-                                                                                }else{
+                                                                                } else {
                                                                                     cM += Double.parseDouble(Objects.requireNonNull(dataSnapshot.getValue(String.class)));
                                                                                 }
 
                                                                             }
 
-                                                                            FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(riderId).addValueEventListener(new ValueEventListener() {
+                                                                            FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(riderId).addListenerForSingleValueEvent(new ValueEventListener() {
                                                                                 @Override
                                                                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                                                     if (dataSnapshot.exists()) {
@@ -1533,63 +1533,39 @@ e.printStackTrace();
                                             }
                                         });
 
-
-                                        gotMoney.setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                if (RATE > 0) {
-                                                    dialog.dismiss();
-                                                    isRatingPopupShowed = true;
-                                                    FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("rating").child(Integer.toString(RATE)).addListenerForSingleValueEvent(new ValueEventListener() {
-                                                        @Override
-                                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                            int rating = Integer.parseInt(dataSnapshot.getValue(String.class)) + 1;
-                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("rating").child(Integer.toString(RATE)).setValue("" + rating);
-                                                        }
-
-                                                        @Override
-                                                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                                        }
-                                                    });
-
-                                                    final Handler handler = new Handler();
-                                                    handler.postDelayed(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            //Do something after 3000ms
-                                                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").removeValue();
-//                                                            switchOnlineUI();
-                                                        }
-                                                    }, 3000);
-
-                                                }
-                                            }
-                                        });
-
                                         dialogButton.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View view) {
                                                 try {
-                                                    Log.e(TAG, "onClick:client id " + clientId);
-                                                    FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("rating").child(Integer.toString(RATE)).addListenerForSingleValueEvent(new ValueEventListener() {
-                                                        @Override
-                                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                            if (dataSnapshot.exists()) {
-                                                                int Rating = Integer.parseInt(dataSnapshot.getValue(String.class)) + 1;
-                                                                FirebaseDatabase.getInstance().getReference("clientUSERS").
-                                                                        child(clientId).child("rating").child(Integer.toString(RATE)).setValue("" + Rating);
+                                                    if (RATE > 0) {
+                                                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("rating").child(Integer.toString(RATE)).addListenerForSingleValueEvent(new ValueEventListener() {
+                                                            @Override
+                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                if (dataSnapshot.exists()) {
+                                                                    int Rating = Integer.parseInt(dataSnapshot.getValue(String.class)) + 1;
+                                                                    FirebaseDatabase.getInstance().getReference("clientUSERS").
+                                                                            child(clientId).child("rating").child(Integer.toString(RATE)).setValue("" + Rating);
+                                                                }
+                                                                dialog.dismiss();
+                                                                isRatingPopupShowed = true;
                                                             }
-                                                            dialog.dismiss();
-                                                            isRatingPopupShowed = true;
-                                                        }
 
-                                                        @Override
-                                                        public void onCancelled(@NonNull DatabaseError databaseError) {
-                                                            dialog.dismiss();
-                                                            isRatingPopupShowed = true;
-                                                        }
-                                                    });
+                                                            @Override
+                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                                dialog.dismiss();
+                                                                isRatingPopupShowed = true;
+                                                            }
+                                                        });
+
+                                                        final Handler handler = new Handler();
+                                                        handler.postDelayed(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                //Do something after 3000ms
+                                                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").removeValue();
+                                                            }
+                                                        }, 3000);
+                                                    }
                                                 } catch (Exception e) {
                                                     e.printStackTrace();
                                                     dialog.dismiss();
@@ -1790,7 +1766,7 @@ e.printStackTrace();
                 }
 
 
-                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(number).addValueEventListener(new ValueEventListener() {
+                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(number).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (dataSnapshot.exists()) {
@@ -1837,7 +1813,7 @@ e.printStackTrace();
                             todayEarnings = "0";
                             todayTrips = "0";
 
-                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(number).child("EARNINGS").child(getDateMonth(GetUnixTime())).child(getDateDay(GetUnixTime())).addValueEventListener(new ValueEventListener() {
+                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(number).child("EARNINGS").child(getDateMonth(GetUnixTime())).child(getDateDay(GetUnixTime())).addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
@@ -2054,49 +2030,6 @@ e.printStackTrace();
                 }
             });
 
-//            final ChildEventListener childEventListener = new ChildEventListener() {
-//                @Override
-//                public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-//
-//                }
-//
-//                @Override
-//                public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-//
-//                }
-//
-//                @Override
-//                public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-//                    try {
-//                        MapsActivity.this.recreate();
-//                    } catch (NullPointerException e) {
-//                        e.printStackTrace();
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//
-//                @Override
-//                public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-//
-//                }
-//
-//                @Override
-//                public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//                }
-//            };
-//            try {
-//                if (userId != null) {
-//                    FirebaseDatabase.getInstance().getReference("COURSES").child(userId).
-//                            addChildEventListener(childEventListener);
-//                }
-//            } catch (NullPointerException e) {
-//                e.printStackTrace();
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-
             return "this string is passed to onPostExecute";
         }
 
@@ -2147,8 +2080,8 @@ e.printStackTrace();
 
     }
 
-    public void checkNetworkConnection(){
-        AlertDialog.Builder builder =new AlertDialog.Builder(this);
+    public void checkNetworkConnection() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("No internet Connection");
         builder.setMessage("Please turn on internet connection to continue");
         builder.setNegativeButton("close", new DialogInterface.OnClickListener() {
@@ -2162,19 +2095,18 @@ e.printStackTrace();
         alertDialog.show();
     }
 
-    public boolean isNetworkConnectionAvailable(){
+    public boolean isNetworkConnectionAvailable() {
         ConnectivityManager cm =
-                (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
         NetworkInfo activeNetwork = Objects.requireNonNull(cm).getActiveNetworkInfo();
         boolean isConnected = activeNetwork != null &&
                 activeNetwork.isConnected();
-        if(isConnected) {
+        if (isConnected) {
             Log.d("Network", "Connected");
             return true;
-        }
-        else{
-            Log.d("Network","Not Connected");
+        } else {
+            Log.d("Network", "Not Connected");
             return false;
         }
     }
