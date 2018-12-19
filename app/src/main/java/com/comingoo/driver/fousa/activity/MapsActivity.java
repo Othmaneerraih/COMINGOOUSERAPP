@@ -334,7 +334,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             call_button = findViewById(R.id.call_button);
             voip_view = findViewById(R.id.voip_view);
             date = findViewById(R.id.textView6);
-
+            df2.setRoundingMode(RoundingMode.UP);
             sinchClient = Sinch.getSinchClientBuilder()
                     .context(this)
                     .userId(driverId)
@@ -1227,7 +1227,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                                                                     final double ee = earned;
                                                                                     final int vv = voyages;
-                                                                                    df2.setRoundingMode(RoundingMode.UP);
                                                                                     FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").addListenerForSingleValueEvent(new ValueEventListener() {
                                                                                         @Override
                                                                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -1345,7 +1344,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                             }
 
 
-                                                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("LASTCOURSE").setValue("Derniére course : Captain " + driverName + " / " + currentBil + " MAD");
+                                                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("LASTCOURSE").setValue("Derniére course : Captain " + driverName + " / " + df2.format(currentBil) + " MAD");
                                                                                             FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("COURSE").setValue(courseID);
                                                                                             FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").setValue(courseID);
                                                                                             FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("EARNINGS").child(getDateMonth(GetUnixTime())).child(getDateDay(GetUnixTime())).setValue(earnings);
