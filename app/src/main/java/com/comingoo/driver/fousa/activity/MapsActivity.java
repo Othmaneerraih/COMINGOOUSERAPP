@@ -962,10 +962,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
         prefs.edit().putString("online", "0").apply();
         stopService(intent);
-//        if (params.length > 0) {
-//            if (params[0])
-//                switchOnlineUI();
-//        }
+        if (params.length > 0) {
+            if (params[0])
+                switchOnlineUI();
+        }
     }
 
     @Override
