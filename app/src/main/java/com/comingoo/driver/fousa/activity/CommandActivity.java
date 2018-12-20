@@ -315,7 +315,7 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
         if (userId != null && clientID != null) {
             if (!userId.isEmpty() && !clientID.isEmpty()) {
                 FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").
-                        child(userId).child(clientID).addValueEventListener(new ValueEventListener() {
+                        child(userId).child(clientID).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (!dataSnapshot.exists()) {
