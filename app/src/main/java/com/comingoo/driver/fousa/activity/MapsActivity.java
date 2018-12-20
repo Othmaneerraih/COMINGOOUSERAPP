@@ -269,6 +269,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if (ContextCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(MapsActivity.this, new String[]{Manifest.permission.RECORD_AUDIO}, 4);
             }
+
             intent = new Intent(MapsActivity.this, DriverService.class);
 
             Display display = getWindowManager().getDefaultDisplay();
@@ -1013,7 +1014,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         destinationLayout.setVisibility(View.GONE);
     }
 
-
     private String getDateMonth(long time) {
         Calendar cal = Calendar.getInstance(Locale.ENGLISH);
         cal.setTimeInMillis(time * 1000L);
@@ -1071,15 +1071,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
                     if (dataSnapshot.exists()) {
                         FirebaseDatabase.getInstance().getReference("DRIVERFINISHEDCOURSES").
-                                child(userId).child(Objects.requireNonNull(dataSnapshot.getValue(String.class))).addListenerForSingleValueEvent(new ValueEventListener() {
+                                child(userId).child(Objects.requireNonNull(dataSnapshot.getValue(String.class))).addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull final DataSnapshot dataSnapshott) {
+                                Log.e(TAG, "onDataChange: "+dataSnapshott );
                                 if (dataSnapshott.exists()) {
                                     if (!isRatingPopupShowed) {
                                         isRatingPopupShowed = true;
                                         try {
-
-
                                             dialog = new Dialog(MapsActivity.this);
                                             dialog.setContentView(R.layout.finished_course);
 
@@ -1186,17 +1185,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                 });
                                                                             }
 
-                                                                            Log.e(TAG, "onDataChange: " + price1);
-                                                                            Log.e(TAG, "onDataChange: " + price2);
-                                                                            Log.e(TAG, "onDataChange: " + price3);
-                                                                            Log.e(TAG, "onDataChange: " + isPromoCode);
-
                                                                             if (isPromoCode)
                                                                                 currentBil = price3;
                                                                             else
                                                                                 currentBil = price2;
-
-                                                                            Log.e(TAG, "onDataChange: final currentBil Ujjwal:  " + currentBil);
 
                                                                             FirebaseDatabase.getInstance().getReference("DRIVERUSERS").
                                                                                     child(userId).child("EARNINGS").child(getDateMonth(GetUnixTime())).child(getDateDay(GetUnixTime())).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -1239,11 +1231,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                             final Map<String, String> earnings = new HashMap<>();
                                                                                             earnings.put("earnings", "" + ee);
                                                                                             earnings.put("voyages", "" + vv);
-
-
-                                                                                            Log.e(TAG, "onDataChange:clientID in calculation: ClientID: " + clientID);
-                                                                                            Log.e(TAG, "onDataChange:clientID in calculation: DriverID: " + courseID);
-                                                                                            Log.e(TAG, "onDataChange:clientID in calculation: currentBill: " + currentBil);
 
                                                                                             final double priviousDebt = debt;
                                                                                             if (clientID != null) {
@@ -1294,9 +1281,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                                                 }
                                                                                                             } catch (NumberFormatException e) {
                                                                                                                 e.printStackTrace();
-                                                                                                                Log.e(TAG, "onDataChange:NumberFormatException " + e.getMessage());
-                                                                                                            } catch (Exception e) {
-                                                                                                                Log.e(TAG, "onDataChange:Exception " + e.getMessage());
+                                                                                                              } catch (Exception e) {
                                                                                                                 e.printStackTrace();
                                                                                                             }
                                                                                                         } else {
@@ -1304,8 +1289,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                                             // if user has  no solde
                                                                                                             try {
                                                                                                                 double commission = currentBil * percent * -1;
-                                                                                                                Log.e(TAG, "onDataChange: 4444444 commission: " + commission);
-
                                                                                                                 double newDebt = (priviousDebt + commission);
                                                                                                                 currentDebt = newDebt;
                                                                                                                 FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("PAID").setValue("0");
@@ -1753,11 +1736,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
 
 
-                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(number).addListenerForSingleValueEvent(new ValueEventListener() {
+                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(number).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (dataSnapshot.exists()) {
-
+                            Log.e(TAG, "onDataChange: driver exists" );
                             String isVerified = dataSnapshot.child("isVerified").getValue(String.class);
                             if (isVerified != null && isVerified.equals("0")) {
                                 prefs.edit().remove("phoneNumber").apply();
@@ -2302,8 +2285,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // This is run in a background thread
         @Override
         protected String doInBackground(LatLng... params) {
-
-
             start = params[0];
             arrival = params[1];
 
@@ -2403,7 +2384,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void drawPolyGradiant(List<LatLng> thePath, String startColor, String endColor) {
-
         int Size = thePath.size();
 
         int Red = Integer.valueOf(startColor.substring(1, 3), 16);
