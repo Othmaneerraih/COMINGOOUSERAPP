@@ -122,30 +122,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Button offlineButton;
     private Button onlineButton;
     private Button switchOnlineButton;
-
     private ImageButton menuButton;
     private ImageButton myPositionButton;
-
-    public static ImageButton wazeButton;
-
+    private ImageButton wazeButton;
     private RelativeLayout clientInfoLayout;
     private ConstraintLayout destinationLayout, userInfoLayout;
-
     private ImageView arrowImage;
     private ImageView whitePersonImage;
-
     private TextView addressText;
-
-    private TextView destTime;
-
     private Button courseActionButton;
     private RelativeLayout cancel_view;
     private ImageView ivCancelCourse;
-
     private Button money;
-
     private FlowingDrawer mDrawer;
-
     private ConstraintLayout Acceuil;
     private ConstraintLayout Historique;
     private ConstraintLayout Inbox;
@@ -153,20 +142,49 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ConstraintLayout Aide;
     private ConstraintLayout logout;
     private String driverId = "";
-
-
     private Marker startPositionMarker;
-
-    int height = 250;
-    int width = 120;
-    BitmapDrawable bitmapdraw;
-    Bitmap smallMarker;
-
     private static final String APP_KEY = "185d9822-a953-4af6-a780-b0af1fd31bf7";
     private static final String APP_SECRET = "ZiJ6FqH5UEWYbkMZd1rWbw==";
     private static final String ENVIRONMENT = "sandbox.sinch.com";
-
     protected static final int REQUEST_CHECK_SETTINGS = 0x1;
+    private float dpWidth;
+    private Intent intent;
+    private TextView tv_appelle_voip;
+    private String TAG = "MapsActivity";
+
+    private boolean isLoud = false;
+    private MediaPlayer mp;
+    private TextView callState;
+    private TextView caller_name;
+    private Handler mHandler = new Handler();
+    private CircleImageView iv_cancel_call_voip_one;
+    private CircleImageView iv_mute;
+    private CircleImageView iv_loud;
+    private CircleImageView iv_recv_call_voip_one;
+
+    private RelativeLayout relativeLayout;
+    private RelativeLayout.LayoutParams params;
+
+    private int mHour, mMinute; // variables holding the hour and minute
+    private Runnable mUpdate = new Runnable() {
+
+        @Override
+        public void run() {
+            mMinute += 1;
+            // just some checks to keep everything in order
+            if (mMinute >= 60) {
+                mMinute = 0;
+                mHour += 1;
+            }
+            if (mHour >= 24) {
+                mHour = 0;
+            }
+            // or call your method
+            caller_name.setText(mHour + ":" + mMinute);
+            mHandler.postDelayed(this, 1000);
+        }
+    };
+
 
     @Override
     protected void onStart() {
@@ -239,15 +257,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         whitePersonImage.setBackground(new BitmapDrawable(getResources(), scaleBitmap(30, 50, R.drawable.person_white)));
     }
 
-    private float density;
-    private float dpHeight;
-    private float dpWidth;
-    private Intent intent;
-    private Call call;
-    private TextView tv_appelle_voip, tv_appelle_telephone;
-    private SinchClient sinchClient;
-    private String TAG = "MapsActivity";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -275,8 +284,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             DisplayMetrics outMetrics = new DisplayMetrics();
             display.getMetrics(outMetrics);
 
-            density = getResources().getDisplayMetrics().density;
-            dpHeight = outMetrics.heightPixels / density;
+            float density = getResources().getDisplayMetrics().density;
+            float dpHeight = outMetrics.heightPixels / density;
             dpWidth = outMetrics.widthPixels / density;
 
             initializeViews();
@@ -288,7 +297,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             loadImages();
 
             tv_appelle_voip = findViewById(R.id.tv_appelle_voip);
-            tv_appelle_telephone = findViewById(R.id.tv_appelle_telephone);
+            TextView tv_appelle_telephone = findViewById(R.id.tv_appelle_telephone);
 
             tv_appelle_telephone.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -335,7 +344,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             voip_view = findViewById(R.id.voip_view);
             date = findViewById(R.id.textView6);
             df2.setRoundingMode(RoundingMode.UP);
-            sinchClient = Sinch.getSinchClientBuilder()
+            SinchClient sinchClient = Sinch.getSinchClientBuilder()
                     .context(this)
                     .userId(driverId)
                     .applicationKey(APP_KEY)
@@ -425,8 +434,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     finish();
                 }
             });
-            bitmapdraw = (BitmapDrawable) getResources().getDrawable(R.drawable.driver_pin);
-            smallMarker = Bitmap.createScaledBitmap(bitmapdraw.getBitmap(), width, height, false);
+            BitmapDrawable bitmapdraw = (BitmapDrawable) getResources().getDrawable(R.drawable.driver_pin);
+            int height = 250;
+            int width = 120;
+            Bitmap smallMarker = Bitmap.createScaledBitmap(bitmapdraw.getBitmap(), width, height, false);
 
             new checkCourseTask().execute();
         } catch (Exception e) {
@@ -446,7 +457,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MapsActivity.this);
         final AlertDialog alertDialog = dialogBuilder.create();
         alertDialog.show();
-        alertDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        Objects.requireNonNull(alertDialog.getWindow()).setBackgroundDrawableResource(android.R.color.transparent);
         LayoutInflater inflater = this.getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.content_cancel_ride_dialog, null);
         alertDialog.getWindow().setContentView(dialogView);
@@ -492,7 +503,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 alertDialog.dismiss();
                 btnYesCancelRide.setBackgroundColor(Color.TRANSPARENT);
                 btnYesCancelRide.setTextColor(Color.WHITE);
-
                 btnNoDontCancelRide.setBackgroundColor(Color.WHITE);
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -508,38 +518,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         onlineButton = findViewById(R.id.online_button);
         offlineButton = findViewById(R.id.offline_button);
         switchOnlineButton = findViewById(R.id.switch_online_button);
-
         menuButton = findViewById(R.id.menu_button);
         myPositionButton = findViewById(R.id.my_position_button);
-
         wazeButton = findViewById(R.id.waze_button);
-
         clientInfoLayout = findViewById(R.id.clientInfo);
         destinationLayout = findViewById(R.id.destination_layout);
         userInfoLayout = findViewById(R.id.constraintLayout);
-
         arrowImage = findViewById(R.id.arrow_image);
         whitePersonImage = findViewById(R.id.white_person_image);
-
         addressText = findViewById(R.id.addressText);
-
-        destTime = findViewById(R.id.destTime);
-
         courseActionButton = findViewById(R.id.course_action_button);
         cancel_view = findViewById(R.id.cancel_view);
         ivCancelCourse = findViewById(R.id.iv_cancel_ride);
-
         mDrawer = findViewById(R.id.drawerlayout);
-
         Acceuil = findViewById(R.id.acceuil);
         Historique = findViewById(R.id.historique);
         Inbox = findViewById(R.id.inbox);
         ComingoonYou = findViewById(R.id.comingoonyou);
         Aide = findViewById(R.id.aide);
         logout = findViewById(R.id.logout);
-
         money = findViewById(R.id.money);
-
         clientInfoLayout.setVisibility(View.GONE);
         userInfoLayout.setBackgroundColor(Color.WHITE);
     }
@@ -553,7 +551,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(MapsActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.READ_CONTACTS}, 1);
         } else {
-            //startLocationUpdates();
             mMap.setMyLocationEnabled(true);
             getLastLocation();
             myPositionButton.setOnClickListener(new View.OnClickListener() {
@@ -608,50 +605,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private class SinchCallClientListener implements CallClientListener {
         @Override
         public void onIncomingCall(CallClient callClient, Call incomingCall) {
-            call = incomingCall;
 
             Toast.makeText(MapsActivity.this, "incoming call", Toast.LENGTH_SHORT).show();
-//            try {
-//                if (VoipCallingActivity.activity != null)
-//                    if (!VoipCallingActivity.activity.isFinishing())
-//                        VoipCallingActivity.activity.finish();
-//                showDialog(MapsActivity.this, call);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-            showDialog(MapsActivity.this, call);
+            showDialog(MapsActivity.this, incomingCall);
         }
     }
-
-    //    private AudioManager audioManager;
-    boolean isLoud = false;
-    private MediaPlayer mp;
-    TextView callState, caller_name, tv_name_voip_one;
-    private Handler mHandler = new Handler();
-    CircleImageView iv_user_image_voip_one, iv_cancel_call_voip_one, iv_mute, iv_loud, iv_recv_call_voip_one;
-
-    RelativeLayout relativeLayout;
-    RelativeLayout.LayoutParams params;
-
-    private int mHour, mMinute; // variables holding the hour and minute
-    private Runnable mUpdate = new Runnable() {
-
-        @Override
-        public void run() {
-            mMinute += 1;
-            // just some checks to keep everything in order
-            if (mMinute >= 60) {
-                mMinute = 0;
-                mHour += 1;
-            }
-            if (mHour >= 24) {
-                mHour = 0;
-            }
-            // or call your method
-            caller_name.setText(mHour + ":" + mMinute);
-            mHandler.postDelayed(this, 1000);
-        }
-    };
 
     public void showDialog(final Context context, final Call call) {
         try {
@@ -661,7 +619,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             View view = inflater.inflate(R.layout.activity_incomming_call, null, false);
             dialog.setContentView(view);
 
-            iv_user_image_voip_one = dialog.findViewById(R.id.iv_user_image_voip_one);
+            CircleImageView iv_user_image_voip_one = dialog.findViewById(R.id.iv_user_image_voip_one);
             iv_cancel_call_voip_one = dialog.findViewById(R.id.iv_cancel_call_voip_one);
             iv_recv_call_voip_one = dialog.findViewById(R.id.iv_recv_call_voip_one);
             caller_name = dialog.findViewById(R.id.callerName);
@@ -669,15 +627,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             iv_mute = dialog.findViewById(R.id.iv_mute);
             iv_loud = dialog.findViewById(R.id.iv_loud);
-            tv_name_voip_one = dialog.findViewById(R.id.tv_name_voip_one);
+            TextView tv_name_voip_one = dialog.findViewById(R.id.tv_name_voip_one);
 
             iv_recv_call_voip_one.setClickable(true);
-//        iv_recv_call_voip_one.setEnabled(true);
             iv_mute.setVisibility(View.GONE);
             iv_loud.setVisibility(View.GONE);
 
             mp = MediaPlayer.create(this, R.raw.ring);
-//        mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mp.start();
 
             call.addCallListener(new CallListener() {
@@ -784,18 +740,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
             }
 
-            switch (am.getRingerMode()) {
-                case 0:
-                    mp.start();
-                    break;
-                case 1:
-                    mp.start();
-                    break;
-                case 2:
-                    mp.start();
-                    break;
+            if (am != null) {
+                switch (am.getRingerMode()) {
+                    case 0:
+                        mp.start();
+                        break;
+                    case 1:
+                        mp.start();
+                        break;
+                    case 2:
+                        mp.start();
+                        break;
+                }
             }
-
 
             mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
@@ -807,7 +764,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 mp.release();
                             }
                         }
-                        am.setStreamVolume(AudioManager.STREAM_MUSIC, origionalVolume, 0);
+                        if (am != null) {
+                            am.setStreamVolume(AudioManager.STREAM_MUSIC, origionalVolume, 0);
+                        }
                     } catch (IllegalStateException e) {
                         e.printStackTrace();
                     } catch (Exception e) {
@@ -901,12 +860,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 @Override
                 public void onClick(View v) {
                     if (!isLoud) {
-                        audioManager.setSpeakerphoneOn(true);
+                        if (audioManager != null) {
+                            audioManager.setSpeakerphoneOn(true);
+                        }
                         iv_loud.setImageResource(R.drawable.clicked_speaker_bt);
                         isLoud = true;
                     } else {
                         iv_loud.setImageResource(R.drawable.speaker_bt);
-                        audioManager.setSpeakerphoneOn(false);
+                        if (audioManager != null) {
+                            audioManager.setSpeakerphoneOn(false);
+                        }
                         isLoud = false;
                     }
                 }
@@ -962,10 +925,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
         prefs.edit().putString("online", "0").apply();
         stopService(intent);
-//        if (params.length > 0) {
-//            if (params[0])
-//                switchOnlineUI();
-//        }
     }
 
     @Override
@@ -1255,7 +1214,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                                                 double oldSold = Double.parseDouble(dataSnapshot.child("SOLDE").getValue(String.class));
 
                                                                                                                 // if user has solde & it is greater then the calculated price
-                                                                                                                if (dataSnapshot.child("USECREDIT").getValue(String.class).equals("1") && Double.parseDouble(dataSnapshot.child("SOLDE").getValue(String.class)) >= currentBil) {
+                                                                                                                if (Objects.requireNonNull(dataSnapshot.child("USECREDIT").getValue(String.class)).equals("1") && Double.parseDouble(dataSnapshot.child("SOLDE").getValue(String.class)) >= currentBil) {
 
                                                                                                                     double newSolde = oldSold - currentBil;
                                                                                                                     FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("SOLDE").setValue("" + newSolde);
@@ -1344,8 +1303,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                             }
 
 
-                                                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("LASTCOURSE").setValue("Derniére course : Captain " + driverName + " / " + df2.format(currentBil) + " MAD");
-                                                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("COURSE").setValue(courseID);
+                                                                                            if (clientID != null) {
+                                                                                                FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("LASTCOURSE").setValue("Derniére course : Captain " + driverName + " / " + df2.format(currentBil) + " MAD");
+                                                                                                FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("COURSE").setValue(courseID);
+                                                                                            }
                                                                                             FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").setValue(courseID);
                                                                                             FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("EARNINGS").child(getDateMonth(GetUnixTime())).child(getDateDay(GetUnixTime())).setValue(earnings);
 
@@ -1396,7 +1357,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                 data.put("fixedDest", "0");
                                                                                 data.put("price", Double.toString(currentBil));
                                                                             }
-                                                                            mCourse.setValue(data);
+                                                                            if (mCourse != null) {
+                                                                                mCourse.setValue(data);
+                                                                            }
                                                                             mCourse.child("date").setValue(timestamp);
 
                                                                             DatabaseReference dCourse = FirebaseDatabase.getInstance().getReference("DRIVERFINISHEDCOURSES").child(userId).child(courseID);
@@ -2018,21 +1981,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             return "this string is passed to onPostExecute";
         }
-
-        // This is called from background thread but runs in UI
         @Override
         protected void onProgressUpdate(Integer... values) {
             super.onProgressUpdate(values);
-
-            // Do things like update the progress bar
         }
-
-        // This runs in UI when background thread finishes
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-
-            // Do things like hide the progress bar or change a TextView
         }
     }
 
@@ -2499,7 +2454,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         PendingResult<LocationSettingsResult> result = LocationServices.SettingsApi.checkLocationSettings(googleApiClient, builder.build());
         result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
             @Override
-            public void onResult(LocationSettingsResult result) {
+            public void onResult(@NonNull LocationSettingsResult result) {
                 final Status status = result.getStatus();
                 switch (status.getStatusCode()) {
                     case LocationSettingsStatusCodes.SUCCESS:
