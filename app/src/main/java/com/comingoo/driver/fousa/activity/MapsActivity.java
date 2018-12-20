@@ -124,7 +124,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Button switchOnlineButton;
     private ImageButton menuButton;
     private ImageButton myPositionButton;
-    private ImageButton wazeButton;
+    public static ImageButton wazeButton;
     private RelativeLayout clientInfoLayout;
     private ConstraintLayout destinationLayout, userInfoLayout;
     private ImageView arrowImage;
