@@ -143,9 +143,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ConstraintLayout logout;
     private String driverId = "";
     private Marker startPositionMarker;
-    private static final String APP_KEY = "185d9822-a953-4af6-a780-b0af1fd31bf7";
-    private static final String APP_SECRET = "ZiJ6FqH5UEWYbkMZd1rWbw==";
-    private static final String ENVIRONMENT = "sandbox.sinch.com";
     protected static final int REQUEST_CHECK_SETTINGS = 0x1;
     private float dpWidth;
     private Intent intent;
@@ -347,9 +344,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             SinchClient sinchClient = Sinch.getSinchClientBuilder()
                     .context(this)
                     .userId(driverId)
-                    .applicationKey(APP_KEY)
-                    .applicationSecret(APP_SECRET)
-                    .environmentHost(ENVIRONMENT)
+                    .applicationKey(getString(R.string.sinch_key))
+                    .applicationSecret(getString(R.string.sinch_app_secret))
+                    .environmentHost(getString(R.string.sinch_envirenment))
                     .build();
 
             sinchClient.setSupportCalling(true);
@@ -2231,7 +2228,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(link));
             startActivity(intent);
         } catch (ActivityNotFoundException ex) {
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.waze"));
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(getResources().getString(R.string.waze_urlt)));
             startActivity(intent);
         }
     }

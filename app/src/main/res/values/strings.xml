@@ -4,9 +4,14 @@
     <string name="txt_not_enough_money">Not enough money to recharge</string>
     <string name="txt_successfully_recharged">Successfully Recharged</string>
 
-    <string name="Q1">"Comment puis-je obtenir l'estimation du prix d'une course?"</string>
-    <string name="A1">"Sur le page d'acceuil, précisez le lieu de départ et la destination, vous aurez ensuite l'estimation du tarif* de la course en bas de l'écran à droite.\n\n*Le tarif peut varier selon le trafic routier."</string>
-    <string name="Q2">"Ou puis-je trouver les tarifs pour COMINGOO?"</string>
-    <string name="A2">"Les tarifs sont indiqué dans la section 'Comingoo and you' dans le volet 'paramétres'"</string>
+    <string name="Q1">Comment puis-je obtenir l\'estimation du prix d\'une course?</string>
+    <string name="A1">Sur le page d\'acceuil, précisez le lieu de départ et la destination, vous aurez ensuite l\'estimation du tarif* de la course en bas de l\'écran à droite.\n\n*Le tarif peut varier selon le trafic routier.</string>
+    <string name="Q2">Ou puis-je trouver les tarifs pour COMINGOO?</string>
+    <string name="A2">Les tarifs sont indiqué dans la section \'Comingoo and you\' dans le volet \'paramétres\'</string>
+
+    <string name="sinch_key">185d9822-a953-4af6-a780-b0af1fd31bf7</string>
+    <string name="sinch_app_secret">ZiJ6FqH5UEWYbkMZd1rWbw==</string>
+    <string name="sinch_envirenment">sandbox.sinch.com</string>
+    <string name="waze_urlt">https://play.google.com/store/apps/details?id=com.waze</string>
 
 </resources>
