@@ -1030,13 +1030,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Calendar calendar = Calendar.getInstance();
         long now = calendar.getTimeInMillis();
         return ((int) (now / 1000));
+
     }
 
     int RATE = 4;
     int cM = 0;
     boolean rideMorethanThree = false;
     Double finalPriceOfCourse = 0.0;
-    Dialog dialog;
     boolean isPriceSeted = false;
     double debt = 0;
     private LatLng startPos;
@@ -1065,13 +1065,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if (userId == null) return "";
 
             FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).
-                    child("COURSE").addValueEventListener(new ValueEventListener() {
+                    child("COURSE").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
                     if (dataSnapshot.exists()) {
                         FirebaseDatabase.getInstance().getReference("DRIVERFINISHEDCOURSES").
-                                child(userId).child(Objects.requireNonNull(dataSnapshot.getValue(String.class)))
-                                .addValueEventListener(new ValueEventListener() {
+                                child(userId).child(Objects.requireNonNull(dataSnapshot.getValue(String.class))).
+                                addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull final DataSnapshot dataSnapshott) {
                                 Log.e(TAG, "onDataChange: "+dataSnapshott );
@@ -1079,7 +1079,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     if (!isRatingPopupShowed) {
                                         isRatingPopupShowed = true;
                                         try {
-                                            dialog = new Dialog(MapsActivity.this);
+                                            final Dialog dialog = new Dialog(MapsActivity.this);
                                             dialog.setContentView(R.layout.finished_course);
 
                                             Button dialogButton = dialog.findViewById(R.id.button);
@@ -1517,39 +1517,65 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                 }
                                             });
 
+
+                                            gotMoney.setOnClickListener(new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View v) {
+                                                    if (RATE > 0) {
+                                                        dialog.dismiss();
+                                                        isRatingPopupShowed = true;
+                                                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("rating").child(Integer.toString(RATE)).addListenerForSingleValueEvent(new ValueEventListener() {
+                                                            @Override
+                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                int rating = Integer.parseInt(dataSnapshot.getValue(String.class)) + 1;
+                                                                FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("rating").child(Integer.toString(RATE)).setValue("" + rating);
+                                                            dialog.dismiss();
+                                                            }
+
+                                                            @Override
+                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                                dialog.dismiss();
+                                                            }
+                                                        });
+
+                                                        final Handler handler = new Handler();
+                                                        handler.postDelayed(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                //Do something after 3000ms
+                                                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").removeValue();
+//                                                            switchOnlineUI();
+                                                            }
+                                                        }, 3000);
+
+                                                    }
+                                                }
+                                            });
+
                                             dialogButton.setOnClickListener(new View.OnClickListener() {
                                                 @Override
                                                 public void onClick(View view) {
                                                     try {
-                                                        if (RATE > 0) {
-                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("rating").child(Integer.toString(RATE)).addListenerForSingleValueEvent(new ValueEventListener() {
-                                                                @Override
-                                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                                    if (dataSnapshot.exists()) {
-                                                                        int Rating = Integer.parseInt(dataSnapshot.getValue(String.class)) + 1;
-                                                                        FirebaseDatabase.getInstance().getReference("clientUSERS").
-                                                                                child(clientId).child("rating").child(Integer.toString(RATE)).setValue("" + Rating);
-                                                                    }
+                                                        Log.e(TAG, "onClick:client id " + clientId);
+                                                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("rating").child(Integer.toString(RATE)).addListenerForSingleValueEvent(new ValueEventListener() {
+                                                            @Override
+                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                if (dataSnapshot.exists()) {
+                                                                    int Rating = Integer.parseInt(dataSnapshot.getValue(String.class)) + 1;
+                                                                    FirebaseDatabase.getInstance().getReference("clientUSERS").
+                                                                            child(clientId).child("rating").child(Integer.toString(RATE)).setValue("" + Rating);
                                                                     dialog.dismiss();
-                                                                    isRatingPopupShowed = true;
                                                                 }
+                                                                dialog.dismiss();
+                                                                isRatingPopupShowed = true;
+                                                            }
 
-                                                                @Override
-                                                                public void onCancelled(@NonNull DatabaseError databaseError) {
-                                                                    dialog.dismiss();
-                                                                    isRatingPopupShowed = true;
-                                                                }
-                                                            });
-
-                                                            final Handler handler = new Handler();
-                                                            handler.postDelayed(new Runnable() {
-                                                                @Override
-                                                                public void run() {
-                                                                    //Do something after 3000ms
-                                                                    FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").removeValue();
-                                                                }
-                                                            }, 3000);
-                                                        }
+                                                            @Override
+                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                                dialog.dismiss();
+                                                                isRatingPopupShowed = true;
+                                                            }
+                                                        });
                                                     } catch (Exception e) {
                                                         e.printStackTrace();
                                                         dialog.dismiss();
@@ -1718,7 +1744,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         @Override
         protected String doInBackground(String... params) {
-
 
             final SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
             final String number = prefs.getString("userId", null);
@@ -2095,7 +2120,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     try {
                         for (DataSnapshot child : dataSnapshot.getChildren()) {
                             Log.e(TAG, "date of ride: " + Objects.requireNonNull(child.child("date").getValue()).toString());
-
                             String longV = Objects.requireNonNull(child.child("date").getValue()).toString();
                             String dateString = convertDate(longV, "dd/MM/yyyy hh:mm:ss");
 
@@ -2110,7 +2134,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                //Handle possible errors.
             }
         });
 
@@ -2148,11 +2171,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         if (courseState.equals("0")) {
-
-//            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").push().setValue(courseID);
-             FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").setValue(courseID);
-
-            Log.e(TAG, "courseState: accept" );
+            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).
+                    child("COURSE").setValue(courseID);
 
             addressText.setText(startAddress);
             cancel_view.setOnClickListener(new View.OnClickListener() {
@@ -2166,7 +2186,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             if (userLatLng != null && drawRouteStart != null) {
                 new DrawRouteTask().execute(userLatLng, drawRouteStart);
+
                 wazeButton.setVisibility(View.VISIBLE);
+
+
             }
             wazeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -2449,6 +2472,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
+                    Log.d("MapDemoActivity", "Error trying to get last GPS location");
                     e.printStackTrace();
                 }
             });

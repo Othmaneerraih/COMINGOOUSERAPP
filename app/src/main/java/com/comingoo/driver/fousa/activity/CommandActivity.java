@@ -58,7 +58,6 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
     private SupportMapFragment map;
     private String lat, lng, destinatinLat, destinationLong;
     private String clientID, userId;
-    String courseID;
     private ProgressBar barTimer;
     public static CountDownTimer countDownTimer;
     private String clientType = "new";
@@ -334,25 +333,6 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
         }
         startTimer();
 
-        FirebaseDatabase.getInstance().getReference("COURSES").orderByChild("driver").
-                equalTo(userId).limitToFirst(1).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    for (final DataSnapshot data : dataSnapshot.getChildren()) {
-                        courseID = data.getKey();
-                    }
-                }
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-
         accept.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -370,12 +350,12 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
                     e.printStackTrace();
                 }
 
-
                 FirebaseDatabase.getInstance().getReference("COURSES").orderByChild("client").
                         equalTo(clientID).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (!dataSnapshot.exists()) {
+
                             DatabaseReference courseDatabase = FirebaseDatabase.getInstance().getReference("COURSES").push();
                             Map<String, String> data = new HashMap<>();
                             data.put("client", clientID);
@@ -406,6 +386,7 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
                             FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
 
                         } else {
+
                             for (DataSnapshot dataS : dataSnapshot.getChildren()) {
                                 if (dataS.child("state").getValue(String.class).equals("3")) {
 
