@@ -171,6 +171,8 @@ public class DriverService extends Service {
         Toast.makeText(myService, message, Toast.LENGTH_SHORT).show();
     }
 
+    boolean isIntentCalled = false;
+    private String TAG = "DriverService";
 
     private class DriverServiceTask extends AsyncTask<String, Integer, String> {
         // Runs in UI before background thread is called
@@ -186,7 +188,6 @@ public class DriverService extends Service {
             mDatabase = FirebaseDatabase.getInstance().getReference().child("DRIVERUSERS");
             driverLcoationDatabase = FirebaseDatabase.getInstance().getReference().child("ONLINEDRIVERS");
             driverPickupRequests = FirebaseDatabase.getInstance().getReference().child("PICKUPREQUEST");
-
 
             requestUsersID = new ArrayList<>();
             requestUsersLocation = new ArrayList<>();
@@ -206,7 +207,6 @@ public class DriverService extends Service {
             String number = prefs.getString("phoneNumber", null);
             userId = prefs.getString("userId", null);
             if (userId == null) {
-                //User Is Logged In
                 DriverService.this.stopSelf();
             } else {
                 // startLocationUpdates();
@@ -225,7 +225,6 @@ public class DriverService extends Service {
                             }
                         }
                     }
-
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
@@ -256,35 +255,38 @@ public class DriverService extends Service {
                         return;
                     }
 
-                    final Intent intent = new Intent(DriverService.this, CommandActivity.class);
-                    intent.putExtra("userId", userId);
-                    intent.putExtra("name", requestUsersID.get(counter));
-                    intent.putExtra("start", "" + startingText.get(counter));
-                    intent.putExtra("arrival", "" + arrivalText.get(counter));
-                    intent.putExtra("distance", "" + requestUsersLocation.get(counter));
+                    if (!isIntentCalled) {
+                        Log.e(TAG, "run: ");
+                        isIntentCalled = true;
+                        final Intent intent = new Intent(DriverService.this, CommandActivity.class);
+                        intent.putExtra("userId", userId);
+                        intent.putExtra("name", requestUsersID.get(counter));
+                        intent.putExtra("start", "" + startingText.get(counter));
+                        intent.putExtra("arrival", "" + arrivalText.get(counter));
+                        intent.putExtra("distance", "" + requestUsersLocation.get(counter));
 
-                    intent.putExtra("startLat", "" + startLat.get(counter));
-                    intent.putExtra("startLong", "" + startLong.get(counter));
-                    intent.putExtra("endLat", "" + endLat.get(counter));
-                    intent.putExtra("endLong", "" + endLong.get(counter));
+                        intent.putExtra("startLat", "" + startLat.get(counter));
+                        intent.putExtra("startLong", "" + startLong.get(counter));
+                        intent.putExtra("endLat", "" + endLat.get(counter));
+                        intent.putExtra("endLong", "" + endLong.get(counter));
 
-                    intent.putExtra("isFixed", "" + isFixed.get(counter));
-                    intent.putExtra("fixedPrice", "" + fixedPrice.get(counter));
+                        intent.putExtra("isFixed", "" + isFixed.get(counter));
+                        intent.putExtra("fixedPrice", "" + fixedPrice.get(counter));
 
 
-                    if (userLoc != null) {
-                        intent.putExtra("driverPosLat", "" + userLoc.latitude);
-                        intent.putExtra("driverPosLong", "" + userLoc.longitude);
-                    } else {
-                        intent.putExtra("driverPosLat", "");
-                        intent.putExtra("driverPosLong", "");
+                        if (userLoc != null) {
+                            intent.putExtra("driverPosLat", "" + userLoc.latitude);
+                            intent.putExtra("driverPosLong", "" + userLoc.longitude);
+                        } else {
+                            intent.putExtra("driverPosLat", "");
+                            intent.putExtra("driverPosLong", "");
+                        }
+
+
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
                     }
-
-
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
-
 
                     final DatabaseReference clientRequetFollow = FirebaseDatabase.getInstance()
                             .getReference("PICKUPREQUEST").child(userId).child(requestUsersID.get(counter));
@@ -295,7 +297,7 @@ public class DriverService extends Service {
                                 CommandActivity.countDownTimer.cancel();
 
                                 startService(new Intent(DriverService.this, DriverService.class));
-//                                CommandActivity.clientR.finish();
+                                CommandActivity.clientR.finish();
                                 if (CommandActivity.mp != null) {
                                     CommandActivity.mp.release();
                                     CommandActivity.vibrator.cancel();
@@ -353,7 +355,7 @@ public class DriverService extends Service {
                                 if (CommandActivity.active) {
                                     CommandActivity.countDownTimer.cancel();
                                     startService(new Intent(DriverService.this, DriverService.class));
-//                                    CommandActivity.clientR.finish();
+                                    CommandActivity.clientR.finish();
                                     if (CommandActivity.mp != null) {
                                         CommandActivity.mp.release();
                                         CommandActivity.vibrator.cancel();
@@ -433,7 +435,7 @@ public class DriverService extends Service {
                             CommandActivity.countDownTimer.cancel();
 
                             startService(new Intent(DriverService.this, DriverService.class));
-//                            CommandActivity.clientR.finish();
+                            CommandActivity.clientR.finish();
                             if (CommandActivity.mp != null) {
                                 CommandActivity.mp.release();
                                 CommandActivity.vibrator.cancel();
