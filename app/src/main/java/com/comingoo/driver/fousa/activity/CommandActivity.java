@@ -109,7 +109,7 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
         mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
-                try{
+                try {
                     if (mp != null) {
                         if (mp.isPlaying()) {
                             mp.stop();
@@ -118,7 +118,7 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
                     }
                     vibrator.cancel();
                     am.setStreamVolume(AudioManager.STREAM_MUSIC, origionalVolume, 0);
-                }catch(IllegalStateException e){
+                } catch (IllegalStateException e) {
                     e.printStackTrace();
                 }
             }
@@ -306,7 +306,7 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
                     CommandActivity.this.finish();
                 } catch (IllegalStateException e) {
                     e.printStackTrace();
-                }catch (Exception e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -315,7 +315,7 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
         if (userId != null && clientID != null) {
             if (!userId.isEmpty() && !clientID.isEmpty()) {
                 FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").
-                        child(userId).child(clientID).addValueEventListener(new ValueEventListener() {
+                        child(userId).child(clientID).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (!dataSnapshot.exists()) {
@@ -338,7 +338,7 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
             public void onClick(View view) {
                 accept.setClickable(false);
                 accept.setEnabled(false);
-                try{
+                try {
                     if (mp != null) {
                         if (mp.isPlaying()) {
                             mp.stop();
@@ -346,7 +346,7 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
                         }
                     }
                     vibrator.cancel();
-                }catch (IllegalStateException e){
+                } catch (IllegalStateException e) {
                     e.printStackTrace();
                 }
 
@@ -491,7 +491,7 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
 
                         vibrator.cancel();
                         showCustomDialog(CommandActivity.this);
-                    }catch (IllegalStateException e) {
+                    } catch (IllegalStateException e) {
                         e.printStackTrace();
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -529,32 +529,38 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
 
 
     public void showCustomDialog(final Context context) {
-        final Dialog dialog = new Dialog(context);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View dialogView = inflater.inflate(R.layout.content_misses_ride_request, null, false);
-        Button btnOk = dialogView.findViewById(R.id.btn_passer_hors);
-        btnOk.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dialog.dismiss();
-                FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
-                stopService(new Intent(CommandActivity.this, DriverService.class));
-            }
-        });
+        try{
+            final Dialog dialog = new Dialog(context);
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View dialogView = inflater.inflate(R.layout.content_misses_ride_request, null, false);
+            Button btnOk = dialogView.findViewById(R.id.btn_passer_hors);
+            btnOk.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    dialog.dismiss();
+                    FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
+                    stopService(new Intent(CommandActivity.this, DriverService.class));
+                }
+            });
 
-        Button btnCancel = dialogView.findViewById(R.id.btn_rester_engine);
-        btnCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
-                dialog.dismiss();
-                finish();
-            }
-        });
-
-        dialog.setContentView(dialogView);
-        dialog.show();
+            Button btnCancel = dialogView.findViewById(R.id.btn_rester_engine);
+            btnCancel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
+                    dialog.dismiss();
+                    finish();
+                }
+            });
+            dialog.setCancelable(false);
+            dialog.setContentView(dialogView);
+            dialog.show();
+        }catch (WindowManager.BadTokenException e){
+            e.printStackTrace();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override
