@@ -53,7 +53,7 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
     private TextView arrivalText;
     private Button decline;
     private Button accept;
-//    public static MediaPlayer mp;
+    public static MediaPlayer mp;
     public static Vibrator vibrator;
     private SupportMapFragment map;
     private String lat, lng, destinatinLat, destinationLong;
@@ -82,9 +82,9 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
         long[] pattern = {0, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500};
         vibrator.vibrate(pattern, 0);
 
-//        mp = MediaPlayer.create(this, R.raw.ring);
-//        mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
-//        mp.start();
+        mp = MediaPlayer.create(this, R.raw.ring);
+        mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        mp.start();
 
         final AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
@@ -94,36 +94,36 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
         switch (am.getRingerMode()) {
             case 0:
                 vibrator.cancel();
-//                mp.start();
+                mp.start();
                 break;
             case 1:
                 vibrator.vibrate(pattern, 0);
-//                mp.start();
+                mp.start();
                 break;
             case 2:
                 vibrator.vibrate(pattern, 0);
-//                mp.start();
+                mp.start();
                 break;
         }
 
 
-//        mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-//            @Override
-//            public void onCompletion(MediaPlayer mediaPlayer) {
-//                try {
-//                    if (mp != null) {
-//                        if (mp.isPlaying()) {
-//                            mp.stop();
-//                            mp.release();
-//                        }
-//                    }
-//                    vibrator.cancel();
-//                    am.setStreamVolume(AudioManager.STREAM_MUSIC, origionalVolume, 0);
-//                } catch (IllegalStateException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
+        mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                try {
+                    if (mp != null) {
+                        if (mp.isPlaying()) {
+                            mp.stop();
+                            mp.release();
+                        }
+                    }
+                    vibrator.cancel();
+                    am.setStreamVolume(AudioManager.STREAM_MUSIC, origionalVolume, 0);
+                } catch (IllegalStateException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
 
 
         tvUserRating = findViewById(R.id.textView10);
@@ -295,12 +295,12 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
             @Override
             public void onClick(View view) {
                 try {
-//                    if (mp != null) {
-//                        if (mp.isPlaying()) {
-//                            mp.stop();
-//                            mp.release();
-//                        }
-//                    }
+                    if (mp != null) {
+                        if (mp.isPlaying()) {
+                            mp.stop();
+                            mp.release();
+                        }
+                    }
                     vibrator.cancel();
                     startDriverService();
                     FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
@@ -359,18 +359,17 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
                 accept.setClickable(false);
                 accept.setEnabled(false);
                 try {
-//                    if (mp != null) {
-//                        if (mp.isPlaying()) {
-//                            mp.stop();
-//                            mp.release();
-//                        }
-//                    }
+                    if (mp != null) {
+                        if (mp.isPlaying()) {
+                            mp.stop();
+                            mp.release();
+                        }
+                    }
                     vibrator.cancel();
                 } catch (IllegalStateException e) {
                     e.printStackTrace();
                 }
-                Log.e("CommandActivity", "onClick: accept" );
-                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").push().setValue(courseID);
+
 
                 FirebaseDatabase.getInstance().getReference("COURSES").orderByChild("client").
                         equalTo(clientID).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -502,12 +501,12 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
                 barTimer.setProgress((int) seconds);
                 if (seconds == 0) {
                     try {
-//                        if (mp != null) {
-//                            if (mp.isPlaying()) {
-//                                mp.stop();
-//                                mp.release();
-//                            }
-//                        }
+                        if (mp != null) {
+                            if (mp.isPlaying()) {
+                                mp.stop();
+                                mp.release();
+                            }
+                        }
 
                         vibrator.cancel();
                         showCustomDialog(CommandActivity.this);

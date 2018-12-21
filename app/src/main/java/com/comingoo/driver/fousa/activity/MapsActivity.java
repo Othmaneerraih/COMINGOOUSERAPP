@@ -2148,6 +2148,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         if (courseState.equals("0")) {
+
+//            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").push().setValue(courseID);
+             FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").setValue(courseID);
+
+            Log.e(TAG, "courseState: accept" );
+
             addressText.setText(startAddress);
             cancel_view.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -2160,10 +2166,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             if (userLatLng != null && drawRouteStart != null) {
                 new DrawRouteTask().execute(userLatLng, drawRouteStart);
-
                 wazeButton.setVisibility(View.VISIBLE);
-
-
             }
             wazeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
