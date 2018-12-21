@@ -53,11 +53,12 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
     private TextView arrivalText;
     private Button decline;
     private Button accept;
-    public static MediaPlayer mp;
+//    public static MediaPlayer mp;
     public static Vibrator vibrator;
     private SupportMapFragment map;
     private String lat, lng, destinatinLat, destinationLong;
     private String clientID, userId;
+    String courseID;
     private ProgressBar barTimer;
     public static CountDownTimer countDownTimer;
     private String clientType = "new";
@@ -81,9 +82,9 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
         long[] pattern = {0, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500};
         vibrator.vibrate(pattern, 0);
 
-        mp = MediaPlayer.create(this, R.raw.ring);
-        mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        mp.start();
+//        mp = MediaPlayer.create(this, R.raw.ring);
+//        mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
+//        mp.start();
 
         final AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
@@ -93,36 +94,36 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
         switch (am.getRingerMode()) {
             case 0:
                 vibrator.cancel();
-                mp.start();
+//                mp.start();
                 break;
             case 1:
                 vibrator.vibrate(pattern, 0);
-                mp.start();
+//                mp.start();
                 break;
             case 2:
                 vibrator.vibrate(pattern, 0);
-                mp.start();
+//                mp.start();
                 break;
         }
 
 
-        mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mediaPlayer) {
-                try {
-                    if (mp != null) {
-                        if (mp.isPlaying()) {
-                            mp.stop();
-                            mp.release();
-                        }
-                    }
-                    vibrator.cancel();
-                    am.setStreamVolume(AudioManager.STREAM_MUSIC, origionalVolume, 0);
-                } catch (IllegalStateException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+//        mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+//            @Override
+//            public void onCompletion(MediaPlayer mediaPlayer) {
+//                try {
+//                    if (mp != null) {
+//                        if (mp.isPlaying()) {
+//                            mp.stop();
+//                            mp.release();
+//                        }
+//                    }
+//                    vibrator.cancel();
+//                    am.setStreamVolume(AudioManager.STREAM_MUSIC, origionalVolume, 0);
+//                } catch (IllegalStateException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
 
 
         tvUserRating = findViewById(R.id.textView10);
@@ -294,12 +295,12 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
             @Override
             public void onClick(View view) {
                 try {
-                    if (mp != null) {
-                        if (mp.isPlaying()) {
-                            mp.stop();
-                            mp.release();
-                        }
-                    }
+//                    if (mp != null) {
+//                        if (mp.isPlaying()) {
+//                            mp.stop();
+//                            mp.release();
+//                        }
+//                    }
                     vibrator.cancel();
                     startDriverService();
                     FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
@@ -333,29 +334,49 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
         }
         startTimer();
 
+        FirebaseDatabase.getInstance().getReference("COURSES").orderByChild("driver").
+                equalTo(userId).limitToFirst(1).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    for (final DataSnapshot data : dataSnapshot.getChildren()) {
+                        courseID = data.getKey();
+                    }
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
         accept.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 accept.setClickable(false);
                 accept.setEnabled(false);
                 try {
-                    if (mp != null) {
-                        if (mp.isPlaying()) {
-                            mp.stop();
-                            mp.release();
-                        }
-                    }
+//                    if (mp != null) {
+//                        if (mp.isPlaying()) {
+//                            mp.stop();
+//                            mp.release();
+//                        }
+//                    }
                     vibrator.cancel();
                 } catch (IllegalStateException e) {
                     e.printStackTrace();
                 }
+                Log.e("CommandActivity", "onClick: accept" );
+                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").push().setValue(courseID);
 
                 FirebaseDatabase.getInstance().getReference("COURSES").orderByChild("client").
                         equalTo(clientID).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (!dataSnapshot.exists()) {
-
                             DatabaseReference courseDatabase = FirebaseDatabase.getInstance().getReference("COURSES").push();
                             Map<String, String> data = new HashMap<>();
                             data.put("client", clientID);
@@ -386,7 +407,6 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
                             FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
 
                         } else {
-
                             for (DataSnapshot dataS : dataSnapshot.getChildren()) {
                                 if (dataS.child("state").getValue(String.class).equals("3")) {
 
@@ -482,12 +502,12 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
                 barTimer.setProgress((int) seconds);
                 if (seconds == 0) {
                     try {
-                        if (mp != null) {
-                            if (mp.isPlaying()) {
-                                mp.stop();
-                                mp.release();
-                            }
-                        }
+//                        if (mp != null) {
+//                            if (mp.isPlaying()) {
+//                                mp.stop();
+//                                mp.release();
+//                            }
+//                        }
 
                         vibrator.cancel();
                         showCustomDialog(CommandActivity.this);

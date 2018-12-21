@@ -298,10 +298,10 @@ public class DriverService extends Service {
 
                                 startService(new Intent(DriverService.this, DriverService.class));
                                 CommandActivity.clientR.finish();
-                                if (CommandActivity.mp != null) {
-                                    CommandActivity.mp.release();
-                                    CommandActivity.vibrator.cancel();
-                                }
+//                                if (CommandActivity.mp != null) {
+//                                    CommandActivity.mp.release();
+//                                    CommandActivity.vibrator.cancel();
+//                                }
                                 counter++;
                                 checkStop = true;
                                 checkHandler.removeCallbacks(checkRunnable);
@@ -334,13 +334,13 @@ public class DriverService extends Service {
                                             if (requestUsersID.size() > 1) {
                                                 requestUsersID.set(counter, "-1");
                                             }
-                                            if (CommandActivity.active) {
-                                                CommandActivity.countDownTimer.cancel();
-                                                if (CommandActivity.mp != null) {
-                                                    CommandActivity.mp.release();
-                                                    CommandActivity.vibrator.cancel();
-                                                }
-                                            }
+//                                            if (CommandActivity.active) {
+//                                                CommandActivity.countDownTimer.cancel();
+//                                                if (CommandActivity.mp != null) {
+//                                                    CommandActivity.mp.release();
+//                                                    CommandActivity.vibrator.cancel();
+//                                                }
+//                                            }
 
 
                                         }
@@ -356,10 +356,10 @@ public class DriverService extends Service {
                                     CommandActivity.countDownTimer.cancel();
                                     startService(new Intent(DriverService.this, DriverService.class));
                                     CommandActivity.clientR.finish();
-                                    if (CommandActivity.mp != null) {
-                                        CommandActivity.mp.release();
-                                        CommandActivity.vibrator.cancel();
-                                    }
+//                                    if (CommandActivity.mp != null) {
+//                                        CommandActivity.mp.release();
+//                                        CommandActivity.vibrator.cancel();
+//                                    }
                                 }
                             }
                         }
@@ -436,10 +436,10 @@ public class DriverService extends Service {
 
                             startService(new Intent(DriverService.this, DriverService.class));
                             CommandActivity.clientR.finish();
-                            if (CommandActivity.mp != null) {
-                                CommandActivity.mp.release();
-                                CommandActivity.vibrator.cancel();
-                            }
+//                            if (CommandActivity.mp != null) {
+//                                CommandActivity.mp.release();
+//                                CommandActivity.vibrator.cancel();
+//                            }
                         }
                     }
 

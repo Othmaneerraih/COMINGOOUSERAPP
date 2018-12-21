@@ -262,7 +262,6 @@ public class CourseService extends Service implements GoogleApiClient.Connection
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-
         }
 
         // This is run in a background thread

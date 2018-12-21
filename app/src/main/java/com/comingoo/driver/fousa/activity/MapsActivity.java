@@ -1030,7 +1030,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Calendar calendar = Calendar.getInstance();
         long now = calendar.getTimeInMillis();
         return ((int) (now / 1000));
-
     }
 
     int RATE = 4;
@@ -1071,7 +1070,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
                     if (dataSnapshot.exists()) {
                         FirebaseDatabase.getInstance().getReference("DRIVERFINISHEDCOURSES").
-                                child(userId).child(Objects.requireNonNull(dataSnapshot.getValue(String.class))).addValueEventListener(new ValueEventListener() {
+                                child(userId).child(Objects.requireNonNull(dataSnapshot.getValue(String.class)))
+                                .addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull final DataSnapshot dataSnapshott) {
                                 Log.e(TAG, "onDataChange: "+dataSnapshott );
@@ -2446,7 +2446,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
-                    Log.d("MapDemoActivity", "Error trying to get last GPS location");
                     e.printStackTrace();
                 }
             });
