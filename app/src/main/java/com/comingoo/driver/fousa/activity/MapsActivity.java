@@ -422,6 +422,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     logout();
                     switchOfflineUI();
                     stopCourseService();
+                    stopService(new Intent(MapsActivity.this, DriverService.class));
                     startActivity(new Intent(MapsActivity.this, MainActivity.class));
                     finish();
                 }
