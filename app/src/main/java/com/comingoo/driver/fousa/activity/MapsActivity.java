@@ -1511,79 +1511,90 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         charge.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View v) {
-                                                String val = moneyAmount.getText().toString();
-                                                if (moneyAmount.getText().toString().length() > 0) {
+                                                try {
+                                                    String val = moneyAmount.getText().toString();
+                                                    if (moneyAmount.getText().toString().length() > 0) {
 
-                                                    String value = moneyAmount.getText().toString();
-                                                    int finalValue = Integer.parseInt(value);
+                                                        String value = moneyAmount.getText().toString();
+                                                        int finalValue = Integer.parseInt(value);
 
-                                                    if (finalValue < 100) {
-                                                        final int money = (finalValue - Integer.parseInt(dataSnapshott.child("price").getValue(String.class)));
-                                                        if (money > 0) {
-                                                            final String riderId = dataSnapshott.child("client").getValue(String.class);
-                                                            FirebaseDatabase.getInstance().getReference("clientUSERS").
-                                                                    child(dataSnapshott.child("client").getValue(String.class)).child("SOLDE").
-                                                                    addListenerForSingleValueEvent(new ValueEventListener() {
-                                                                        @Override
-                                                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                                                                            cM = money;
-                                                                            if (dataSnapshot.exists()) {
-                                                                                cM += Integer.parseInt(dataSnapshot.getValue(String.class));
-                                                                            }
-
-                                                                            FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(riderId).addValueEventListener(new ValueEventListener() {
-                                                                                @Override
-                                                                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                                        if (finalValue < 100) {
+                                                            final int money = (finalValue - Integer.parseInt(dataSnapshott.child("price").getValue(String.class)));
+                                                            if (money > 0) {
+                                                                final String riderId = dataSnapshott.child("client").getValue(String.class);
+                                                                FirebaseDatabase.getInstance().getReference("clientUSERS").
+                                                                        child(dataSnapshott.child("client").getValue(String.class)).child("SOLDE").
+                                                                        addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                            @Override
+                                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                                try {
+                                                                                    cM = money;
                                                                                     if (dataSnapshot.exists()) {
-                                                                                        if (dataSnapshot.getChildrenCount() >= 3) {
-                                                                                            rideMorethanThree = true;
-                                                                                            if (cM <= 100) {
-                                                                                                FirebaseDatabase.getInstance().getReference("clientUSERS").child(dataSnapshott.child("client").getValue(String.class)).child("SOLDE").setValue("" + cM);
-                                                                                                dialog.dismiss();
-                                                                                            } else
-                                                                                                Toast.makeText(MapsActivity.this, "Vous ne pouvez pas dépasser 100 MAD de recharge pour ce client.", Toast.LENGTH_LONG).show();
-                                                                                        } else {
-                                                                                            rideMorethanThree = false;
-                                                                                            if (cM <= 10) {
-                                                                                                FirebaseDatabase.getInstance().getReference("clientUSERS").child(dataSnapshott.child("client").getValue(String.class)).child("SOLDE").setValue("" + cM);
-                                                                                                dialog.dismiss();
-                                                                                            } else
-                                                                                                Toast.makeText(MapsActivity.this, "Vous ne pouvez pas dépasser 10 MAD de recharge pour ce client.", Toast.LENGTH_LONG).show();
-                                                                                        }
-                                                                                    } else {
+                                                                                        cM += Integer.parseInt(dataSnapshot.getValue(String.class));
                                                                                     }
+
+                                                                                    FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(riderId).addValueEventListener(new ValueEventListener() {
+                                                                                        @Override
+                                                                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                                                                                            if (dataSnapshot.exists()) {
+                                                                                                if (dataSnapshot.getChildrenCount() >= 3) {
+                                                                                                    rideMorethanThree = true;
+                                                                                                    if (cM <= 100) {
+                                                                                                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(dataSnapshott.child("client").getValue(String.class)).child("SOLDE").setValue("" + cM);
+                                                                                                        dialog.dismiss();
+                                                                                                    } else
+                                                                                                        Toast.makeText(MapsActivity.this, "Vous ne pouvez pas dépasser 100 MAD de recharge pour ce client.", Toast.LENGTH_LONG).show();
+                                                                                                } else {
+                                                                                                    rideMorethanThree = false;
+                                                                                                    if (cM <= 10) {
+                                                                                                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(dataSnapshott.child("client").getValue(String.class)).child("SOLDE").setValue("" + cM);
+                                                                                                        dialog.dismiss();
+                                                                                                    } else
+                                                                                                        Toast.makeText(MapsActivity.this, "Vous ne pouvez pas dépasser 10 MAD de recharge pour ce client.", Toast.LENGTH_LONG).show();
+                                                                                                }
+                                                                                            } else {
+                                                                                            }
+                                                                                        }
+
+                                                                                        @Override
+                                                                                        public void onCancelled(DatabaseError databaseError) {
+                                                                                            dialog.dismiss();
+                                                                                        }
+                                                                                    });
+
+
+                                                                                } catch (NumberFormatException e) {
+                                                                                    e.printStackTrace();
+                                                                                } catch (Exception e) {
+                                                                                    e.printStackTrace();
                                                                                 }
+                                                                            }
+                                                                            @Override
+                                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                                                dialog.dismiss();
+                                                                            }
+                                                                        });
 
-                                                                                @Override
-                                                                                public void onCancelled(DatabaseError databaseError) {
-                                                                                    dialog.dismiss();
-                                                                                }
-                                                                            });
-
-                                                                        }
-
-                                                                        @Override
-                                                                        public void onCancelled(@NonNull DatabaseError databaseError) {
-                                                                            dialog.dismiss();
-                                                                        }
-                                                                    });
+                                                            } else
+                                                                Toast.makeText(MapsActivity.this, getString(R.string.txt_not_enough_money), Toast.LENGTH_LONG).show();
 
                                                         } else
-                                                            Toast.makeText(MapsActivity.this, getString(R.string.txt_not_enough_money), Toast.LENGTH_LONG).show();
+                                                            Toast.makeText(MapsActivity.this, "Vous ne pouvez pas dépasser 100 MAD de recharge pour ce client.", Toast.LENGTH_LONG).show();
 
-                                                    } else
-                                                        Toast.makeText(MapsActivity.this, "Vous ne pouvez pas dépasser 100 MAD de recharge pour ce client.", Toast.LENGTH_LONG).show();
+                                                        final Handler handler = new Handler();
+                                                        handler.postDelayed(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                //Do something after 3000ms
+                                                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").removeValue();
+                                                            }
+                                                        }, 3000);
 
-                                                    final Handler handler = new Handler();
-                                                    handler.postDelayed(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            //Do something after 3000ms
-                                                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("COURSE").removeValue();
-                                                        }
-                                                    }, 3000);
-
+                                                    }
+                                                }catch (NumberFormatException e){
+                                                    e.printStackTrace();
+                                                } catch (Exception e){
+                                                    e.printStackTrace();
                                                 }
                                             }
                                         });
