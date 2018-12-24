@@ -404,7 +404,7 @@ public class CourseService extends Service implements GoogleApiClient.Connection
 //                            dCourse.child("date").setValue(timestamp);
 //
 //
-//                            //  new GeoCoderTask().execute();
+                              new GeoCoderTask().execute();
 //
 //
 //                            FirebaseDatabase.getInstance().getReference("PRICES").addListenerForSingleValueEvent(new ValueEventListener() {

@@ -278,8 +278,8 @@ public class DriverService extends Service {
                             intent.putExtra("driverPosLat", "" + userLoc.latitude);
                             intent.putExtra("driverPosLong", "" + userLoc.longitude);
                         } else {
-                            intent.putExtra("driverPosLat", "");
-                            intent.putExtra("driverPosLong", "");
+                            intent.putExtra("driverPosLat", "0.0");
+                            intent.putExtra("driverPosLong", "0.0");
                         }
 
 
