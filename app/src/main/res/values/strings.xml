@@ -4,14 +4,18 @@
     <string name="txt_not_enough_money">Not enough money to recharge</string>
     <string name="txt_successfully_recharged">Successfully Recharged</string>
 
-    <string name="Q1">Comment puis-je obtenir l\'estimation du prix d\'une course?</string>
-    <string name="A1">Sur le page d\'acceuil, précisez le lieu de départ et la destination, vous aurez ensuite l\'estimation du tarif* de la course en bas de l\'écran à droite.\n\n*Le tarif peut varier selon le trafic routier.</string>
-    <string name="Q2">Ou puis-je trouver les tarifs pour COMINGOO?</string>
-    <string name="A2">Les tarifs sont indiqué dans la section \'Comingoo and you\' dans le volet \'paramétres\'</string>
+    <string name="Q1">How can I get an estimate of the price of a race?</string>
+    <string name="A1">On the home page, specify the place of departure and destination, then you will have the estimate of the fare * of the race at the bottom of the screen on the right. \ N \ n * The fare may vary according to road traffic.</string>
+    <string name="Q2">Where can I find the prices for COMINGOO?</string>
+    <string name="A2">Rates are listed in the \'Comingoo and you\' section in the \'settings\' pane</string>
 
     <string name="sinch_key">185d9822-a953-4af6-a780-b0af1fd31bf7</string>
     <string name="sinch_app_secret">ZiJ6FqH5UEWYbkMZd1rWbw==</string>
     <string name="sinch_envirenment">sandbox.sinch.com</string>
     <string name="waze_urlt">https://play.google.com/store/apps/details?id=com.waze</string>
+    <string name="payement_par_carte_banquaire">Payment by bank card</string>
+    <string name="esp_ces_collect_es">Species collected</string>
+    <string name="montant_total_collecter">Total amount to be collected</string>
+    <string name="evaluez_votre_xperience">Evaluate your experience</string>
 
 </resources>

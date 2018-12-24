@@ -1035,7 +1035,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                 count = 1;
                                                 try {
                                                     final Dialog dialog = new Dialog(MapsActivity.this);
-                                                    dialog.setContentView(R.layout.finished_course);
+                                                    dialog.setContentView(R.layout.dialog_finished_course);
 
                                                     Button dialogButton = dialog.findViewById(R.id.button);
                                                     final Button star1 = dialog.findViewById(R.id.star1);
