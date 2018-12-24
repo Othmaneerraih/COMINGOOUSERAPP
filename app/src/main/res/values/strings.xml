@@ -31,5 +31,8 @@
     <string name="se_connecter">Se connecter</string>
     <string name="num_ro_de_t_l_phone">Numéro de téléphone</string>
     <string name="mot_de_passe">Mot de passe</string>
+    <string name="bon_client">Bon Client</string>
+    <string name="refuser">Refuser</string>
+    <string name="accepter">Accepter</string>
 
 </resources>

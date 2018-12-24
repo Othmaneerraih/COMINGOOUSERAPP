@@ -66,7 +66,7 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_command);
+        setContentView(R.layout.activity_command_new);
         clientR = this;
 
         Window window = this.getWindow();

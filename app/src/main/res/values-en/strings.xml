@@ -31,4 +31,7 @@
     <string name="se_connecter">To log in</string>
     <string name="num_ro_de_t_l_phone">Phone number</string>
     <string name="mot_de_passe">Password</string>
+    <string name="bon_client">Good Customer</string>
+    <string name="refuser">Refuse</string>
+    <string name="accepter">Accept</string>
 </resources>
