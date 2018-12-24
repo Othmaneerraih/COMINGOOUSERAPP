@@ -58,7 +58,6 @@
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/logo_cnu" />
     </android.support.constraint.ConstraintLayout>
-
     <android.support.constraint.ConstraintLayout
         android:id="@+id/constraintLayout10"
         android:layout_width="300dp"
@@ -192,6 +191,12 @@
         </LinearLayout>
 
     </android.support.constraint.ConstraintLayout>
+
+
+
+
+
+
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/parametres_layout"
