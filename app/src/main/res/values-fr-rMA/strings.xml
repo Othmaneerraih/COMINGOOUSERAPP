@@ -18,4 +18,11 @@
     <string name="esp_ces_collect_es">Espéces collectées</string>
     <string name="montant_total_collecter">Montant total à collecter</string>
     <string name="evaluez_votre_xperience">Evaluez votre éxperience</string>
+    <string name="vous_avez_manque_une_course_etes_vous_occupe">Vous Avez manque une course.Etes vous occupe?</string>
+    <string name="rester_en_ligne">Rester en ligne</string>
+    <string name="passer_hors_ligne">Passer hors ligne</string>
+    <string name="are_you_sure_you_want_to_cancel_the_ride">Êtes-vous sûr de vouloir annuler le trajet?</string>
+    <string name="addition_charges_may_apply">Des frais supplémentaires peuvent s\'appliquery</string>
+    <string name="no_i_don_t_want_to_cancel">Non, je ne veux pas annuler</string>
+    <string name="yes_i_am_sure">Oui je suis sûr</string>
 </resources>

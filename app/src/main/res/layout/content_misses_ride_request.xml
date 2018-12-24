@@ -2,54 +2,53 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/colorPrimaryDark"
     android:layout_margin="10dp"
+    android:background="@color/colorPrimaryDark"
     android:padding="10dp">
 
     <ImageView
         android:id="@+id/iv_alert"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:src="@drawable/ic_aleart"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/ic_aleart" />
 
     <TextView
         android:id="@+id/tv_miss_ride_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Vous Avez manque une course.Etes vous occupe?"
-        android:gravity="center"
         android:layout_below="@+id/iv_alert"
-        android:textSize="18sp"
-        android:textColor="@android:color/white"
-        android:textStyle="bold"
         android:layout_marginTop="10dp"
-        />
+        android:gravity="center"
+        android:text="@string/vous_avez_manque_une_course_etes_vous_occupe"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        android:textStyle="bold" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
         android:layout_below="@+id/tv_miss_ride_text"
-        android:layout_marginTop="10dp">
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/btn_rester_engine"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:text="Rester en ligne"
-            android:textColor="@color/colorPrimaryDark"/>
+            android:text="@string/rester_en_ligne"
+            android:textColor="@color/colorPrimaryDark"
+            android:textStyle="bold" />
 
         <Button
             android:id="@+id/btn_passer_hors"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textStyle="bold"
+            android:layout_marginStart="20dp"
+            android:text="@string/passer_hors_ligne"
             android:textColor="@color/colorPrimaryDark"
-            android:layout_marginLeft="20dp"
-            android:text="Passer hors ligne"/>
+            android:textStyle="bold" />
 
 
     </LinearLayout>

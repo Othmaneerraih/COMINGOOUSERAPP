@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_large"
         android:gravity="center"
-        android:text="Are you sure you want to cancel the ride?"
+        android:text="@string/are_you_sure_you_want_to_cancel_the_ride"
         android:textColor="@android:color/white"
         android:textSize="18sp" />
 
@@ -25,7 +25,7 @@
         android:textColor="@android:color/white"
         android:layout_margin="10dp"
         android:visibility="invisible"
-        android:text="Addition charges may apply"
+        android:text="@string/addition_charges_may_apply"
         android:textSize="12sp" />
 
     <RelativeLayout
@@ -40,7 +40,7 @@
             android:id="@+id/btn_dont_cancel_ride"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="No, i don't want to Cancel"
+            android:text="@string/no_i_don_t_want_to_cancel"
             android:textSize="12sp"
             android:paddingLeft="20dp"
             android:paddingRight="20dp"
@@ -51,12 +51,12 @@
             android:id="@+id/btn_yes_cancel_ride"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
             android:paddingLeft="20dp"
             android:textSize="12sp"
             android:paddingRight="20dp"
-            android:layout_toRightOf="@id/btn_dont_cancel_ride"
-            android:text="Yes, I am sure"
+            android:layout_toEndOf="@id/btn_dont_cancel_ride"
+            android:text="@string/yes_i_am_sure"
             android:textColor="@android:color/white"
             android:background="@android:color/transparent"/>
 
