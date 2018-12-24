@@ -55,7 +55,7 @@ public class ComingooUAdapter extends RecyclerView.Adapter<ComingooUAdapter.View
                                                                       int viewType) {
         // create a new view
         View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.cars_rows, parent, false);
+                .inflate(R.layout.rows_cars, parent, false);
         ComingooUAdapter.ViewHolder vh = new ComingooUAdapter.ViewHolder(v);
         return vh;
     }

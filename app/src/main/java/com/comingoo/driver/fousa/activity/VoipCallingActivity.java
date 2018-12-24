@@ -24,7 +24,6 @@ import com.comingoo.driver.fousa.R;
 import com.sinch.android.rtc.PushPair;
 import com.sinch.android.rtc.Sinch;
 import com.sinch.android.rtc.SinchClient;
-import com.sinch.android.rtc.SinchError;
 import com.sinch.android.rtc.calling.Call;
 import com.sinch.android.rtc.calling.CallClient;
 import com.sinch.android.rtc.calling.CallClientListener;
@@ -83,7 +82,7 @@ public class VoipCallingActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.content_voip_one);
+        setContentView(R.layout.activity_voip_one);
         activity = this;
 
         ImageView iv_back_voip_one = findViewById(R.id.iv_back_voip_one);

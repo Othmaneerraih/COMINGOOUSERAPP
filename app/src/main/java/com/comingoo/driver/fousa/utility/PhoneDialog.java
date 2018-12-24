@@ -19,7 +19,7 @@ public class PhoneDialog  extends AppCompatDialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceSatte) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
-        View view = inflater.inflate(R.layout.subscribe_phone, null);
+        View view = inflater.inflate(R.layout.dialog_subscribe_phone, null);
 
         confirmCode = (EditText) view.findViewById(R.id.confirmCode);
 

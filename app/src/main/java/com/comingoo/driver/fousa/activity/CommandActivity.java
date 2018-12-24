@@ -533,7 +533,7 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
             final Dialog dialog = new Dialog(context);
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View dialogView = inflater.inflate(R.layout.content_misses_ride_request, null, false);
+            View dialogView = inflater.inflate(R.layout.dialog_misses_ride_request, null, false);
             Button btnOk = dialogView.findViewById(R.id.btn_passer_hors);
             btnOk.setOnClickListener(new View.OnClickListener() {
                 @Override

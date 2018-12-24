@@ -75,7 +75,7 @@ public class HistoryAdapter  extends RecyclerView.Adapter<HistoryAdapter.ViewHol
                                                    int viewType) {
         // create a new view
         View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.courses_rows, parent, false);
+                .inflate(R.layout.rows_courses, parent, false);
         ViewHolder vh = new ViewHolder(v);
         return vh;
     }

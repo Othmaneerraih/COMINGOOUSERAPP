@@ -25,7 +25,7 @@ public class SubscribeDialog extends AppCompatDialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceSatte){
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
-        View view = inflater.inflate(R.layout.subscribe_dialog, null);
+        View view = inflater.inflate(R.layout.dialog_subscribe, null);
 
         builder.setView(view);
 
