@@ -55,6 +55,6 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        
+
     }
 }
