@@ -1,0 +1,138 @@
+package com.comingoo.driver.fousa.activity;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Looper;
+import android.support.annotation.NonNull;
+import android.text.format.DateFormat;
+import android.util.Log;
+import android.widget.Toast;
+
+import com.comingoo.driver.fousa.interfaces.DataCallBack;
+import com.comingoo.driver.fousa.utility.Utilities;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.Calendar;
+import java.util.Locale;
+import java.util.Objects;
+
+import static android.content.Context.MODE_PRIVATE;
+
+public class MapsVM {
+    private Context context;
+    private double rat = 0.0;
+    private String drivrNam = "";
+    private String drivrImg = "";
+    private String drivrNum = "";
+    private String debt = "";
+    private String todystrp = "";
+    private String todysErn = "";
+    public DataCallBack callback;
+
+    public void checkLogin() {
+        final String TAG = "checkLoginVM";
+        final SharedPreferences prefs = context.getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
+        final String driverId = prefs.getString("userId", null);
+        if (driverId == null) {
+            //User Is Logged In
+            Intent intent = new Intent(context, MainActivity.class);
+            context.startActivity(intent);
+            ((Activity) context).finish();
+        } else {
+
+            if (Looper.myLooper() == null) {
+                Looper.prepare();
+                Looper.myLooper();
+            }
+
+
+            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(driverId).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        Log.e(TAG, "onDataChange: driver exists");
+                        String isVerified = dataSnapshot.child("isVerified").getValue(String.class);
+                        if (isVerified != null && isVerified.equals("0")) {
+                            prefs.edit().remove("phoneNumber").apply();
+                            prefs.edit().remove("userId").apply();
+                            Intent intent = new Intent(context, MainActivity.class);
+                            context.startActivity(intent);
+                            ((Activity) context).finish();
+                        }
+                        drivrNam = dataSnapshot.child("fullName").getValue(String.class);
+                        drivrImg = dataSnapshot.child("image").getValue(String.class);
+                        drivrNum = dataSnapshot.child("phoneNumber").getValue(String.class);
+                        prefs.edit().putString("userId", dataSnapshot.getKey()).apply();
+
+                        if (dataSnapshot.child("rating").child("1").getValue(String.class) != null
+                                || dataSnapshot.child("rating").child("2").getValue(String.class) != null ||
+                                dataSnapshot.child("rating").child("3").getValue(String.class) != null ||
+                                dataSnapshot.child("rating").child("4").getValue(String.class) != null ||
+                                dataSnapshot.child("rating").child("5").getValue(String.class) != null) {
+
+                            double r1 = Double.parseDouble(Objects.requireNonNull(dataSnapshot.child("rating").child("1").getValue(String.class)));
+                            double r2 = Double.parseDouble(Objects.requireNonNull(dataSnapshot.child("rating").child("2").getValue(String.class)));
+                            double r3 = Double.parseDouble(Objects.requireNonNull(dataSnapshot.child("rating").child("3").getValue(String.class)));
+                            double r4 = Double.parseDouble(Objects.requireNonNull(dataSnapshot.child("rating").child("4").getValue(String.class)));
+                            double r5 = Double.parseDouble(Objects.requireNonNull(dataSnapshot.child("rating").child("5").getValue(String.class)));
+
+                            double gettingTotalRate = r1 + (r2 * 2) + (r3 * 3) + (r4 * 4) + (r5 * 5);
+                            double sum = r1 + r2 + r3 + r4 + r5;
+
+
+                            if (sum != 0)
+                                rat = gettingTotalRate / sum;
+                        }
+
+                        if (dataSnapshot.child("debt").exists())
+                            debt = dataSnapshot.child("debt").getValue(String.class);
+                        else
+                            debt = "0.0";
+
+
+                        todysErn = "0";
+                        todystrp = "0";
+
+                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(driverId).child("EARNINGS").child(Utilities.getDateMonth(Utilities.GetUnixTime())).child(Utilities.getDateDay(Utilities.GetUnixTime())).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                                if (dataSnapshot.exists()) {
+                                    todysErn = dataSnapshot.child("earnings").getValue(String.class);
+                                    todystrp = dataSnapshot.child("voyages").getValue(String.class);
+                                    callback.callbackCall(true,drivrNam,drivrImg,drivrNum,debt,todystrp,todysErn,rat);
+                                }
+
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                                callback.callbackCall(false,"","","","","","",0.0);
+                            }
+                        });
+
+                        callback.callbackCall(true,drivrNam,drivrImg,drivrNum,debt,todystrp,todysErn,rat);
+                    } else {
+                        Toast.makeText(context, driverId, Toast.LENGTH_SHORT).show();
+                        prefs.edit().remove("phoneNumber").apply();
+                        prefs.edit().remove("userId").apply();
+                        Intent intent = new Intent(context, MainActivity.class);
+                        context.startActivity(intent);
+                        ((Activity) context).finish();
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    callback.callbackCall(false,"","","","","","",0.0);
+                }
+            });
+        }
+
+    }
+}

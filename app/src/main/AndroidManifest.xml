@@ -28,7 +28,6 @@
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
-
     <application
         android:allowBackup="true"
         android:fullBackupContent="true"
@@ -41,10 +40,10 @@
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:ignore="GoogleAppIndexingWarning">
         <service
-            android:name="com.comingoo.driver.fousa.service.DriverService"
+            android:name=".service.DriverService"
             android:exported="false" />
         <service
-            android:name="com.comingoo.driver.fousa.service.CourseService"
+            android:name=".service.CourseService"
             android:exported="false" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -58,11 +57,10 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <!--<meta-data-->
-        <!--android:name="io.fabric.ApiKey"-->
-        <!--android:value="9d2f04b9fa154d690885532b8443aab2fbe59bb8"-->
-        <!--/>-->
-
+        <!-- <meta-data -->
+        <!-- android:name="io.fabric.ApiKey" -->
+        <!-- android:value="9d2f04b9fa154d690885532b8443aab2fbe59bb8" -->
+        <!-- /> -->
 
         <activity
             android:name=".activity.MapsActivity"
@@ -76,9 +74,7 @@
         <activity
             android:name=".activity.CommandActivity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait">
-
-        </activity>
+            android:screenOrientation="portrait"></activity>
         <activity
             android:name=".activity.MainActivity"
             android:configChanges="orientation"
@@ -104,11 +100,11 @@
             android:name=".activity.ComingooAndYouActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".activity.VoipCallingActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
+        <activity android:name=".activity.MapsNewActivity"></activity>
     </application>
 
 </manifest>
