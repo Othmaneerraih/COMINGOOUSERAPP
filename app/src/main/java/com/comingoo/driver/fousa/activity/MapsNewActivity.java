@@ -37,6 +37,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.comingoo.driver.fousa.R;
+import com.comingoo.driver.fousa.interfaces.CourseCallBack;
 import com.comingoo.driver.fousa.interfaces.DataCallBack;
 import com.comingoo.driver.fousa.utility.CustomAnimation;
 import com.comingoo.driver.fousa.utility.Utilities;
@@ -74,7 +75,6 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
 public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCallback {
-
     private MapsVM mapsVM;
     private double rating = 0.0;
     private String driverName = "";
@@ -83,7 +83,18 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
     private String debit = "";
     private String todayTrips = "";
     private String todayEarnings = "";
+
+    private String courseState = "";
     private String driverId = "";
+    private String courseId;
+    private String clientId;
+    private String clientName;
+    private String clientImageUri;
+    private String clientPhoneNumber;
+    private String clientlastCourse;
+    private String startAddress;
+    private String destAddress;
+
     private String TAG = "MapsNewActivity";
     private DecimalFormat df2 = new DecimalFormat("0.##");
 
@@ -159,9 +170,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         }
     }
 
-
     private void initialize() {
-        // NOTE : Map init
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         if (mapFragment != null) {
@@ -170,11 +179,11 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
 
         // NOTE : Banner init
         moneyBtn = findViewById(R.id.money_btn);
-        destinationLayout = findViewById(R.id.destination_layout);
+        destinationLayout = findViewById(R.id.nevigation_layout);
         destTimeTxt = findViewById(R.id.dest_time_txt);
         addressTxt = findViewById(R.id.address_txt);
         //initially hide
-//        destinationLayout.setVisibility(View.GONE);
+        destinationLayout.setVisibility(View.GONE);
 
         // NOTE : Client init
         clientImage = findViewById(R.id.user_image);
@@ -239,7 +248,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         mapsVM.checkLogin(MapsNewActivity.this, new DataCallBack() {
             @Override
             public void callbackCall(boolean success, String drivrNam, String drivrImg, String drivrNum, String debt, String todystrp, String todysErn, double rat, String drivrId) {
-                if(success){
+                if (success) {
                     driverName = drivrNam;
                     driverImage = drivrImg;
                     driverNumber = drivrNum;
@@ -248,7 +257,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                     todayEarnings = todysErn;
                     rating = rat;
                     driverId = drivrId;
-                }else{
+                } else {
                     Intent intent = new Intent(MapsNewActivity.this, MainActivity.class);
                     startActivity(intent);
                     finish();
@@ -256,9 +265,27 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
             }
         });
 
+        mapsVM.checkCourseTask(MapsNewActivity.this, new CourseCallBack() {
+            @Override
+            public void callbackCourseInfo(String coursId, String clintId,
+                                           String clintName, String clintImageUri, String clintPhoneNumber,
+                                           String clintlastCourse, String strtAddress, String destAddr, String courseSta) {
+                courseState = courseSta;
+                courseId = coursId;
+                clientId = clintId;
+                clientName = clintName;
+                clientImageUri = clintImageUri;
+                clientPhoneNumber = clintPhoneNumber;
+                clientlastCourse = clintlastCourse;
+                startAddress = strtAddress;
+                destAddress = destAddr;
+            }
+        });
+
         SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
-        if (prefs.getString("online", "0").equals("1"))
+        if (Objects.equals(prefs.getString("online", "0"), "1")) {
             switchOnlineUI();
+        }
 
 
         telephoneTv.setOnClickListener(new View.OnClickListener() {
@@ -297,7 +324,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
             }
         });
 
-        if(!driverId.equals("")){
+        if (!driverId.equals("")) {
             SinchClient sinchClient = Sinch.getSinchClientBuilder()
                     .context(this)
                     .userId(driverId)
@@ -309,11 +336,8 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
             sinchClient.setSupportCalling(true);
             sinchClient.startListeningOnActiveConnection();
             sinchClient.start();
-
             sinchClient.getCallClient().addCallClientListener(new SinchCallClientListener());
         }
-
-
 
         closeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -335,7 +359,6 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
 
             }
         });
-
 
         switchOnlineBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -382,6 +405,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                 startActivity(new Intent(MapsNewActivity.this, AideActivity.class));
             }
         });
+
         logoutLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -402,6 +426,42 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
 
     }
 
+    private void courseHandle() {
+        if (courseState.equals("4")) {
+            wazeBtn.setVisibility(View.GONE);
+            courseUIOff();
+            if (mMap != null)
+                mMap.clear();
+
+        } else {
+            switchToCourseUI();
+            if (courseState.equals("3")) {
+//                stopCourseService();
+                courseState = "4";
+//                isRatingPopupShowed = false;
+                if (mMap != null)
+                    mMap.clear();
+            }
+
+            try {
+//                startCourseService();
+//                checkCourseState();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+
+    }
+    private void switchToCourseUI() {
+        statusLayout.setVisibility(View.GONE);
+        moneyBtn.setVisibility(View.GONE);
+        menuBtn.setVisibility(View.GONE);
+        clientInfoLayout.setVisibility(View.VISIBLE);
+        cancelRideIv.setVisibility(View.VISIBLE);
+        destinationLayout.setVisibility(View.VISIBLE);
+        clientInfoLayout.setBackgroundColor(Color.WHITE);
+    }
     private void rideCancelDialog() {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MapsNewActivity.this);
         final AlertDialog alertDialog = dialogBuilder.create();
@@ -461,7 +521,6 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
             }
         });
     }
-
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -584,7 +643,6 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // TODO Auto-generated method stub
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == 1 && RESULT_OK == -1 && data.hasExtra("result")) {
@@ -895,7 +953,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                 @Override
                 public void onClick(View v) {
                     if (audioManager != null) {
-                        mute(audioManager,iv_mute);
+                        mute(audioManager, iv_mute);
                     }
                 }
             });

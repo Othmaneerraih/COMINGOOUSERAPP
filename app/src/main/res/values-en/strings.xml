@@ -44,4 +44,6 @@
     <string name="appelle_telephonique">Phone call</string>
     <string name="appelle_voip">VOIP call</string>
     <string name="appuyez_pour_arriver">Press to arrive</string>
+    <string name="_0_0_mad">0.0 MAD</string>
+    <string name="todo">TODO</string>
 </resources>

@@ -175,13 +175,12 @@ public class DriverService extends Service {
     private String TAG = "DriverService";
 
     private class DriverServiceTask extends AsyncTask<String, Integer, String> {
-        // Runs in UI before background thread is called
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
         }
 
-        // This is run in a background thread
         @Override
         protected String doInBackground(String... params) {
 
@@ -217,8 +216,6 @@ public class DriverService extends Service {
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (dataSnapshot.exists()) {
                             if (dataSnapshot.child("isVerified").getValue(String.class).equals("0")) {
-                                //Intent inte = new Intent(ComingoDriverService.this, ComingoDriverService.class);
-                                //stopService(inte);
                                 SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
                                 prefs.edit().remove("online").apply();
                                 DriverService.this.stopSelf();
@@ -305,7 +302,7 @@ public class DriverService extends Service {
                                 counter++;
                                 checkStop = true;
                                 checkHandler.removeCallbacks(checkRunnable);
-                                handler.postDelayed(runnable, 0); // Optional, to repeat the task.
+                                handler.postDelayed(runnable, 0);
                                 clientRequetFollow.removeEventListener(this);
                             }
                         }
@@ -443,7 +440,6 @@ public class DriverService extends Service {
                         }
                     }
 
-                    //handler.removeCallbacks(runnable);
                     if (requestUsersID.size() > 0 && !isRunning) {
                         runnable.run();
                     }
@@ -459,21 +455,14 @@ public class DriverService extends Service {
 
             return "this string is passed to onPostExecute";
         }
-
-        // This is called from background thread but runs in UI
         @Override
         protected void onProgressUpdate(Integer... values) {
             super.onProgressUpdate(values);
-
-            // Do things like update the progress bar
         }
 
-        // This runs in UI when background thread finishes
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-
-            // Do things like hide the progress bar or change a TextView
         }
     }
 
@@ -517,48 +506,33 @@ public class DriverService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-
-
         return null;
     }
-
 
     public void onLocationChanged(Location location) {
         new LocationChangedTask().execute(location);
     }
 
-
     private class LocationUpdatesTask extends AsyncTask<String, Integer, String> {
-
-        private static final long FASTEST_INTERVAL = 1000 * 1;
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
         }
 
-        // This is run in a background thread
         @Override
         protected String doInBackground(String... params) {
-            //createLocationRequest();
             getLastLocation();
             return "this string is passed to onPostExecute";
         }
 
-        // This is called from background thread but runs in UI
         @Override
         protected void onProgressUpdate(Integer... values) {
             super.onProgressUpdate(values);
-
-            // Do things like update the progress bar
         }
-
-        // This runs in UI when background thread finishes
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-
-            // Do things like hide the progress bar or change a TextView
         }
     }
 
@@ -580,7 +554,6 @@ public class DriverService extends Service {
         return deg * (Math.PI / 180);
     }
 
-
     private class LocationChangedTask extends AsyncTask<Location, Integer, String> {
         SharedPreferences prefs;
         String userId;
@@ -590,7 +563,6 @@ public class DriverService extends Service {
             super.onPreExecute();
             prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
             userId = prefs.getString("userId", null);
-            // Do something like display a progress bar
         }
 
         // This is run in a background thread
@@ -627,25 +599,21 @@ public class DriverService extends Service {
         @Override
         protected void onProgressUpdate(Integer... values) {
             super.onProgressUpdate(values);
-
-            // Do things like update the progress bar
         }
 
         // This runs in UI when background thread finishes
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-
-            // Do things like hide the progress bar or change a TextView
         }
     }
 
 
     public void getLastLocation() {
-        // Get last known recent location using new Google Play Services SDK (v11+)
         FusedLocationProviderClient locationClient = getFusedLocationProviderClient(this);
 
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) ==
+        if (ContextCompat.checkSelfPermission(this,
+                android.Manifest.permission.ACCESS_FINE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED) {
             locationClient.getLastLocation()
                     .addOnSuccessListener(new OnSuccessListener<Location>() {
@@ -660,7 +628,6 @@ public class DriverService extends Service {
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Log.d("MapDemoActivity", "Error trying to get last GPS location");
                             e.printStackTrace();
                         }
                     });

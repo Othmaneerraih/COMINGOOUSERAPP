@@ -30,7 +30,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:background="@drawable/money_button"
-        android:text="0.0 MAD"
+        android:text="@string/_0_0_mad"
         android:textColor="@color/colorPrimarySecond"
         android:visibility="visible" />
 
@@ -88,7 +88,8 @@
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
         android:layout_marginEnd="16dp"
-        android:background="@drawable/my_location" />
+        android:background="@drawable/my_location"
+        android:contentDescription="@string/todo" />
 
     <ImageButton
         android:id="@+id/menu_button"
@@ -99,7 +100,8 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
         android:background="@drawable/menu_icon"
-        android:visibility="visible" />
+        android:visibility="visible"
+        android:contentDescription="@string/todo" />
 
     <ImageButton
         android:id="@+id/waze_button"
@@ -109,6 +111,7 @@
         android:layout_alignParentEnd="true"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="@dimen/margin_xxlarge"
-        android:background="@drawable/waze_icon" />
+        android:background="@drawable/waze_icon"
+        android:contentDescription="@string/todo" />
 
 </RelativeLayout>

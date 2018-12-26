@@ -252,7 +252,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-//        statusCheck();
+
         if (!isNetworkConnectionAvailable()) {
             checkNetworkConnection();
         }
@@ -597,7 +597,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private class SinchCallClientListener implements CallClientListener {
         @Override
         public void onIncomingCall(CallClient callClient, Call incomingCall) {
-
             Toast.makeText(MapsActivity.this, "incoming call", Toast.LENGTH_SHORT).show();
             showDialog(MapsActivity.this, incomingCall);
         }
