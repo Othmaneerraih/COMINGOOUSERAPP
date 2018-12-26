@@ -2,15 +2,19 @@ package com.comingoo.driver.fousa.utility;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.IntentSender;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.text.format.DateFormat;
 import android.util.Log;
 
+import com.comingoo.driver.fousa.R;
 import com.comingoo.driver.fousa.activity.MapsActivity;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -21,6 +25,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.Calendar;
 import java.util.Locale;
@@ -118,5 +123,23 @@ public class Utilities {
                 }
             }
         });
+    }
+
+    public static String convertDate(String dateInMilliseconds, String dateFormat) {
+        return DateFormat.format(dateFormat, Long.parseLong(dateInMilliseconds)).toString();
+    }
+
+    private void openWaze(LatLng location, Context context) {
+        String link = "https://waze.com/ul?";
+        if (location != null) {
+            link += "ll=" + location.latitude + "," + location.longitude + "&navigate=yes";
+        }
+        try {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(link));
+            context.startActivity(intent);
+        } catch (ActivityNotFoundException ex) {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(context.getResources().getString(R.string.waze_urlt)));
+            context.startActivity(intent);
+        }
     }
 }

@@ -113,7 +113,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/destTime"
+                android:id="@+id/dest_time_txt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
@@ -175,7 +175,7 @@
             app:layout_constraintTop_toBottomOf="@+id/destination_layout" />
 
         <android.support.constraint.ConstraintLayout
-            android:id="@+id/statusConstraint"
+            android:id="@+id/status_layout"
             android:layout_width="match_parent"
             android:layout_height="80dp"
             android:layout_marginStart="8dp"
@@ -341,7 +341,7 @@
                         app:layout_constraintTop_toBottomOf="@+id/course_details_txt" />
 
                     <TextView
-                        android:id="@+id/textView6"
+                        android:id="@+id/date_txt"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
@@ -704,7 +704,7 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
-                    android:id="@+id/comingoonyouu_txt"
+                    android:id="@+id/comingoonyou_txt"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="20dp"

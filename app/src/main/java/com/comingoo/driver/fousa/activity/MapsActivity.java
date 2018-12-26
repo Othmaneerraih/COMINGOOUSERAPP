@@ -334,7 +334,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             close_button = findViewById(R.id.close_button);
             call_button = findViewById(R.id.call_button);
             voip_view = findViewById(R.id.voip_view);
-            date = findViewById(R.id.textView6);
+            date = findViewById(R.id.date_txt);
             df2.setRoundingMode(RoundingMode.UP);
             SinchClient sinchClient = Sinch.getSinchClientBuilder()
                     .context(this)
@@ -946,7 +946,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void switchToCourseUI() {
-        findViewById(R.id.statusConstraint).setVisibility(View.GONE);
+        findViewById(R.id.status_layout).setVisibility(View.GONE);
         findViewById(R.id.money_btn).setVisibility(View.GONE);
         menuButton.setVisibility(View.GONE);
         clientInfoLayout.setVisibility(View.VISIBLE);
@@ -956,7 +956,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void cancelCourseUI() {
-        findViewById(R.id.statusConstraint).setVisibility(View.VISIBLE);
+        findViewById(R.id.status_layout).setVisibility(View.VISIBLE);
         findViewById(R.id.money_btn).setVisibility(View.VISIBLE);
         menuButton.setVisibility(View.VISIBLE);
         clientInfoLayout.setVisibility(View.GONE);
@@ -2195,7 +2195,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     private void courseUIOff() {
-        findViewById(R.id.statusConstraint).setVisibility(View.VISIBLE);
+        findViewById(R.id.status_layout).setVisibility(View.VISIBLE);
         findViewById(R.id.money_btn).setVisibility(View.VISIBLE);
         clientInfoLayout.setVisibility(View.GONE);
         destinationLayout.setVisibility(View.GONE);

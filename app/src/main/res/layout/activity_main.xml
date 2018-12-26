@@ -88,7 +88,7 @@
 
 
             <TextView
-                android:id="@+id/textView6"
+                android:id="@+id/date_txt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/vous_avez_deja_un_compte"

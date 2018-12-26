@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import com.comingoo.driver.fousa.interfaces.DataCallBack;
 import com.comingoo.driver.fousa.utility.Utilities;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
@@ -32,12 +33,14 @@ public class MapsVM {
     private String debt = "";
     private String todystrp = "";
     private String todysErn = "";
+    private String driverId = "";
+    private String courseId = "";
     public DataCallBack callback;
 
     public void checkLogin() {
         final String TAG = "checkLoginVM";
         final SharedPreferences prefs = context.getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
-        final String driverId = prefs.getString("userId", null);
+        driverId = prefs.getString("userId", null);
         if (driverId == null) {
             //User Is Logged In
             Intent intent = new Intent(context, MainActivity.class);
@@ -105,18 +108,18 @@ public class MapsVM {
                                 if (dataSnapshot.exists()) {
                                     todysErn = dataSnapshot.child("earnings").getValue(String.class);
                                     todystrp = dataSnapshot.child("voyages").getValue(String.class);
-                                    callback.callbackCall(true,drivrNam,drivrImg,drivrNum,debt,todystrp,todysErn,rat);
+                                    callback.callbackCall(true,drivrNam,drivrImg,drivrNum,debt,todystrp,todysErn,rat,driverId);
                                 }
 
                             }
 
                             @Override
                             public void onCancelled(@NonNull DatabaseError databaseError) {
-                                callback.callbackCall(false,"","","","","","",0.0);
+                                callback.callbackCall(false,"","","","","","",0.0,"");
                             }
                         });
 
-                        callback.callbackCall(true,drivrNam,drivrImg,drivrNum,debt,todystrp,todysErn,rat);
+                        callback.callbackCall(true,drivrNam,drivrImg,drivrNum,debt,todystrp,todysErn,rat,driverId);
                     } else {
                         Toast.makeText(context, driverId, Toast.LENGTH_SHORT).show();
                         prefs.edit().remove("phoneNumber").apply();
@@ -129,10 +132,12 @@ public class MapsVM {
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
-                    callback.callbackCall(false,"","","","","","",0.0);
+                    callback.callbackCall(false,"","","","","","",0.0,"");
                 }
             });
         }
 
     }
+
+
 }

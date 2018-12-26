@@ -167,7 +167,7 @@
             android:background="@drawable/comingoo_you" />
 
         <TextView
-            android:id="@+id/comingoonyouu_txt"
+            android:id="@+id/comingoonyou_txt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"

@@ -65,16 +65,16 @@
         <activity
             android:name=".activity.MapsActivity"
             android:label="@string/title_activity_maps">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--</intent-filter>-->
         </activity>
         <activity
             android:name=".activity.CommandActivity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".activity.MainActivity"
             android:configChanges="orientation"
@@ -104,7 +104,16 @@
             android:name=".activity.VoipCallingActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
-        <activity android:name=".activity.MapsNewActivity"></activity>
+        <activity android:name=".activity.MapsNewActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
+            android:label="@string/title_activity_maps">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
