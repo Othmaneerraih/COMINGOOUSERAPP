@@ -27,8 +27,13 @@
         <include
             layout="@layout/include_maps"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent" />
 
     </RelativeLayout>
+
+    <include
+        layout="@layout/include_maps_drawer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 </com.mxn.soul.flowingdrawer_core.FlowingDrawer>

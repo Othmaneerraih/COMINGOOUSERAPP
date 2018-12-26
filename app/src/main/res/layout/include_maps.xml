@@ -34,8 +34,10 @@
         android:textColor="@color/colorPrimarySecond"
         android:visibility="visible" />
 
-    <RelativeLayout
-        android:id="@+id/destination_layout"
+
+    <include
+        android:id="@+id/destination_include"
+        layout="@layout/include_map_top_banner"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_alignParentTop="true"
@@ -44,79 +46,13 @@
         android:layout_marginLeft="20dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="20dp"
-        android:layout_marginRight="20dp"
-        android:background="@drawable/dest_const"
-        android:visibility="visible">
-
-        <RelativeLayout
-            android:id="@+id/button9"
-            android:layout_width="65dp"
-            android:layout_height="match_parent"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:background="@android:color/white"
-            android:elevation="4dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_centerInParent="true"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:id="@+id/arrow_image"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_gravity="center"
-                    android:elevation="4dp"
-                    android:src="@drawable/arrow_blue" />
-
-                <TextView
-                    android:id="@+id/destTime"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:elevation="4dp"
-                    android:text="6 min"
-                    android:textColor="@color/colorPrimary" />
-            </LinearLayout>
-
-        </RelativeLayout>
-
-
-        <ImageView
-            android:id="@+id/white_person_image"
-            android:layout_width="30dp"
-            android:layout_height="50dp"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="8dp"
-            android:src="@drawable/person_white" />
-
-        <TextView
-            android:id="@+id/addressText"
-            android:layout_width="200dp"
-            android:layout_height="match_parent"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginBottom="8dp"
-            android:layout_toStartOf="@+id/button9"
-            android:layout_toEndOf="@+id/white_person_image"
-            android:gravity="center_vertical"
-            android:text=""
-            android:textColor="@android:color/white"
-            android:textSize="12sp" />
-
-    </RelativeLayout>
+        android:layout_marginRight="20dp" />
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/iv_cancel_ride"
         android:layout_width="25dp"
         android:layout_height="25dp"
-        android:layout_below="@+id/destination_layout"
+        android:layout_below="@+id/destination_include"
         android:layout_alignParentEnd="true"
         android:layout_margin="15dp"
         android:layout_marginTop="16dp"
@@ -126,8 +62,16 @@
         app:civ_border_color="@android:color/black"
         app:civ_border_width="2dp" />
 
-    <RelativeLayout
-        android:id="@+id/statusConstraint"
+    <include
+        layout="@layout/include_maps_user_info"
+        android:layout_width="match_parent"
+        android:layout_height="270dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
+
+
+    <include
+        layout="@layout/include_maps_bottom_status"
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:layout_alignParentBottom="true"
@@ -135,60 +79,37 @@
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:visibility="visible">
+        android:layout_marginRight="8dp" />
 
-        <Button
-            android:id="@+id/offline_button"
-            android:layout_width="match_parent"
-            android:layout_height="45dp"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:layout_toStartOf="@+id/switch_online_button"
-            android:background="@drawable/status"
-            android:clickable="false"
-            android:elevation="4dp"
-            android:text="Vous étes hors ligne"
-            android:textAllCaps="false"
-            android:textSize="16sp" />
 
-        <Button
-            android:id="@+id/switch_online_button"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:layout_marginEnd="8dp"
-            android:background="@drawable/goo_bt"
-            android:elevation="4dp" />
+    <ImageButton
+        android:id="@+id/my_position_button"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/my_location" />
 
-        <Button
-            android:id="@+id/online_button"
-            android:layout_width="match_parent"
-            android:layout_height="45dp"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:layout_toStartOf="@+id/switch_online_button"
-            android:background="@drawable/online_button"
-            android:elevation="10dp"
-            android:text="Vous étes en ligne"
-            android:textAllCaps="false"
-            android:textColor="@android:color/white"
-            android:textSize="18sp"
-            android:visibility="visible" />
+    <ImageButton
+        android:id="@+id/menu_button"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/menu_icon"
+        android:visibility="visible" />
 
-    </RelativeLayout>
-
-    <include
-        layout="@layout/include_maps_user_info"
-        android:layout_width="match_parent"
-        android:layout_height="270dp"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
+    <ImageButton
+        android:id="@+id/waze_button"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_below="@+id/my_position_button"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="@dimen/margin_xxlarge"
+        android:background="@drawable/waze_icon" />
 
 </RelativeLayout>
