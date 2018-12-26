@@ -69,7 +69,6 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
 
-
     <include
         layout="@layout/include_maps_bottom_status"
         android:layout_width="match_parent"

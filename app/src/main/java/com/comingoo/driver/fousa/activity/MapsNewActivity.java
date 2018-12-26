@@ -77,7 +77,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
 
     private MapsVM mapsVM;
     private double rating = 0.0;
-    private String ddriverName = "";
+    private String driverName = "";
     private String driverImage = "";
     private String driverNumber = "";
     private String debit = "";
@@ -87,7 +87,6 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
     private String TAG = "MapsNewActivity";
     private DecimalFormat df2 = new DecimalFormat("0.##");
 
-    private TextView voipCallTv;
     private CircularImageView clientImage;
     private TextView clientNameTv;
     private TextView driverInfoTv;
@@ -175,7 +174,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         destTimeTxt = findViewById(R.id.dest_time_txt);
         addressTxt = findViewById(R.id.address_txt);
         //initially hide
-        destinationLayout.setVisibility(View.GONE);
+//        destinationLayout.setVisibility(View.GONE);
 
         // NOTE : Client init
         clientImage = findViewById(R.id.user_image);
@@ -237,20 +236,26 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         df2.setRoundingMode(RoundingMode.UP);
         mapsVM = new MapsVM();
 
-        mapsVM.checkLogin();
-        mapsVM.callback = new DataCallBack() {
+        mapsVM.checkLogin(MapsNewActivity.this, new DataCallBack() {
             @Override
             public void callbackCall(boolean success, String drivrNam, String drivrImg, String drivrNum, String debt, String todystrp, String todysErn, double rat, String drivrId) {
-                ddriverName = drivrNam;
-                driverImage = drivrImg;
-                driverNumber = drivrNum;
-                debit = debt;
-                todayTrips = todystrp;
-                todayEarnings = todysErn;
-                rating = rat;
-                driverId = drivrId;
+                if(success){
+                    driverName = drivrNam;
+                    driverImage = drivrImg;
+                    driverNumber = drivrNum;
+                    debit = debt;
+                    todayTrips = todystrp;
+                    todayEarnings = todysErn;
+                    rating = rat;
+                    driverId = drivrId;
+                }else{
+                    Intent intent = new Intent(MapsNewActivity.this, MainActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
             }
-        };
+        });
+
         SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
         if (prefs.getString("online", "0").equals("1"))
             switchOnlineUI();
@@ -276,12 +281,12 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
             }
         });
 
-        voipCallTv.setOnClickListener(new View.OnClickListener() {
+        voipTv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!driverId.isEmpty()) {
-                    voipCallTv.setClickable(false);
-                    voipCallTv.setEnabled(false);
+                    voipTv.setClickable(false);
+                    voipTv.setEnabled(false);
 //                    Intent intent = new Intent(MapsNewActivity.this, VoipCallingActivity.class);
 //                    intent.putExtra("driverId", driverId);
 //                    intent.putExtra("clientId", clientId);
@@ -292,19 +297,22 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
             }
         });
 
-        SinchClient sinchClient = Sinch.getSinchClientBuilder()
-                .context(this)
-                .userId(driverId)
-                .applicationKey(getString(R.string.sinch_key))
-                .applicationSecret(getString(R.string.sinch_app_secret))
-                .environmentHost(getString(R.string.sinch_envirenment))
-                .build();
+        if(!driverId.equals("")){
+            SinchClient sinchClient = Sinch.getSinchClientBuilder()
+                    .context(this)
+                    .userId(driverId)
+                    .applicationKey(getString(R.string.sinch_key))
+                    .applicationSecret(getString(R.string.sinch_app_secret))
+                    .environmentHost(getString(R.string.sinch_envirenment))
+                    .build();
 
-        sinchClient.setSupportCalling(true);
-        sinchClient.startListeningOnActiveConnection();
-        sinchClient.start();
+            sinchClient.setSupportCalling(true);
+            sinchClient.startListeningOnActiveConnection();
+            sinchClient.start();
 
-        sinchClient.getCallClient().addCallClientListener(new SinchCallClientListener());
+            sinchClient.getCallClient().addCallClientListener(new SinchCallClientListener());
+        }
+
 
 
         closeBtn.setOnClickListener(new View.OnClickListener() {
@@ -580,8 +588,8 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == 1 && RESULT_OK == -1 && data.hasExtra("result")) {
-            voipCallTv.setClickable(true);
-            voipCallTv.setEnabled(true);
+            voipTv.setClickable(true);
+            voipTv.setEnabled(true);
         }
 
         switch (requestCode) {
@@ -623,8 +631,8 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
     protected void onResume() {
         super.onResume();
 
-        voipCallTv.setClickable(true);
-        voipCallTv.setEnabled(true);
+        voipTv.setClickable(true);
+        voipTv.setEnabled(true);
 
         if (ActivityCompat.checkSelfPermission(MapsNewActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MapsNewActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(MapsNewActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 1);

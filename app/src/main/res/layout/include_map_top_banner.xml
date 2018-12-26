@@ -3,8 +3,7 @@
     android:id="@+id/destination_layout"
     android:layout_width="match_parent"
     android:layout_height="60dp"
-    android:background="@drawable/dest_const"
-    android:visibility="visible">
+    android:background="@drawable/dest_const">
 
     <RelativeLayout
         android:id="@+id/nevigation_layout"

@@ -25,7 +25,6 @@ import java.util.Objects;
 import static android.content.Context.MODE_PRIVATE;
 
 public class MapsVM {
-    private Context context;
     private double rat = 0.0;
     private String drivrNam = "";
     private String drivrImg = "";
@@ -35,17 +34,14 @@ public class MapsVM {
     private String todysErn = "";
     private String driverId = "";
     private String courseId = "";
-    public DataCallBack callback;
 
-    public void checkLogin() {
+    public void checkLogin(final Context context, final DataCallBack callback) {
         final String TAG = "checkLoginVM";
         final SharedPreferences prefs = context.getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
         driverId = prefs.getString("userId", null);
         if (driverId == null) {
             //User Is Logged In
-            Intent intent = new Intent(context, MainActivity.class);
-            context.startActivity(intent);
-            ((Activity) context).finish();
+            callback.callbackCall(false,"","","","","","",0.0,"");
         } else {
 
             if (Looper.myLooper() == null) {
