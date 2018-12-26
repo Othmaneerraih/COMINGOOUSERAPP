@@ -34,4 +34,14 @@
     <string name="bon_client">Good Customer</string>
     <string name="refuser">Refuse</string>
     <string name="accepter">Accept</string>
+    <string name="vous_tes_hors_ligne">You are offline</string>
+    <string name="vous_tes_en_ligne">You are in line</string>
+    <string name="se_deconnecter">Sign out</string>
+    <string name="aide">Help</string>
+    <string name="inbox">Inbox</string>
+    <string name="historique">History</string>
+    <string name="acceuil">Home</string>
+    <string name="appelle_telephonique">Phone call</string>
+    <string name="appelle_voip">VOIP call</string>
+    <string name="appuyez_pour_arriver">Press to arrive</string>
 </resources>

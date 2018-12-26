@@ -288,8 +288,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             loadImages();
 
-            tv_appelle_voip = findViewById(R.id.tv_appelle_voip);
-            TextView tv_appelle_telephone = findViewById(R.id.tv_appelle_telephone);
+            tv_appelle_voip = findViewById(R.id.tv_voip);
+            TextView tv_appelle_telephone = findViewById(R.id.tv_telephone);
 
             tv_appelle_telephone.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -327,10 +327,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             });
 
-            clientImage = findViewById(R.id.clientImage);
-            name = findViewById(R.id.name);
-            tvLastCourse = findViewById(R.id.textView5);
-            totalCourse = findViewById(R.id.textView2);
+            clientImage = findViewById(R.id.user_image);
+            name = findViewById(R.id.user_name_txt);
+            tvLastCourse = findViewById(R.id.driver_details_txt);
+            totalCourse = findViewById(R.id.course_count_txt);
             close_button = findViewById(R.id.close_button);
             call_button = findViewById(R.id.call_button);
             voip_view = findViewById(R.id.voip_view);
@@ -513,23 +513,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         menuButton = findViewById(R.id.menu_button);
         myPositionButton = findViewById(R.id.my_position_button);
         wazeButton = findViewById(R.id.waze_button);
-        clientInfoLayout = findViewById(R.id.clientInfo);
+        clientInfoLayout = findViewById(R.id.client_info_layout);
         destinationLayout = findViewById(R.id.destination_layout);
-        userInfoLayout = findViewById(R.id.constraintLayout);
+        userInfoLayout = findViewById(R.id.info_layout);
         arrowImage = findViewById(R.id.arrow_image);
         whitePersonImage = findViewById(R.id.white_person_image);
-        addressText = findViewById(R.id.addressText);
+        addressText = findViewById(R.id.address_txt);
         courseActionButton = findViewById(R.id.course_action_button);
         cancel_view = findViewById(R.id.cancel_view);
         ivCancelCourse = findViewById(R.id.iv_cancel_ride);
         mDrawer = findViewById(R.id.drawerlayout);
         Acceuil = findViewById(R.id.acceuil);
         Historique = findViewById(R.id.historique);
-        Inbox = findViewById(R.id.inbox);
-        ComingoonYou = findViewById(R.id.comingoonyou);
-        Aide = findViewById(R.id.aide);
-        logout = findViewById(R.id.logout);
-        money = findViewById(R.id.money);
+        Inbox = findViewById(R.id.inbox_layout);
+        ComingoonYou = findViewById(R.id.comingoonyou_layout);
+        Aide = findViewById(R.id.aide_layout);
+        logout = findViewById(R.id.logout_layout);
+        money = findViewById(R.id.money_btn);
         clientInfoLayout.setVisibility(View.GONE);
         userInfoLayout.setBackgroundColor(Color.WHITE);
     }
@@ -947,7 +947,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void switchToCourseUI() {
         findViewById(R.id.statusConstraint).setVisibility(View.GONE);
-        findViewById(R.id.money).setVisibility(View.GONE);
+        findViewById(R.id.money_btn).setVisibility(View.GONE);
         menuButton.setVisibility(View.GONE);
         clientInfoLayout.setVisibility(View.VISIBLE);
         ivCancelCourse.setVisibility(View.VISIBLE);
@@ -957,7 +957,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void cancelCourseUI() {
         findViewById(R.id.statusConstraint).setVisibility(View.VISIBLE);
-        findViewById(R.id.money).setVisibility(View.VISIBLE);
+        findViewById(R.id.money_btn).setVisibility(View.VISIBLE);
         menuButton.setVisibility(View.VISIBLE);
         clientInfoLayout.setVisibility(View.GONE);
         ivCancelCourse.setVisibility(View.GONE);
@@ -2196,7 +2196,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void courseUIOff() {
         findViewById(R.id.statusConstraint).setVisibility(View.VISIBLE);
-        findViewById(R.id.money).setVisibility(View.VISIBLE);
+        findViewById(R.id.money_btn).setVisibility(View.VISIBLE);
         clientInfoLayout.setVisibility(View.GONE);
         destinationLayout.setVisibility(View.GONE);
         menuButton.setVisibility(View.VISIBLE);

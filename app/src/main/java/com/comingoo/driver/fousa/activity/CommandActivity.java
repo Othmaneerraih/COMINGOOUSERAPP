@@ -125,10 +125,10 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
         });
 
 
-        tvUserRating = findViewById(R.id.textView10);
+        tvUserRating = findViewById(R.id.comingoonyouu_txt);
         ratingShow = findViewById(R.id.rating_txt);
         distance = findViewById(R.id.textView8);
-        startText = findViewById(R.id.textView9);
+        startText = findViewById(R.id.inbox_txt);
         tvDestination = findViewById(R.id.tv_destination);
         decline = findViewById(R.id.decline);
         accept = findViewById(R.id.accept);

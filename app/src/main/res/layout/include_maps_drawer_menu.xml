@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/content"
+    android:id="@+id/content_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimaryDark">
@@ -18,7 +18,7 @@
         app:civ_border_color="@android:color/white" />
 
     <TextView
-        android:id="@+id/fullName"
+        android:id="@+id/name_txt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/profile_image"
@@ -30,11 +30,11 @@
         android:textSize="18sp" />
 
     <ImageButton
-        android:id="@+id/imageButton"
+        android:id="@+id/rating_image"
         android:layout_width="51dp"
         android:layout_height="30dp"
-        android:layout_below="@+id/fullName"
-        android:layout_alignStart="@+id/fullName"
+        android:layout_below="@+id/name_txt"
+        android:layout_alignStart="@+id/name_txt"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginEnd="8dp"
@@ -42,19 +42,19 @@
         android:background="@drawable/rating_box" />
 
     <TextView
-        android:id="@+id/ratings"
+        android:id="@+id/rating_txt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/fullName"
-        android:layout_alignTop="@+id/imageButton"
+        android:layout_below="@+id/name_txt"
+        android:layout_alignTop="@+id/rating_image"
         android:layout_marginStart="-35dp"
         android:layout_marginTop="6dp"
-        android:layout_toEndOf="@+id/imageButton"
-        android:text="4.6"
+        android:layout_toEndOf="@+id/rating_image"
+        android:text="4"
         android:textSize="12sp" />
 
     <RelativeLayout
-        android:id="@+id/acceuil"
+        android:id="@+id/home_layout"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_below="@+id/profile_image"
@@ -62,7 +62,7 @@
         android:layout_marginTop="40dp">
 
         <ImageView
-            android:id="@+id/imageView6"
+            android:id="@+id/home_image"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_alignParentStart="true"
@@ -73,26 +73,27 @@
             android:background="@drawable/acceuil" />
 
         <TextView
+            android:id="@+id/home_txt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginStart="20dp"
-            android:layout_toEndOf="@+id/imageView6"
-            android:text="Acceuil"
+            android:layout_toEndOf="@+id/home_image"
+            android:text="@string/acceuil"
             android:textColor="@android:color/white"
             android:textSize="16sp" />
 
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/historique"
+        android:id="@+id/historique_layout"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:layout_below="@+id/acceuil"
+        android:layout_below="@+id/home_layout"
         android:layout_alignParentStart="true">
 
         <ImageView
-            android:id="@+id/imageView5"
+            android:id="@+id/history_image"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_alignParentStart="true"
@@ -103,27 +104,27 @@
             android:background="@drawable/historique" />
 
         <TextView
-            android:id="@+id/textView8"
+            android:id="@+id/history_txt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginStart="20dp"
-            android:layout_toEndOf="@+id/imageView5"
-            android:text="Historique"
+            android:layout_toEndOf="@+id/history_image"
+            android:text="@string/historique"
             android:textColor="@android:color/white"
             android:textSize="16sp" />
 
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/inbox"
+        android:id="@+id/inbox_layout"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:layout_below="@+id/historique"
+        android:layout_below="@+id/historique_layout"
         android:layout_alignParentStart="true">
 
         <ImageView
-            android:id="@+id/imageView8"
+            android:id="@+id/inbox_image"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_alignParentStart="true"
@@ -134,13 +135,13 @@
             android:background="@drawable/inbox" />
 
         <TextView
-            android:id="@+id/textView9"
+            android:id="@+id/inbox_txt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginStart="20dp"
-            android:layout_toEndOf="@+id/imageView8"
-            android:text="Inbox"
+            android:layout_toEndOf="@+id/inbox_image"
+            android:text="@string/inbox"
             android:textColor="@android:color/white"
             android:textSize="16sp" />
 
@@ -148,14 +149,14 @@
 
 
     <RelativeLayout
-        android:id="@+id/comingoonyou"
+        android:id="@+id/comingoonyou_layout"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:layout_below="@+id/inbox"
+        android:layout_below="@+id/inbox_layout"
         android:layout_alignParentStart="true">
 
         <ImageView
-            android:id="@+id/imageView9"
+            android:id="@+id/comingoonyoo_image"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_alignParentStart="true"
@@ -166,12 +167,12 @@
             android:background="@drawable/comingoo_you" />
 
         <TextView
-            android:id="@+id/textView10"
+            android:id="@+id/comingoonyouu_txt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginStart="20dp"
-            android:layout_toEndOf="@+id/imageView9"
+            android:layout_toEndOf="@+id/comingoonyoo_image"
             android:text="Comingoo and you"
             android:textColor="@android:color/white"
             android:textSize="16sp" />
@@ -179,14 +180,14 @@
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/aide"
+        android:id="@+id/aide_layout"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:layout_below="@+id/comingoonyou"
+        android:layout_below="@+id/comingoonyou_layout"
         android:layout_alignParentStart="true">
 
         <ImageView
-            android:id="@+id/imageView12"
+            android:id="@+id/aide_image"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_alignParentStart="true"
@@ -197,12 +198,13 @@
             android:background="@drawable/aide" />
 
         <TextView
+            android:id="@+id/aide_txt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginStart="20dp"
-            android:layout_toEndOf="@+id/imageView12"
-            android:text="Aide"
+            android:layout_toEndOf="@+id/aide_image"
+            android:text="@string/aide"
             android:textColor="@android:color/white"
             android:textSize="16sp" />
 
@@ -210,7 +212,7 @@
 
 
     <RelativeLayout
-        android:id="@+id/logout"
+        android:id="@+id/logout_layout"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_alignParentStart="true"
@@ -229,7 +231,7 @@
             android:layout_marginBottom="8dp">
 
             <ImageView
-                android:id="@+id/imageView10"
+                android:id="@+id/logout_image"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_alignParentStart="true"
@@ -239,13 +241,13 @@
                 android:background="@drawable/se_deconnecter" />
 
             <TextView
-                android:id="@+id/textView11"
+                android:id="@+id/logout_txt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="8dp"
-                android:layout_toEndOf="@+id/imageView10"
-                android:text="Se deconnecter"
+                android:layout_toEndOf="@+id/logout_image"
+                android:text="@string/se_deconnecter"
                 android:textColor="@android:color/white"
                 android:textSize="16sp" />
 

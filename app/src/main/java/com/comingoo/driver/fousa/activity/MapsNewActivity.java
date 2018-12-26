@@ -1,5 +1,9 @@
 package com.comingoo.driver.fousa.activity;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
@@ -27,17 +31,34 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps_new);
+        permission();
+
+
+        initialize();
+        action();
+    }
+
+    private void permission(){
         if (!Utilities.isNetworkConnectionAvailable(MapsNewActivity.this)) {
             Utilities.checkNetworkConnection(MapsNewActivity.this);
         }
         Utilities.displayLocationSettingsRequest(MapsNewActivity.this,TAG,REQUEST_CHECK_SETTINGS);
+        if (ContextCompat.checkSelfPermission(MapsNewActivity.this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(MapsNewActivity.this, new String[]{Manifest.permission.RECORD_AUDIO}, 4);
+        }
+    }
 
+
+    private void initialize(){
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
         }
         mapsVM = new MapsVM();
+    }
+
+    private void action(){
         mapsVM.checkLogin();
         mapsVM.callback = new DataCallBack() {
             @Override

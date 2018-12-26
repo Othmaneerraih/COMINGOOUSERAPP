@@ -34,5 +34,15 @@
     <string name="bon_client">Bon Client</string>
     <string name="refuser">Refuser</string>
     <string name="accepter">Accepter</string>
+    <string name="vous_tes_hors_ligne">Vous étes hors ligne</string>
+    <string name="vous_tes_en_ligne">Vous étes en ligne</string>
+    <string name="se_deconnecter">Se deconnecter</string>
+    <string name="aide">Aide</string>
+    <string name="inbox">Boîte de réception</string>
+    <string name="historique">Historique</string>
+    <string name="acceuil">Acceuil</string>
+    <string name="appelle_telephonique">Appelle telephonique</string>
+    <string name="appelle_voip">Appelle VOIP</string>
+    <string name="appuyez_pour_arriver">Appuyez pour arriver</string>
 
 </resources>

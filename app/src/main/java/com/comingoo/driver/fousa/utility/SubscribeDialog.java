@@ -30,7 +30,7 @@ public class SubscribeDialog extends AppCompatDialogFragment {
         builder.setView(view);
 
 
-        nameEdit = view.findViewById(R.id.name);
+        nameEdit = view.findViewById(R.id.user_name_txt);
         teleEdit = view.findViewById(R.id.tele);
         passwordEdit = view.findViewById(R.id.password);
 

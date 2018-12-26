@@ -19,7 +19,7 @@
         android:background="@drawable/transp_fade" />
 
     <Button
-        android:id="@+id/money"
+        android:id="@+id/money_btn"
         android:layout_width="100dp"
         android:layout_height="40dp"
         android:layout_alignParentTop="true"
