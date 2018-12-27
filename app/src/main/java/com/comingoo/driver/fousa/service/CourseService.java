@@ -48,7 +48,8 @@ import java.util.Map;
 
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
-public class CourseService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class CourseService extends Service implements GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener {
     private DatabaseReference onlineDriver;
     private DatabaseReference courseRef;
 
@@ -209,7 +210,8 @@ public class CourseService extends Service implements GoogleApiClient.Connection
         driverName = "";
         SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
         userId = prefs.getString("userId", "");
-        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("fullName").addListenerForSingleValueEvent(new ValueEventListener() {
+        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").
+                child(userId).child("fullName").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 driverName = dataSnapshot.getValue(String.class);
@@ -288,12 +290,15 @@ public class CourseService extends Service implements GoogleApiClient.Connection
                 }
             }
 
-            FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("PROMOCODE").addListenerForSingleValueEvent(new ValueEventListener() {
+            FirebaseDatabase.getInstance().getReference("clientUSERS")
+                    .child(clientID).child("PROMOCODE").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if (dataSnapshot.exists()) {
                         promoCodeValue = dataSnapshot.getValue(String.class);
-                        FirebaseDatabase.getInstance().getReference("CLIENTNOTIFICATIONS").orderByChild(promoCodeValue).equalTo(promoCodeValue).addListenerForSingleValueEvent(new ValueEventListener() {
+                        FirebaseDatabase.getInstance().getReference("CLIENTNOTIFICATIONS").
+                                orderByChild(promoCodeValue).equalTo(promoCodeValue).
+                                addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                 for (DataSnapshot data : dataSnapshot.getChildren()) {
@@ -947,8 +952,6 @@ public class CourseService extends Service implements GoogleApiClient.Connection
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-
-
         return null;
     }
 
@@ -1070,7 +1073,8 @@ public class CourseService extends Service implements GoogleApiClient.Connection
                         mCourse.setValue(data);
                         mCourse.child("date").setValue(timestamp);
 
-                        DatabaseReference dCourse = FirebaseDatabase.getInstance().getReference("DRIVERFINISHEDCOURSES").child(userId).child(courseID);
+                        DatabaseReference dCourse = FirebaseDatabase.getInstance()
+                                .getReference("DRIVERFINISHEDCOURSES").child(userId).child(courseID);
 
                         Map<String, String> dData = new HashMap<>();
                         dData.put("client", clientID);
@@ -1093,7 +1097,9 @@ public class CourseService extends Service implements GoogleApiClient.Connection
 
 
                         final double getP = price;
-                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("EARNINGS").child(getDateMonth(GetUnixTime())).child(getDateDay(GetUnixTime())).addListenerForSingleValueEvent(new ValueEventListener() {
+                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").
+                                child(userId).child("EARNINGS").child(getDateMonth(GetUnixTime()))
+                                .child(getDateDay(GetUnixTime())).addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                 double earned = 0;
@@ -1113,10 +1119,10 @@ public class CourseService extends Service implements GoogleApiClient.Connection
 
                                 voyages += 1;
 
-
                                 final double ee = earned;
                                 final int vv = voyages;
-                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").addListenerForSingleValueEvent(new ValueEventListener() {
+                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").
+                                        child(userId).child("debt").addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                         double debt = 0;
@@ -1258,7 +1264,8 @@ public class CourseService extends Service implements GoogleApiClient.Connection
             Location location = params[0];
 
             if (countingDistance && userLoc != null && location != null && time != 0) {
-                double distance = GetDistanceFromLatLonInKm(userLoc.getLatitude(), userLoc.getLongitude(), location.getLatitude(), location.getLongitude());
+                double distance = GetDistanceFromLatLonInKm(userLoc.getLatitude(),
+                        userLoc.getLongitude(), location.getLatitude(), location.getLongitude());
                 if (distance < 0.005)
                     return "";
 
@@ -1352,7 +1359,8 @@ public class CourseService extends Service implements GoogleApiClient.Connection
         // Get last known recent location using new Google Play Services SDK (v11+)
         FusedLocationProviderClient locationClient = getFusedLocationProviderClient(this);
 
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
             locationClient.getLastLocation()
                     .addOnSuccessListener(new OnSuccessListener<Location>() {
                         @Override

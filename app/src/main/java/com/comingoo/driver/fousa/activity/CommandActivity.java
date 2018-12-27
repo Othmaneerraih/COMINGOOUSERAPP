@@ -420,7 +420,7 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
                                 }
                             }
                         }
-                        MapsActivity.wazeButton.setVisibility(View.VISIBLE);
+//                        MapsActivity.wazeButton.setVisibility(View.VISIBLE);
                         CommandActivity.this.finish();
                     }
 

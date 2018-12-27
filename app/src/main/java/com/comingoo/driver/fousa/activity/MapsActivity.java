@@ -333,7 +333,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             totalCourse = findViewById(R.id.course_count_txt);
             close_button = findViewById(R.id.close_button);
             call_button = findViewById(R.id.call_button);
-            voip_view = findViewById(R.id.voip_view);
+            voip_view = findViewById(R.id.ll_voip_view);
             date = findViewById(R.id.date_txt);
             df2.setRoundingMode(RoundingMode.UP);
             SinchClient sinchClient = Sinch.getSinchClientBuilder()
@@ -520,7 +520,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         whitePersonImage = findViewById(R.id.white_person_image);
         addressText = findViewById(R.id.address_txt);
         courseActionButton = findViewById(R.id.course_action_button);
-        cancel_view = findViewById(R.id.cancel_view);
+        cancel_view = findViewById(R.id.rl_cancel_course);
         ivCancelCourse = findViewById(R.id.iv_cancel_ride);
         mDrawer = findViewById(R.id.drawerlayout);
         Acceuil = findViewById(R.id.acceuil);
@@ -2047,7 +2047,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    CircleImageView /*clientImage,*/ close_button, call_button;
+    CircleImageView close_button, call_button;
     com.mikhaellopez.circularimageview.CircularImageView clientImage;
     TextView name, tvLastCourse, totalCourse, date;
     LinearLayout voip_view;
@@ -2123,16 +2123,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     courseRef.child("state").setValue("1");
                 }
             });
-            courseActionButton.setText("Appuyez pour arriver");
+            courseActionButton.setText(R.string.txt_driver_arrive);
 
 
             if (userLatLng != null && drawRouteStart != null) {
                 new DrawRouteTask().execute(userLatLng, drawRouteStart);
-
                 wazeButton.setVisibility(View.VISIBLE);
-
-
             }
+
             wazeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -2143,7 +2141,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         if (courseState.equals("1")) {
             addressText.setText(destAddress);
-            courseActionButton.setText("Appuyez pour commancer");
+            courseActionButton.setText(R.string.txt_tap_to_start);
             cancel_view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -2157,7 +2155,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         if (courseState.equals("2")) {
             addressText.setText(destAddress);
-            courseActionButton.setText("Appuyez pour terminer");
+            courseActionButton.setText(R.string.txt_finish_course);
             cancel_view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -2421,14 +2419,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-
     private void goToLocation(final Double lat, final Double lng) {
         CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(new LatLng(lat, lng))      // Sets the center of the map to Mountain View
                 .zoom(17)                   // Sets the zoom
                 .build();                   // Creates a CameraPosition from the builder
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-
     }
 
     private void displayLocationSettingsRequest(Context context) {

@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/client_info_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
+    android:layout_height="wrap_content">
+    <RelativeLayout
+        android:id="@+id/client_info_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
     <RelativeLayout
         android:id="@+id/user_info_layout"
         android:layout_width="match_parent"
@@ -125,7 +127,7 @@
         </RelativeLayout>
 
         <RelativeLayout
-            android:id="@+id/cancel_view"
+            android:id="@+id/rl_cancel_course"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/info_layout"
@@ -155,7 +157,7 @@
     </RelativeLayout>
 
     <LinearLayout
-        android:id="@+id/voip_view"
+        android:id="@+id/ll_voip_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@+id/user_info_layout"
@@ -192,6 +194,6 @@
             android:textSize="14sp" />
 
     </LinearLayout>
-
+    </RelativeLayout>
 
 </RelativeLayout>

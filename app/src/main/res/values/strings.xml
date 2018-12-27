@@ -46,5 +46,8 @@
     <string name="appuyez_pour_arriver">Appuyez pour arriver</string>
     <string name="_0_0_mad">0.0 MAD</string>
     <string name="todo">TODO</string>
+    <string name="txt_driver_arrive">Appuyez pour arriver</string>
+    <string name="txt_tap_to_start">Appuyez pour commancer</string>
+    <string name="txt_finish_course">Appuyez pour terminer</string>
 
 </resources>

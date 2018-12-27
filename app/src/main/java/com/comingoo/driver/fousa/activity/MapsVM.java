@@ -12,7 +12,6 @@ import android.widget.Toast;
 
 import com.comingoo.driver.fousa.interfaces.CourseCallBack;
 import com.comingoo.driver.fousa.interfaces.DataCallBack;
-import com.comingoo.driver.fousa.service.DriverService;
 import com.comingoo.driver.fousa.utility.Utilities;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DataSnapshot;
@@ -20,8 +19,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.Calendar;
-import java.util.Locale;
 import java.util.Objects;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -45,6 +42,10 @@ public class MapsVM {
     private String clientName = "";
     private String clientPhoneNumber = "";
     private String clientlastCourse = "";
+    private String clientTotalCourse = "";
+    private String clientLastRideDate = "";
+    private String preWaitTime = "";
+    private LatLng driverArraivalLatLong;
 
     public void checkLogin(final Context context, final DataCallBack callback) {
         final String TAG = "checkLoginVM";
@@ -142,7 +143,45 @@ public class MapsVM {
 
     }
 
-    public void checkCourseTask(Context context, final CourseCallBack callback) {
+    public void checkCourseTask(final CourseCallBack callback) {
+
+        // Note: Getting total Course Number of client
+        FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(clientId).
+                addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        clientTotalCourse = String.valueOf(dataSnapshot.getChildrenCount());
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                    }
+                });
+
+        // Note: Getting last Course date time of client
+        FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(clientId)
+                .limitToLast(1).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    try {
+                        for (DataSnapshot child : dataSnapshot.getChildren()) {
+                            String longV = Objects.requireNonNull(child.child("date").getValue()).toString();
+                            String dateString = DateFormat.format(longV, Long.parseLong("dd/MM/yyyy hh:mm:ss")).toString();
+                            clientLastRideDate = dateString;
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
+
+
         FirebaseDatabase.getInstance().getReference("COURSES").orderByChild("driver").
                 equalTo(driverId).limitToFirst(1).addValueEventListener(new ValueEventListener() {
             @Override
@@ -152,11 +191,21 @@ public class MapsVM {
                         courseId = data.getKey();
                         courseState = data.child("state").getValue(String.class);
 
-
                         startAddress = data.child("startAddress").getValue(String.class);
                         destAddress = data.child("endAddress").getValue(String.class);
 
+                        preWaitTime = data.child("preWaitTime").getValue(String.class);
+
                         clientId = data.child("client").getValue(String.class);
+
+                        if (data.child("endLat").getValue(String.class) != null) {
+                            if (Objects.equals(data.child("endLat").getValue(String.class), "")) {
+                                driverArraivalLatLong = null;
+                            } else {
+                                driverArraivalLatLong = new LatLng(Double.parseDouble(data.child("endLat").getValue(String.class)),
+                                        Double.parseDouble(data.child("endLong").getValue(String.class)));
+                            }
+                        }
 
                         if (clientId != null) {
                             FirebaseDatabase.getInstance().getReference("clientUSERS").
@@ -168,21 +217,33 @@ public class MapsVM {
                                         clientName = dataSnapshot.child("fullName").getValue(String.class);
                                         clientPhoneNumber = dataSnapshot.child("phoneNumber").getValue(String.class);
                                         clientlastCourse = dataSnapshot.child("LASTCOURSE").getValue(String.class);
+
                                         callback.callbackCourseInfo(courseId,
-                                                clientId, clientName, clientImageUri, clientPhoneNumber, clientlastCourse, startAddress, destAddress, courseState);
+                                                clientId, clientName, clientImageUri,
+                                                clientPhoneNumber, clientlastCourse,
+                                                startAddress, destAddress, courseState,
+                                                clientTotalCourse, clientLastRideDate, preWaitTime,
+                                                driverArraivalLatLong);
                                     }
                                 }
 
                                 @Override
                                 public void onCancelled(@NonNull DatabaseError databaseError) {
-                                    callback.callbackCourseInfo(courseId, clientId, clientName, clientImageUri, clientPhoneNumber, clientlastCourse, startAddress, destAddress, courseState);
+                                    callback.callbackCourseInfo(courseId,
+                                            clientId, clientName, clientImageUri,
+                                            clientPhoneNumber, clientlastCourse,
+                                            startAddress, destAddress, courseState,
+                                            clientTotalCourse, clientLastRideDate, preWaitTime, driverArraivalLatLong);
                                 }
                             });
                         }
                     }
                 } else {
                     courseState = "4";
-                    callback.callbackCourseInfo(courseId, clientId, clientName, clientImageUri, clientPhoneNumber, clientlastCourse, startAddress, destAddress, courseState);
+                    callback.callbackCourseInfo(courseId, clientId, clientName,
+                            clientImageUri, clientPhoneNumber, clientlastCourse,
+                            startAddress, destAddress,  courseState,
+                            clientTotalCourse, clientLastRideDate, preWaitTime, driverArraivalLatLong);
                 }
             }
 

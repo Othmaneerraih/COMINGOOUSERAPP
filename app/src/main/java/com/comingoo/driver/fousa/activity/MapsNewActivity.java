@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -16,12 +17,12 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.format.DateFormat;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -39,6 +40,7 @@ import android.widget.Toast;
 import com.comingoo.driver.fousa.R;
 import com.comingoo.driver.fousa.interfaces.CourseCallBack;
 import com.comingoo.driver.fousa.interfaces.DataCallBack;
+import com.comingoo.driver.fousa.service.DriverService;
 import com.comingoo.driver.fousa.utility.CustomAnimation;
 import com.comingoo.driver.fousa.utility.Utilities;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -50,10 +52,8 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.mikhaellopez.circularimageview.CircularImageView;
 import com.mxn.soul.flowingdrawer_core.FlowingDrawer;
 import com.sinch.android.rtc.PushPair;
@@ -94,6 +94,13 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
     private String clientlastCourse;
     private String startAddress;
     private String destAddress;
+    private String clientTotalRide;
+    private String clientLastRideDate;
+    private LatLng destinationLatLong;
+    private DatabaseReference courseRef;
+    private int preWaitTime = 0;
+    private Handler handler;
+    private  Runnable runnable;
 
     private String TAG = "MapsNewActivity";
     private DecimalFormat df2 = new DecimalFormat("0.##");
@@ -106,7 +113,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
     private CircleImageView closeBtn;
     private CircleImageView callBtn;
     private TextView courseDetailsTv;
-    private RelativeLayout cancelView;
+    private RelativeLayout rlRideFlow;
     private Button courseActionBtn;
     private RelativeLayout clientInfoLayout;
     private LinearLayout voipView;
@@ -158,90 +165,10 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         setContentView(R.layout.activity_maps_new);
         permission();
         initialize();
+        action();
     }
 
-    private void permission() {
-        if (!Utilities.isNetworkConnectionAvailable(MapsNewActivity.this)) {
-            Utilities.checkNetworkConnection(MapsNewActivity.this);
-        }
-        Utilities.displayLocationSettingsRequest(MapsNewActivity.this, TAG, REQUEST_CHECK_SETTINGS);
-        if (ContextCompat.checkSelfPermission(MapsNewActivity.this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(MapsNewActivity.this, new String[]{Manifest.permission.RECORD_AUDIO}, 4);
-        }
-    }
-
-    private void initialize() {
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        if (mapFragment != null) {
-            mapFragment.getMapAsync(this);
-        }
-
-        // NOTE : Banner init
-        moneyBtn = findViewById(R.id.money_btn);
-        destinationLayout = findViewById(R.id.nevigation_layout);
-        destTimeTxt = findViewById(R.id.dest_time_txt);
-        addressTxt = findViewById(R.id.address_txt);
-        //initially hide
-        destinationLayout.setVisibility(View.GONE);
-
-        // NOTE : Client init
-        clientImage = findViewById(R.id.user_image);
-        clientNameTv = findViewById(R.id.user_name_txt);
-        totalCourseTv = findViewById(R.id.course_count_txt);
-        driverInfoTv = findViewById(R.id.driver_details_txt);
-        courseDetailsTv = findViewById(R.id.course_details_txt);
-        closeBtn = findViewById(R.id.close_button);
-        callBtn = findViewById(R.id.call_button);
-        cancelView = findViewById(R.id.cancel_view);
-        voipView = findViewById(R.id.voip_view);
-        dateTv = findViewById(R.id.date_txt);
-        courseActionBtn = findViewById(R.id.course_action_button);
-        telephoneTv = findViewById(R.id.tv_telephone);
-        voipTv = findViewById(R.id.tv_voip);
-        clientInfoLayout = findViewById(R.id.client_info_layout);
-        // NOTE : Those are initially Hide
-        clientInfoLayout.setVisibility(View.GONE);
-        closeBtn.setVisibility(View.GONE);
-        voipView.setVisibility(View.GONE);
-
-        // NOTE : botton status init
-        offlineBtn = findViewById(R.id.offline_button);
-        switchOnlineBtn = findViewById(R.id.switch_online_button);
-        onlineBtn = findViewById(R.id.online_button);
-        statusLayout = findViewById(R.id.status_layout);
-
-        // NOTE : Those are initially Hide
-        onlineBtn.setVisibility(View.GONE);
-
-        // NOTE : Common init
-        currentLocationBtn = findViewById(R.id.my_position_button);
-        menuBtn = findViewById(R.id.menu_button);
-        wazeBtn = findViewById(R.id.waze_button);
-        cancelRideIv = findViewById(R.id.iv_cancel_ride);
-        //initially hide
-        cancelRideIv.setVisibility(View.GONE);
-        wazeBtn.setVisibility(View.GONE);
-
-        // NOTE : Drawer init
-        mDrawer = findViewById(R.id.drawer_layout);
-        profileImage = findViewById(R.id.profile_image);
-        nameTxt = findViewById(R.id.name_txt);
-        ratingTxt = findViewById(R.id.rating_txt);
-        homeLayout = findViewById(R.id.home_layout);
-        homeTxt = findViewById(R.id.home_txt);
-        historiqueLayout = findViewById(R.id.historique_layout);
-        historiqueTxt = findViewById(R.id.history_txt);
-        inboxLayout = findViewById(R.id.inbox_layout);
-        inboxTxt = findViewById(R.id.inbox_txt);
-        comingoonyouLayout = findViewById(R.id.comingoonyou_layout);
-        comingoonyouTxt = findViewById(R.id.comingoonyou_txt);
-        aideLayout = findViewById(R.id.aide_layout);
-        aideTxt = findViewById(R.id.aide_txt);
-        logoutLayout = findViewById(R.id.logout_layout);
-        logoutTxt = findViewById(R.id.logout_txt);
-
-
+    private void action() {
         df2.setRoundingMode(RoundingMode.UP);
         mapsVM = new MapsVM();
 
@@ -265,11 +192,15 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
             }
         });
 
-        mapsVM.checkCourseTask(MapsNewActivity.this, new CourseCallBack() {
+        mapsVM.checkCourseTask(new CourseCallBack() {
+
             @Override
-            public void callbackCourseInfo(String coursId, String clintId,
-                                           String clintName, String clintImageUri, String clintPhoneNumber,
-                                           String clintlastCourse, String strtAddress, String destAddr, String courseSta) {
+            public void callbackCourseInfo(String coursId,
+                                           String clintId, String clintName,
+                                           String clintImageUri, String clintPhoneNumber,
+                                           String clintlastCourse, String strtAddress,
+                                           String destAddr, String courseSta, String clintTotalRide,
+                                           String clintLastRideDate, String preWTime, LatLng clientDestLatLng) {
                 courseState = courseSta;
                 courseId = coursId;
                 clientId = clintId;
@@ -279,32 +210,48 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                 clientlastCourse = clintlastCourse;
                 startAddress = strtAddress;
                 destAddress = destAddr;
+                clientTotalRide = clintTotalRide;
+                clientLastRideDate = clintLastRideDate;
+                preWaitTime = Integer.parseInt(preWTime);
+                destinationLatLong = clientDestLatLng;
+//                Log.e(TAG, "callbackCourseInfo: courseState " + courseState);
+//                showClientInformation();
+                courseHandle();
             }
         });
+
+        // Note: Prewait Time Handeller
+        handler = new Handler(Looper.getMainLooper());
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+                int time = preWaitTime + 1;
+                courseRef.child("preWaitTime").setValue(Integer.toString(time));
+            }
+        };
+
 
         SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
         if (Objects.equals(prefs.getString("online", "0"), "1")) {
             switchOnlineUI();
         }
 
-
         telephoneTv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                if (clientPhoneNumber != null) {
-//                    try {
-//                        String callNumber = clientPhoneNumber;
-//                        if (callNumber.contains("+212")) {
-//                            callNumber = callNumber.replace("+212", "");
-//                        }
-//
-//                        Intent intent = new Intent(Intent.ACTION_DIAL);
-//                        intent.setData(Uri.parse("tel:" + callNumber));
-//                        startActivity(intent);
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
-//                }
+                if (clientPhoneNumber != null) {
+                    try {
+                        String callNumber = clientPhoneNumber;
+                        if (callNumber.contains("+212")) {
+                            callNumber = callNumber.replace("+212", "");
+                        }
+                        Intent intent = new Intent(Intent.ACTION_DIAL);
+                        intent.setData(Uri.parse("tel:" + callNumber));
+                        startActivity(intent);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         });
 
@@ -314,12 +261,12 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                 if (!driverId.isEmpty()) {
                     voipTv.setClickable(false);
                     voipTv.setEnabled(false);
-//                    Intent intent = new Intent(MapsNewActivity.this, VoipCallingActivity.class);
-//                    intent.putExtra("driverId", driverId);
-//                    intent.putExtra("clientId", clientId);
-//                    intent.putExtra("clientName", clientName);
-//                    intent.putExtra("clientImage", clientImageUri);
-//                    startActivity(intent);
+                    Intent intent = new Intent(MapsNewActivity.this, VoipCallingActivity.class);
+                    intent.putExtra("driverId", driverId);
+                    intent.putExtra("clientId", clientId);
+                    intent.putExtra("clientName", clientName);
+                    intent.putExtra("clientImage", clientImageUri);
+                    startActivity(intent);
                 }
             }
         });
@@ -364,6 +311,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
             @Override
             public void onClick(View v) {
                 switchOnlineUI();
+                startService(new Intent(MapsNewActivity.this, DriverService.class));
             }
         });
 
@@ -371,6 +319,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
             @Override
             public void onClick(View v) {
                 switchOfflineUI();
+                stopService(new Intent(MapsNewActivity.this, DriverService.class));
             }
         });
 
@@ -416,7 +365,6 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
             }
         });
 
-
         cancelRideIv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -424,35 +372,149 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
             }
         });
 
+        // Note: initially driver will be offline
+        switchOfflineUI();
+
+        // Note: ride flow
+//        courseHandle();
+
+        rlRideFlow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (courseState.equalsIgnoreCase("0")) {
+                    courseRef.child("state").setValue("1");
+                    courseActionBtn.setText(getString(R.string.txt_tap_to_start));
+                } else if (courseState.equalsIgnoreCase("1")) {
+                    courseRef.child("state").setValue("2");
+                    courseActionBtn.setText(getString(R.string.txt_finish_course));
+                } else if (courseState.equalsIgnoreCase("2")) {
+                    courseRef.child("state").setValue("3");
+                }
+            }
+        });
+
+        wazeBtn.setVisibility(View.VISIBLE);
+        wazeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openWaze(destinationLatLong);
+            }
+        });
+
+    }
+
+    private void permission() {
+        if (!Utilities.isNetworkConnectionAvailable(MapsNewActivity.this)) {
+            Utilities.checkNetworkConnection(MapsNewActivity.this);
+        }
+        Utilities.displayLocationSettingsRequest(MapsNewActivity.this, TAG, REQUEST_CHECK_SETTINGS);
+        if (ContextCompat.checkSelfPermission(MapsNewActivity.this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(MapsNewActivity.this, new String[]{Manifest.permission.RECORD_AUDIO}, 4);
+        }
+    }
+
+    private void initialize() {
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        if (mapFragment != null) {
+            mapFragment.getMapAsync(this);
+        }
+
+        // NOTE : Banner init
+        moneyBtn = findViewById(R.id.money_btn);
+        destinationLayout = findViewById(R.id.nevigation_layout);
+        destTimeTxt = findViewById(R.id.dest_time_txt);
+        addressTxt = findViewById(R.id.address_txt);
+        //initially hide
+        destinationLayout.setVisibility(View.GONE);
+
+        // NOTE : Client init
+        clientImage = findViewById(R.id.user_image);
+        clientNameTv = findViewById(R.id.user_name_txt);
+        totalCourseTv = findViewById(R.id.course_count_txt);
+        driverInfoTv = findViewById(R.id.driver_details_txt);
+        courseDetailsTv = findViewById(R.id.course_details_txt);
+        closeBtn = findViewById(R.id.close_button);
+        callBtn = findViewById(R.id.call_button);
+        rlRideFlow = findViewById(R.id.rl_cancel_course);
+        voipView = findViewById(R.id.ll_voip_view);
+        dateTv = findViewById(R.id.date_txt);
+        courseActionBtn = findViewById(R.id.course_action_button);
+        telephoneTv = findViewById(R.id.tv_telephone);
+        voipTv = findViewById(R.id.tv_voip);
+        clientInfoLayout = findViewById(R.id.client_info_layout);
+        // NOTE : Those are initially Hide
+        clientInfoLayout.setVisibility(View.GONE);
+        closeBtn.setVisibility(View.GONE);
+        voipView.setVisibility(View.GONE);
+
+        // NOTE : botton status init
+        offlineBtn = findViewById(R.id.offline_button);
+        switchOnlineBtn = findViewById(R.id.switch_online_button);
+        onlineBtn = findViewById(R.id.online_button);
+        statusLayout = findViewById(R.id.status_layout);
+
+        // NOTE : Those are initially Hide
+        onlineBtn.setVisibility(View.GONE);
+
+        // NOTE : Common init
+        currentLocationBtn = findViewById(R.id.my_position_button);
+        menuBtn = findViewById(R.id.menu_button);
+        wazeBtn = findViewById(R.id.waze_button);
+        cancelRideIv = findViewById(R.id.iv_cancel_ride);
+        //initially hide
+        cancelRideIv.setVisibility(View.GONE);
+        wazeBtn.setVisibility(View.GONE);
+
+        // NOTE : Drawer init
+        mDrawer = findViewById(R.id.drawer_layout);
+        profileImage = findViewById(R.id.profile_image);
+        nameTxt = findViewById(R.id.name_txt);
+        ratingTxt = findViewById(R.id.rating_txt);
+        homeLayout = findViewById(R.id.home_layout);
+        homeTxt = findViewById(R.id.home_txt);
+        historiqueLayout = findViewById(R.id.historique_layout);
+        historiqueTxt = findViewById(R.id.history_txt);
+        inboxLayout = findViewById(R.id.inbox_layout);
+        inboxTxt = findViewById(R.id.inbox_txt);
+        comingoonyouLayout = findViewById(R.id.comingoonyou_layout);
+        comingoonyouTxt = findViewById(R.id.comingoonyou_txt);
+        aideLayout = findViewById(R.id.aide_layout);
+        aideTxt = findViewById(R.id.aide_txt);
+        logoutLayout = findViewById(R.id.logout_layout);
+        logoutTxt = findViewById(R.id.logout_txt);
     }
 
     private void courseHandle() {
-        if (courseState.equals("4")) {
-            wazeBtn.setVisibility(View.GONE);
-            courseUIOff();
-            if (mMap != null)
-                mMap.clear();
+        if (courseState.equalsIgnoreCase("0")) {
+            statusLayout.setVisibility(View.GONE);
+            courseRef = FirebaseDatabase.getInstance().getReference("COURSES").child(courseId);
 
-        } else {
+            // Note: Setting the course into driver's profile
+            FirebaseDatabase.getInstance().getReference("DRIVERUSERS")
+                    .child(driverId).child("COURSE").setValue(courseId);
+            showClientInformation();
+        } else if (courseState.equals("1")) {
+            handler.postDelayed(runnable, 1000);
+        } else if (courseState.equals("2")) {
+           handler.removeCallbacks(runnable);
+        } else if (courseState.equals("3")) {
             switchToCourseUI();
-            if (courseState.equals("3")) {
-//                stopCourseService();
-                courseState = "4";
-//                isRatingPopupShowed = false;
-                if (mMap != null)
-                    mMap.clear();
-            }
+            // Note: Making driver offline
+            FirebaseDatabase.getInstance().getReference().child("ONLINEDRIVERS").child(driverId).removeValue();
 
-            try {
-//                startCourseService();
-//                checkCourseState();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }
-
-
     }
+
+    private void showClientInformation() {
+        courseActionBtn.setText(getString(R.string.txt_driver_arrive));
+        clientInfoLayout.setVisibility(View.VISIBLE);
+        clientNameTv.setText(clientName);
+        Picasso.get().load(clientImageUri).into(clientImage);
+        totalCourseTv.setText("Courses:" + clientTotalRide);
+        driverInfoTv.setText(clientlastCourse);
+    }
+
     private void switchToCourseUI() {
         statusLayout.setVisibility(View.GONE);
         moneyBtn.setVisibility(View.GONE);
@@ -462,6 +524,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         destinationLayout.setVisibility(View.VISIBLE);
         clientInfoLayout.setBackgroundColor(Color.WHITE);
     }
+
     private void rideCancelDialog() {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MapsNewActivity.this);
         final AlertDialog alertDialog = dialogBuilder.create();
@@ -483,19 +546,18 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                 } else {
                     btnYesCancelRide.setTextColor(getApplicationContext().getResources().getColor(R.color.primaryLight));
                 }
-
                 btnNoDontCancelRide.setBackgroundColor(Color.TRANSPARENT);
                 btnNoDontCancelRide.setTextColor(Color.WHITE);
 
 
-//                FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).child("state").setValue("5");
+                FirebaseDatabase.getInstance().getReference("COURSES").child(courseId).child("state").setValue("5");
 
                 final Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        //Do something after 3000ms
-//                        FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).removeValue();
+                        // Note: remove course after 3000ms
+                        FirebaseDatabase.getInstance().getReference("COURSES").child(courseId).removeValue();
                     }
                 }, 3000);
 
@@ -542,7 +604,6 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         }
     }
 
-
     private void courseUIOff() {
         moneyBtn.setVisibility(View.VISIBLE);
         statusLayout.setVisibility(View.VISIBLE);
@@ -554,13 +615,11 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
 
     public void getLastLocation() {
         FusedLocationProviderClient locationClient = getFusedLocationProviderClient(this);
-
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             locationClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
                 @Override
                 public void onSuccess(Location location) {
-                    // GPS location can be null if GPS is switched off
                     if (location != null) {
                         userLatLng = new LatLng(location.getLatitude(), location.getLongitude());
                         goToLocation(userLatLng.latitude, userLatLng.longitude);
@@ -569,13 +628,25 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
-                    Log.d("MapDemoActivity", "Error trying to get last GPS location");
                     e.printStackTrace();
                 }
             });
         }
     }
 
+    private void openWaze(LatLng location) {
+        String link = "https://waze.com/ul?";
+        if (location != null) {
+            link += "ll=" + location.latitude + "," + location.longitude + "&navigate=yes";
+        }
+        try {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(link));
+            startActivity(intent);
+        } catch (ActivityNotFoundException ex) {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(getResources().getString(R.string.waze_urlt)));
+            startActivity(intent);
+        }
+    }
 
     private void goToLocation(final Double lat, final Double lng) {
         CameraPosition cameraPosition = new CameraPosition.Builder()
@@ -583,7 +654,6 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                 .zoom(17)                   // Sets the zoom
                 .build();                   // Creates a CameraPosition from the builder
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-
     }
 
     private void logout() {
@@ -632,11 +702,12 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         prefs.edit().putString("online", "1").apply();
     }
 
-    private void switchOfflineUI(boolean... params) {
+    private void switchOfflineUI() {
         CustomAnimation.fadeIn(MapsNewActivity.this, offlineBtn, 500, 10);
         CustomAnimation.fadeIn(MapsNewActivity.this, switchOnlineBtn, 500, 10);
         CustomAnimation.fadeOut(MapsNewActivity.this, onlineBtn, 0, 10);
-
+        switchOnlineBtn.setVisibility(View.VISIBLE);
+        offlineBtn.setVisibility(View.VISIBLE);
         SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
         prefs.edit().putString("online", "0").apply();
     }
@@ -645,7 +716,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == 1 && RESULT_OK == -1 && data.hasExtra("result")) {
+        if (requestCode == 1 && data.hasExtra("result")) {
             voipTv.setClickable(true);
             voipTv.setEnabled(true);
         }
