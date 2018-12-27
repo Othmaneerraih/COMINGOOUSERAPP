@@ -1056,9 +1056,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                     });
 
 
-///////////***************calculating task start form here *************************
-
-
+                                                   /////////***************calculating task start form here *************************
                                                     FirebaseDatabase.getInstance().getReference("COURSES").child(courseID).
                                                             addListenerForSingleValueEvent(new ValueEventListener() {
                                                                 @Override
@@ -1141,7 +1139,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                         currentBil = price2;
 
                                                                                     FirebaseDatabase.getInstance().getReference("DRIVERUSERS").
-                                                                                            child(userId).child("EARNINGS").child(getDateMonth(GetUnixTime())).child(getDateDay(GetUnixTime())).addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                                            child(userId).child("EARNINGS").child(getDateMonth(GetUnixTime())).
+                                                                                            child(getDateDay(GetUnixTime())).addListenerForSingleValueEvent(new ValueEventListener() {
                                                                                         @Override
                                                                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
@@ -1169,7 +1168,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                                                                             final double ee = earned;
                                                                                             final int vv = voyages;
-                                                                                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt").addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(userId).child("debt")
+                                                                                                    .addListenerForSingleValueEvent(new ValueEventListener() {
                                                                                                 @Override
                                                                                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                                                                     double debt = 0;
@@ -1376,7 +1376,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                     charge.setOnClickListener(new View.OnClickListener() {
                                                         @Override
                                                         public void onClick(View v) {
-
                                                             if (moneyAmount.getText().toString().length() > 0) {
                                                                 final String value = moneyAmount.getText().toString();
                                                                 final int userProvidedRecharge = Integer.parseInt(value);

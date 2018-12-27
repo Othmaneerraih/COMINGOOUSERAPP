@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -31,7 +32,9 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -40,6 +43,7 @@ import android.widget.Toast;
 import com.comingoo.driver.fousa.R;
 import com.comingoo.driver.fousa.interfaces.CourseCallBack;
 import com.comingoo.driver.fousa.interfaces.DataCallBack;
+import com.comingoo.driver.fousa.interfaces.PriceCallBack;
 import com.comingoo.driver.fousa.service.DriverService;
 import com.comingoo.driver.fousa.utility.CustomAnimation;
 import com.comingoo.driver.fousa.utility.Utilities;
@@ -72,6 +76,7 @@ import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+import static com.comingoo.driver.fousa.utility.Utilities.GetUnixTime;
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
 public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCallback {
@@ -92,6 +97,8 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
     private String clientImageUri;
     private String clientPhoneNumber;
     private String clientlastCourse;
+    private String clientSolde = "";
+    private String clientCredit;
     private String startAddress;
     private String destAddress;
     private String clientTotalRide;
@@ -99,8 +106,14 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
     private LatLng destinationLatLong;
     private DatabaseReference courseRef;
     private int preWaitTime = 0;
+    private double currentBil = 0;
+    private String distanceTraveled;
     private Handler handler;
-    private  Runnable runnable;
+    private Runnable runnable;
+
+    private double fixedPrice, price1, price2, price3, promoCode;
+    private double currentDebt = 0.0;
+    private double currentWallet = 0.0;
 
     private String TAG = "MapsNewActivity";
     private DecimalFormat df2 = new DecimalFormat("0.##");
@@ -193,13 +206,12 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         });
 
         mapsVM.checkCourseTask(new CourseCallBack() {
-
             @Override
             public void callbackCourseInfo(String coursId,
                                            String clintId, String clintName,
                                            String clintImageUri, String clintPhoneNumber,
-                                           String clintlastCourse, String strtAddress,
-                                           String destAddr, String courseSta, String clintTotalRide,
+                                           String clintlastCourse, String clintSold, String clintCre, String strtAddress,
+                                           String destAddr, String distanceTravele, String courseSta, String clintTotalRide,
                                            String clintLastRideDate, String preWTime, LatLng clientDestLatLng) {
                 courseState = courseSta;
                 courseId = coursId;
@@ -208,19 +220,23 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                 clientImageUri = clintImageUri;
                 clientPhoneNumber = clintPhoneNumber;
                 clientlastCourse = clintlastCourse;
+                clientSolde = clintSold;
+                clientCredit = clintCre;
                 startAddress = strtAddress;
                 destAddress = destAddr;
                 clientTotalRide = clintTotalRide;
+                distanceTraveled = distanceTravele;
                 clientLastRideDate = clintLastRideDate;
-                preWaitTime = Integer.parseInt(preWTime);
+                if (!preWTime.equals(""))
+                    preWaitTime = Integer.parseInt(preWTime);
+                else preWaitTime = 0;
                 destinationLatLong = clientDestLatLng;
-//                Log.e(TAG, "callbackCourseInfo: courseState " + courseState);
-//                showClientInformation();
+                // Note: ride flow
                 courseHandle();
             }
         });
 
-        // Note: Prewait Time Handeller
+        // Note: Prewait Time Handler
         handler = new Handler(Looper.getMainLooper());
         runnable = new Runnable() {
             @Override
@@ -229,7 +245,6 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                 courseRef.child("preWaitTime").setValue(Integer.toString(time));
             }
         };
-
 
         SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
         if (Objects.equals(prefs.getString("online", "0"), "1")) {
@@ -335,6 +350,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                 mDrawer.closeMenu();
             }
         });
+
         historiqueLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -375,8 +391,6 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         // Note: initially driver will be offline
         switchOfflineUI();
 
-        // Note: ride flow
-//        courseHandle();
 
         rlRideFlow.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -389,6 +403,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                     courseActionBtn.setText(getString(R.string.txt_finish_course));
                 } else if (courseState.equalsIgnoreCase("2")) {
                     courseRef.child("state").setValue("3");
+                    destinationLayout.setVisibility(View.GONE);
                 }
             }
         });
@@ -400,7 +415,6 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                 openWaze(destinationLatLong);
             }
         });
-
     }
 
     private void permission() {
@@ -425,6 +439,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         destinationLayout = findViewById(R.id.nevigation_layout);
         destTimeTxt = findViewById(R.id.dest_time_txt);
         addressTxt = findViewById(R.id.address_txt);
+
         //initially hide
         destinationLayout.setVisibility(View.GONE);
 
@@ -497,13 +512,161 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         } else if (courseState.equals("1")) {
             handler.postDelayed(runnable, 1000);
         } else if (courseState.equals("2")) {
-           handler.removeCallbacks(runnable);
+            handler.removeCallbacks(runnable);
         } else if (courseState.equals("3")) {
             switchToCourseUI();
             // Note: Making driver offline
             FirebaseDatabase.getInstance().getReference().child("ONLINEDRIVERS").child(driverId).removeValue();
-
+            calculatePrice();
         }
+    }
+
+    private void calculatePrice() {
+        mapsVM.gettingPriceValue(new PriceCallBack() {
+            @Override
+            public void callbackPrice(Double att, Double base, Double debtCeil, Double km, Double mini,
+                                      Double percent, boolean promo, double earn, double voya, double debt) {
+
+                final Dialog dialog = new Dialog(MapsNewActivity.this);
+                dialog.setContentView(R.layout.dialog_finished_course);
+
+                Button dialogButton = dialog.findViewById(R.id.button);
+                final Button star1 = dialog.findViewById(R.id.star1);
+                final Button star2 = dialog.findViewById(R.id.star2);
+                final Button star3 = dialog.findViewById(R.id.star3);
+                final Button star4 = dialog.findViewById(R.id.star4);
+                final Button star5 = dialog.findViewById(R.id.star5);
+
+               Button price = dialog.findViewById(R.id.button3);
+
+                final ImageView imot = dialog.findViewById(R.id.stars_rating);
+
+                final Button gotMoney = dialog.findViewById(R.id.button);
+                final Button charge = dialog.findViewById(R.id.btn_recharger);
+                final EditText moneyAmount = dialog.findViewById(R.id.editText);
+
+                dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        FirebaseDatabase.getInstance().getReference().child("ONLINEDRIVERS").child(driverId).removeValue();
+                        switchOnlineUI();
+                    }
+                });
+
+
+//                double attribute = att;
+//                double baseValue = base;
+//                double kilometer = km;
+                double minimum = mini;
+//                double comingooPercent = percent;
+//                double earning = earn;
+//                double voyages = voya;
+                double driverDebt = debt;
+//                boolean isPromoCode = promo;
+
+                long timestamp = GetUnixTime() * -1;
+
+                double preWaitT = 0;
+
+                if (preWaitTime > 180) {
+                    preWaitT = 3;
+                }
+
+                int preWait = preWaitTime / 60;
+
+                promoCode = 0.20;
+                price1 = base + (Double.parseDouble(distanceTraveled) * km) + (att * preWaitTime);
+
+                if (price1 < minimum) {
+                    price1 = minimum;
+                }
+                price2 = price1 * percent;
+                price3 = price2 * (1 - promoCode);
+
+                if (clientSolde != null) {
+                    if (!clientSolde.equals("")) {
+                        try {
+                            double oldSold = Double.parseDouble(clientSolde);
+
+                            // if user has solde & it is greater then the calculated price
+                            if (clientCredit.equals("1") && oldSold >= currentBil) {
+
+                                double newSolde = oldSold - currentBil;
+                                FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("SOLDE").setValue("" + newSolde);
+                                FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("USECREDIT").setValue("1");
+                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(driverId).child("PAID").setValue("1");
+                                double commission = currentBil * percent;
+                                double driverIncome = currentBil - commission;
+                                double newDebt = driverDebt + driverIncome;
+                                currentDebt = newDebt;
+                                currentWallet = newSolde;
+                                FirebaseDatabase.getInstance().getReference("COURSES").child(courseId).child("price").setValue("0.0");
+                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(driverId).child("debt").setValue(Double.toString(newDebt));
+                                price.setText("0.0 MAD");
+
+                            } else {
+                                // if user has solde & it is small then the calculated price
+
+                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(driverId).child("PAID").setValue("0");
+
+                                double commission = currentBil * percent;
+                                double userDue = currentBil - oldSold;
+                                double newDebt = driverDebt + (currentBil - userDue - commission);
+                                currentDebt = newDebt;
+                                Log.e(TAG, "onDataChange: 3333333 old sold: " + commission);
+                                Log.e(TAG, "onDataChange: 3333333 old currentbill: " + userDue);
+                                currentWallet = 0.0;
+                                FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("SOLDE").setValue("" + currentWallet);
+                                FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("USECREDIT").setValue("0");
+                                FirebaseDatabase.getInstance().getReference("COURSES").child(courseId).child("price").setValue(df2.format(userDue));
+
+
+                                price.setText(df2.format(userDue) + " MAD");
+
+                                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(driverId).child("debt").setValue(Double.toString(newDebt));
+                                Log.e(TAG, "onDataChange: new Debt" + newDebt);
+                            }
+                        } catch (NumberFormatException e) {
+                            e.printStackTrace();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+
+                        // if user has  no solde
+                        try {
+                            double commission = currentBil * percent * -1;
+                            double newDebt = (driverDebt + commission);
+                            currentDebt = newDebt;
+                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(driverId).child("PAID").setValue("0");
+                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(driverId).child("debt").setValue(Double.toString(newDebt));
+                            FirebaseDatabase.getInstance().getReference("COURSES").child(courseId).child("price").setValue(df2.format(currentBil));
+                            price.setText(df2.format(currentBil) + " MAD");
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } else {
+
+                    // if user has  no solde
+                    try {
+                        double commission = currentBil * percent * -1;
+                        double newDebt = (driverDebt + commission);
+                        currentDebt = newDebt;
+                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(driverId).child("PAID").setValue("0");
+                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(driverId).child("debt").setValue(Double.toString(newDebt));
+                        FirebaseDatabase.getInstance().getReference("COURSES").child(courseId).child("price").setValue(df2.format(currentBil));
+                        price.setText(df2.format(currentBil) + " MAD");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+
+        });
+
+
     }
 
     private void showClientInformation() {
@@ -754,6 +917,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
             Toast.makeText(MapsNewActivity.this, "incoming call", Toast.LENGTH_SHORT).show();
             showDialog(MapsNewActivity.this, incomingCall);
         }
+
     }
 
     @Override

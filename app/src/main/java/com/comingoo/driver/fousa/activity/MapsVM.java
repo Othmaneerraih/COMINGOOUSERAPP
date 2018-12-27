@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import com.comingoo.driver.fousa.interfaces.CourseCallBack;
 import com.comingoo.driver.fousa.interfaces.DataCallBack;
+import com.comingoo.driver.fousa.interfaces.PriceCallBack;
 import com.comingoo.driver.fousa.utility.Utilities;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DataSnapshot;
@@ -22,6 +23,9 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.Objects;
 
 import static android.content.Context.MODE_PRIVATE;
+import static com.comingoo.driver.fousa.utility.Utilities.GetUnixTime;
+import static com.comingoo.driver.fousa.utility.Utilities.getDateDay;
+import static com.comingoo.driver.fousa.utility.Utilities.getDateMonth;
 
 public class MapsVM {
     private double rat = 0.0;
@@ -33,6 +37,11 @@ public class MapsVM {
     private String todysErn = "";
     private String driverId = "";
 
+    private boolean isPromoCode;
+    private double earned = 0;
+    private double voyages = 0;
+    private double driverDebt = 0;
+
     private String courseId = "";
     private String courseState = "";
     private String startAddress = "";
@@ -42,9 +51,12 @@ public class MapsVM {
     private String clientName = "";
     private String clientPhoneNumber = "";
     private String clientlastCourse = "";
+    private String clientSolde = "";
+    private String clientCredit = "";
     private String clientTotalCourse = "";
     private String clientLastRideDate = "";
     private String preWaitTime = "";
+    private String distanceTraveled = "";
     private LatLng driverArraivalLatLong;
 
     public void checkLogin(final Context context, final DataCallBack callback) {
@@ -107,7 +119,7 @@ public class MapsVM {
                         todysErn = "0";
                         todystrp = "0";
 
-                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(driverId).child("EARNINGS").child(Utilities.getDateMonth(Utilities.GetUnixTime())).child(Utilities.getDateDay(Utilities.GetUnixTime())).addListenerForSingleValueEvent(new ValueEventListener() {
+                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(driverId).child("EARNINGS").child(getDateMonth(GetUnixTime())).child(getDateDay(GetUnixTime())).addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                 if (dataSnapshot.exists()) {
@@ -193,9 +205,8 @@ public class MapsVM {
 
                         startAddress = data.child("startAddress").getValue(String.class);
                         destAddress = data.child("endAddress").getValue(String.class);
-
+                        distanceTraveled = data.child("distanceTraveled").getValue(String.class);
                         preWaitTime = data.child("preWaitTime").getValue(String.class);
-
                         clientId = data.child("client").getValue(String.class);
 
                         if (data.child("endLat").getValue(String.class) != null) {
@@ -217,11 +228,13 @@ public class MapsVM {
                                         clientName = dataSnapshot.child("fullName").getValue(String.class);
                                         clientPhoneNumber = dataSnapshot.child("phoneNumber").getValue(String.class);
                                         clientlastCourse = dataSnapshot.child("LASTCOURSE").getValue(String.class);
+                                        clientSolde = dataSnapshot.child("SOLDE").getValue(String.class);
+                                        clientCredit = dataSnapshot.child("USECREDIT").getValue(String.class);
 
                                         callback.callbackCourseInfo(courseId,
                                                 clientId, clientName, clientImageUri,
-                                                clientPhoneNumber, clientlastCourse,
-                                                startAddress, destAddress, courseState,
+                                                clientPhoneNumber, clientlastCourse, clientSolde, clientCredit,
+                                                startAddress, destAddress, distanceTraveled, courseState,
                                                 clientTotalCourse, clientLastRideDate, preWaitTime,
                                                 driverArraivalLatLong);
                                     }
@@ -231,8 +244,8 @@ public class MapsVM {
                                 public void onCancelled(@NonNull DatabaseError databaseError) {
                                     callback.callbackCourseInfo(courseId,
                                             clientId, clientName, clientImageUri,
-                                            clientPhoneNumber, clientlastCourse,
-                                            startAddress, destAddress, courseState,
+                                            clientPhoneNumber, clientlastCourse, clientSolde, clientCredit,
+                                            startAddress, destAddress, distanceTraveled, courseState,
                                             clientTotalCourse, clientLastRideDate, preWaitTime, driverArraivalLatLong);
                                 }
                             });
@@ -241,8 +254,8 @@ public class MapsVM {
                 } else {
                     courseState = "4";
                     callback.callbackCourseInfo(courseId, clientId, clientName,
-                            clientImageUri, clientPhoneNumber, clientlastCourse,
-                            startAddress, destAddress,  courseState,
+                            clientImageUri, clientPhoneNumber, clientlastCourse, clientSolde, clientCredit,
+                            startAddress, destAddress, distanceTraveled, courseState,
                             clientTotalCourse, clientLastRideDate, preWaitTime, driverArraivalLatLong);
                 }
             }
@@ -255,4 +268,71 @@ public class MapsVM {
 
     }
 
+    public void gettingPriceValue(final PriceCallBack priceCallBack) {
+
+        FirebaseDatabase.getInstance().getReference("clientUSERS").
+                child(clientId).child("PROMOCODE").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    isPromoCode = true;
+                } else {
+                    isPromoCode = false;
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
+        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").
+                child(driverId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    try {
+                        driverDebt = Double.parseDouble(dataSnapshot.child("debt").getValue(String.class));
+                        earned = Double.parseDouble(dataSnapshot.child("EARNINGS").child(getDateMonth(GetUnixTime())).
+                                child(getDateDay(GetUnixTime())).child("earnings").getValue(String.class));
+                        voyages = Integer.parseInt(dataSnapshot.child("EARNINGS").child(getDateMonth(GetUnixTime())).
+                                child(getDateDay(GetUnixTime())).child("voyages").getValue(String.class));
+                    } catch (NumberFormatException e) {
+                        e.printStackTrace();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
+        FirebaseDatabase.getInstance().getReference("PRICES").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Log.e("Price", " Price Calculation in Course Service");
+                if (dataSnapshot.exists()) {
+                    double att = Double.parseDouble(dataSnapshot.child("att").getValue(String.class));
+                    double base = Double.parseDouble(dataSnapshot.child("base").getValue(String.class));
+                    double debtCeil = Double.parseDouble(dataSnapshot.child("debtCeil").getValue(String.class));
+                    double km = Double.parseDouble(dataSnapshot.child("km").getValue(String.class));
+                    double min = Double.parseDouble(dataSnapshot.child("minimum").getValue(String.class));
+                    final double percent = Double.parseDouble(dataSnapshot.child("percent").getValue(String.class));
+                    priceCallBack.callbackPrice(att, base, debtCeil, km, min, percent, isPromoCode, earned, voyages, driverDebt);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
 }
