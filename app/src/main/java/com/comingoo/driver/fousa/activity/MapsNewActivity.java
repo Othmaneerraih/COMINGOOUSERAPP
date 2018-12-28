@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -24,8 +25,10 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -71,12 +74,16 @@ import com.squareup.picasso.Picasso;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 import static com.comingoo.driver.fousa.utility.Utilities.GetUnixTime;
+import static com.comingoo.driver.fousa.utility.Utilities.getDateDay;
+import static com.comingoo.driver.fousa.utility.Utilities.getDateMonth;
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
 public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCallback {
@@ -87,13 +94,15 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
     private String driverNumber = "";
     private String debit = "";
     private String todayTrips = "";
-    private String todayEarnings = "";
+    private Double todayEarnings;
+    private Double todayVoyages;
 
     private String courseState = "";
     private String driverId = "";
     private String courseId;
     private String clientId;
     private String clientName;
+    private String clientLevel;
     private String clientImageUri;
     private String clientPhoneNumber;
     private String clientlastCourse;
@@ -110,7 +119,10 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
     private String distanceTraveled;
     private Handler handler;
     private Runnable runnable;
+    private boolean isFixed;
+    private int totalRecharge;
 
+    private int RATE = 4;
     private double fixedPrice, price1, price2, price3, promoCode;
     private double currentDebt = 0.0;
     private double currentWallet = 0.0;
@@ -194,7 +206,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                     driverNumber = drivrNum;
                     debit = debt;
                     todayTrips = todystrp;
-                    todayEarnings = todysErn;
+                    todayEarnings = Double.parseDouble(todysErn);
                     rating = rat;
                     driverId = drivrId;
                 } else {
@@ -436,7 +448,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
 
         // NOTE : Banner init
         moneyBtn = findViewById(R.id.money_btn);
-        destinationLayout = findViewById(R.id.nevigation_layout);
+        destinationLayout = findViewById(R.id.destination_include);
         destTimeTxt = findViewById(R.id.dest_time_txt);
         addressTxt = findViewById(R.id.address_txt);
 
@@ -517,6 +529,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
             switchToCourseUI();
             // Note: Making driver offline
             FirebaseDatabase.getInstance().getReference().child("ONLINEDRIVERS").child(driverId).removeValue();
+            switchOnlineUI();
             calculatePrice();
         }
     }
@@ -525,7 +538,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         mapsVM.gettingPriceValue(new PriceCallBack() {
             @Override
             public void callbackPrice(Double att, Double base, Double debtCeil, Double km, Double mini,
-                                      Double percent, boolean promo, double earn, double voya, double debt) {
+                                      Double percent, boolean promo, double earn, double voya, double debt, String level) {
 
                 final Dialog dialog = new Dialog(MapsNewActivity.this);
                 dialog.setContentView(R.layout.dialog_finished_course);
@@ -537,7 +550,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                 final Button star4 = dialog.findViewById(R.id.star4);
                 final Button star5 = dialog.findViewById(R.id.star5);
 
-               Button price = dialog.findViewById(R.id.button3);
+                Button price = dialog.findViewById(R.id.btn_price_show);
 
                 final ImageView imot = dialog.findViewById(R.id.stars_rating);
 
@@ -575,7 +588,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                 int preWait = preWaitTime / 60;
 
                 promoCode = 0.20;
-                price1 = base + (Double.parseDouble(distanceTraveled) * km) + (att * preWaitTime);
+                price1 = base + (Double.parseDouble(distanceTraveled) * km) + (att * preWait);
 
                 if (price1 < minimum) {
                     price1 = minimum;
@@ -583,14 +596,28 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                 price2 = price1 * percent;
                 price3 = price2 * (1 - promoCode);
 
+                if (promo)
+                    currentBil = price3;
+                else
+                    currentBil = price2;
+
+                if (isFixed)
+                    earn += fixedPrice;
+                else
+                    earn += currentBil;
+
+                voya += 1;
+
+
+                todayEarnings = earn;
+                todayVoyages = voya;
+
                 if (clientSolde != null) {
                     if (!clientSolde.equals("")) {
                         try {
                             double oldSold = Double.parseDouble(clientSolde);
-
                             // if user has solde & it is greater then the calculated price
                             if (clientCredit.equals("1") && oldSold >= currentBil) {
-
                                 double newSolde = oldSold - currentBil;
                                 FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("SOLDE").setValue("" + newSolde);
                                 FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("USECREDIT").setValue("1");
@@ -603,28 +630,19 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                                 FirebaseDatabase.getInstance().getReference("COURSES").child(courseId).child("price").setValue("0.0");
                                 FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(driverId).child("debt").setValue(Double.toString(newDebt));
                                 price.setText("0.0 MAD");
-
                             } else {
-                                // if user has solde & it is small then the calculated price
-
+                                // Note: if user has solde & it is small then the calculated price
                                 FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(driverId).child("PAID").setValue("0");
-
                                 double commission = currentBil * percent;
                                 double userDue = currentBil - oldSold;
                                 double newDebt = driverDebt + (currentBil - userDue - commission);
                                 currentDebt = newDebt;
-                                Log.e(TAG, "onDataChange: 3333333 old sold: " + commission);
-                                Log.e(TAG, "onDataChange: 3333333 old currentbill: " + userDue);
                                 currentWallet = 0.0;
                                 FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("SOLDE").setValue("" + currentWallet);
                                 FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("USECREDIT").setValue("0");
                                 FirebaseDatabase.getInstance().getReference("COURSES").child(courseId).child("price").setValue(df2.format(userDue));
-
-
                                 price.setText(df2.format(userDue) + " MAD");
-
                                 FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(driverId).child("debt").setValue(Double.toString(newDebt));
-                                Log.e(TAG, "onDataChange: new Debt" + newDebt);
                             }
                         } catch (NumberFormatException e) {
                             e.printStackTrace();
@@ -632,8 +650,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                             e.printStackTrace();
                         }
                     } else {
-
-                        // if user has  no solde
+                        //Note: if user has no solde
                         try {
                             double commission = currentBil * percent * -1;
                             double newDebt = (driverDebt + commission);
@@ -661,13 +678,186 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                         e.printStackTrace();
                     }
                 }
+
+//                if (clientLevel != null) {
+//                    if (clientLevel.equals("2"))
+//                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("level").setValue("1");
+//
+//                    if (clientLevel.equals("1"))
+//                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("level").setValue("0");
+//                }
+
+                FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("LASTCOURSE").setValue("Derniére course : Captain " + driverName + " / " + df2.format(currentBil) + " MAD");
+                FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("COURSE").setValue(courseId);
+                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(clientId).child("COURSE").setValue(courseId);
+
+                // Note: inserting driver earnings into Driver profile
+                final Map<String, String> earnings = new HashMap<>();
+                earnings.put("earnings", "" + todayEarnings);
+                earnings.put("voyages", "" + todayVoyages);
+                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").
+                        child(clientId).child("EARNINGS").child(getDateMonth(GetUnixTime()))
+                        .child(getDateDay(GetUnixTime())).setValue(earnings);
+
+                final Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        FirebaseDatabase.getInstance().getReference("COURSES").child(courseId).removeValue();
+                    }
+                }, 3000);
+
+                switchOnlineUI();
+
+                // Note: Recharge Functionality Here
+
+                charge.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (moneyAmount.getText().toString().length() > 0) {
+                            final String value = moneyAmount.getText().toString();
+                            final int userProvidedRecharge = Integer.parseInt(value);
+
+                            if (userProvidedRecharge < 100) {
+                                totalRecharge = userProvidedRecharge;
+
+                                if (clientSolde.equals("")) {
+                                    totalRecharge += 0.0;
+                                } else {
+                                    totalRecharge += Double.parseDouble(clientSolde);
+                                }
+
+                                double newdebt = currentDebt - userProvidedRecharge;
+                                currentDebt = newdebt;
+                                double newSold = currentWallet + userProvidedRecharge;
+
+                                if (Integer.parseInt(clientTotalRide) >= 3) {
+//                                                rideMorethanThree = true;
+                                    if (totalRecharge <= 100) {
+                                        // Enter the value into driver wallet here
+                                        Log.e(TAG, "onDataChange: " + newSold);
+                                        Toast.makeText(MapsNewActivity.this, getString(R.string.txt_successfully_recharged), Toast.LENGTH_LONG).show();
+                                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(clientId).child("debt").setValue("" + newdebt);
+                                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("SOLDE").setValue("" + newSold);
+                                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("USECREDIT").setValue("1");
+                                        dialog.dismiss();
+                                    } else {
+                                        Toast.makeText(MapsNewActivity.this, "Vous ne pouvez pas dépasser 100 MAD de recharge pour ce client.", Toast.LENGTH_LONG).show();
+                                    }
+                                } else {
+//                                                rideMorethanThree = false;
+                                    if (totalRecharge <= 10) {
+                                        // Enter the value into driver wallet here
+                                        Toast.makeText(MapsNewActivity.this, getString(R.string.txt_successfully_recharged), Toast.LENGTH_LONG).show();
+                                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(clientId).child("debt").setValue("" + newdebt);
+                                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("SOLDE").setValue("" + newSold);
+                                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("USECREDIT").setValue("1");
+                                        dialog.dismiss();
+                                    } else {
+                                        Toast.makeText(MapsNewActivity.this, getString(R.string.txt_highest_10_mad), Toast.LENGTH_LONG).show();
+                                    }
+                                }
+                            } else
+                                Toast.makeText(MapsNewActivity.this, getString(R.string.txt_highest_100_mad), Toast.LENGTH_LONG).show();
+
+                        }
+                    }
+                });
+
+//                gotMoney.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        if (RATE > 0) {
+//                            dialog.dismiss();
+//                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("rating").child(Integer.toString(RATE)).
+//                                    addListenerForSingleValueEvent(new ValueEventListener() {
+//                                @Override
+//                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                    int rating = Integer.parseInt(dataSnapshot.getValue(String.class)) + 1;
+//                                    FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("rating").child(Integer.toString(RATE)).setValue("" + rating);
+//                                    dialog.dismiss();
+//                                }
+//
+//                                @Override
+//                                public void onCancelled(@NonNull DatabaseError databaseError) {
+//                                    dialog.dismiss();
+//                                }
+//                            });
+//
+//                            final Handler handler = new Handler();
+//                            handler.postDelayed(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(clientId).child("COURSE").removeValue();
+//
+//                                }
+//                            }, 3000);
+//
+//                        }
+//                    }
+//                });
+
+//                dialogButton.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View view) {
+//                        try {
+//                            Log.e(TAG, "onClick:client id " + clientId);
+//                            FirebaseDatabase.getInstance().getReference("clientUSERS").
+//                                    child(clientId).child("rating").child(Integer.toString(RATE)).
+//                                    addListenerForSingleValueEvent(new ValueEventListener() {
+//                                @Override
+//                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                    if (dataSnapshot.exists()) {
+//                                        int Rating = Integer.parseInt(dataSnapshot.getValue(String.class)) + 1;
+//                                        FirebaseDatabase.getInstance().getReference("clientUSERS").
+//                                                child(clientId).child("rating").child(Integer.toString(RATE)).setValue("" + Rating);
+//                                        dialog.dismiss();
+//                                    }
+//                                    dialog.dismiss();
+//                                    isRatingPopupShowed = true;
+//                                }
+//
+//                                @Override
+//                                public void onCancelled(@NonNull DatabaseError databaseError) {
+//                                    dialog.dismiss();
+//                                    isRatingPopupShowed = true;
+//                                }
+//                            });
+//                        } catch (Exception e) {
+//                            e.printStackTrace();
+//                            dialog.dismiss();
+////                            isRatingPopupShowed = true;
+//                        }
+//
+//                    }
+//                });
+
+                dialog.setCancelable(false);
+                dialog.setCanceledOnTouchOutside(false);
+                dialog.show();
+
+//                Display display = getWindowManager().getDefaultDisplay();
+//                DisplayMetrics outMetrics = new DisplayMetrics();
+//                display.getMetrics(outMetrics);
+//
+//                float density = getResources().getDisplayMetrics().density;
+//                float dpHeight = outMetrics.heightPixels / density;
+//                float dpWidth = outMetrics.widthPixels / density;
+//                dialog.findViewById(R.id.body).getLayoutParams().width =
+//                        (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (int)
+//                                (dpWidth), MapsNewActivity.this.getResources().getDisplayMetrics());
+
+
+                WindowManager.LayoutParams lp = Objects.requireNonNull(dialog.getWindow()).getAttributes();
+                lp.dimAmount = 0.5f;
+                dialog.getWindow().setAttributes(lp);
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+
             }
-
-
         });
-
-
     }
+
 
     private void showClientInformation() {
         courseActionBtn.setText(getString(R.string.txt_driver_arrive));

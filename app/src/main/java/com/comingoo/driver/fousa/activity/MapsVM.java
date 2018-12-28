@@ -47,6 +47,7 @@ public class MapsVM {
     private String startAddress = "";
     private String destAddress = "";
     private String clientId = "";
+    private String clientLevel = "";
     private String clientImageUri = "";
     private String clientName = "";
     private String clientPhoneNumber = "";
@@ -230,6 +231,13 @@ public class MapsVM {
                                         clientlastCourse = dataSnapshot.child("LASTCOURSE").getValue(String.class);
                                         clientSolde = dataSnapshot.child("SOLDE").getValue(String.class);
                                         clientCredit = dataSnapshot.child("USECREDIT").getValue(String.class);
+                                        clientLevel = dataSnapshot.child("level").getValue(String.class);
+
+                                        if (dataSnapshot.child("PROMOCODE").exists()) {
+                                            isPromoCode = true;
+                                        } else {
+                                            isPromoCode = false;
+                                        }
 
                                         callback.callbackCourseInfo(courseId,
                                                 clientId, clientName, clientImageUri,
@@ -269,25 +277,6 @@ public class MapsVM {
     }
 
     public void gettingPriceValue(final PriceCallBack priceCallBack) {
-
-        FirebaseDatabase.getInstance().getReference("clientUSERS").
-                child(clientId).child("PROMOCODE").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    isPromoCode = true;
-                } else {
-                    isPromoCode = false;
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-
         FirebaseDatabase.getInstance().getReference("DRIVERUSERS").
                 child(driverId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -325,7 +314,8 @@ public class MapsVM {
                     double km = Double.parseDouble(dataSnapshot.child("km").getValue(String.class));
                     double min = Double.parseDouble(dataSnapshot.child("minimum").getValue(String.class));
                     final double percent = Double.parseDouble(dataSnapshot.child("percent").getValue(String.class));
-                    priceCallBack.callbackPrice(att, base, debtCeil, km, min, percent, isPromoCode, earned, voyages, driverDebt);
+                    priceCallBack.callbackPrice(att, base,
+                            debtCeil, km, min, percent, isPromoCode, earned, voyages, driverDebt, clientLevel);
                 }
             }
 

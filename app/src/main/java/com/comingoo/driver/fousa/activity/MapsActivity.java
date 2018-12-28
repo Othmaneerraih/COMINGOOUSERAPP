@@ -1039,12 +1039,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                     final Button star4 = dialog.findViewById(R.id.star4);
                                                     final Button star5 = dialog.findViewById(R.id.star5);
 
-                                                    price = dialog.findViewById(R.id.button3);
+                                                    price = dialog.findViewById(R.id.btn_price_show);
 
                                                     final ImageView imot = dialog.findViewById(R.id.stars_rating);
 
                                                     final Button gotMoney = dialog.findViewById(R.id.button);
                                                     final Button charge = dialog.findViewById(R.id.btn_recharger);
+
                                                     final EditText moneyAmount = dialog.findViewById(R.id.editText);
 
                                                     dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -1143,8 +1144,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                                             child(getDateDay(GetUnixTime())).addListenerForSingleValueEvent(new ValueEventListener() {
                                                                                         @Override
                                                                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-
                                                                                             double earned = 0;
                                                                                             int voyages = 0;
                                                                                             if (dataSnapshot.exists()) {
