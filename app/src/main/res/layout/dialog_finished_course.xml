@@ -34,7 +34,7 @@
         android:id="@+id/textView14"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/stars_rating"
+        android:layout_above="@+id/rating_reaction"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="40dp"
         android:text="@string/evaluez_votre_xperience"
@@ -44,7 +44,7 @@
         android:textStyle="bold" />
 
     <ImageView
-        android:id="@+id/stars_rating"
+        android:id="@+id/rating_reaction"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_centerInParent="true"
@@ -55,7 +55,7 @@
         android:id="@+id/start_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/stars_rating"
+        android:layout_below="@+id/rating_reaction"
         android:gravity="center"
         android:orientation="horizontal">
 

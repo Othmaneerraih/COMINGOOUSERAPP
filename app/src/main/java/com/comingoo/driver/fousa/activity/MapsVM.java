@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.text.format.DateFormat;
@@ -12,6 +13,7 @@ import android.widget.Toast;
 
 import com.comingoo.driver.fousa.interfaces.CourseCallBack;
 import com.comingoo.driver.fousa.interfaces.DataCallBack;
+import com.comingoo.driver.fousa.interfaces.OnlineOfflineCallBack;
 import com.comingoo.driver.fousa.interfaces.PriceCallBack;
 import com.comingoo.driver.fousa.utility.Utilities;
 import com.google.android.gms.maps.model.LatLng;
@@ -157,44 +159,6 @@ public class MapsVM {
     }
 
     public void checkCourseTask(final CourseCallBack callback) {
-
-        // Note: Getting total Course Number of client
-        FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(clientId).
-                addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        clientTotalCourse = String.valueOf(dataSnapshot.getChildrenCount());
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                    }
-                });
-
-        // Note: Getting last Course date time of client
-        FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(clientId)
-                .limitToLast(1).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    try {
-                        for (DataSnapshot child : dataSnapshot.getChildren()) {
-                            String longV = Objects.requireNonNull(child.child("date").getValue()).toString();
-                            String dateString = DateFormat.format(longV, Long.parseLong("dd/MM/yyyy hh:mm:ss")).toString();
-                            clientLastRideDate = dateString;
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
-        });
-
-
         FirebaseDatabase.getInstance().getReference("COURSES").orderByChild("driver").
                 equalTo(driverId).limitToFirst(1).addValueEventListener(new ValueEventListener() {
             @Override
@@ -239,12 +203,87 @@ public class MapsVM {
                                             isPromoCode = false;
                                         }
 
-                                        callback.callbackCourseInfo(courseId,
-                                                clientId, clientName, clientImageUri,
-                                                clientPhoneNumber, clientlastCourse, clientSolde, clientCredit,
-                                                startAddress, destAddress, distanceTraveled, courseState,
-                                                clientTotalCourse, clientLastRideDate, preWaitTime,
-                                                driverArraivalLatLong);
+
+                                        Log.e("MapsVM", "clientId: "+clientId );
+                                        FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(clientId)/*.child(userId)
+                .orderByKey()*/.limitToLast(1).addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                if (dataSnapshot.exists()) {
+                                                    try {
+                                                        for (DataSnapshot child : dataSnapshot.getChildren()) {
+//                                                            Log.e(TAG, "date of ride: " + Objects.requireNonNull(child.child("date").getValue()).toString());
+                                                            String longV = Objects.requireNonNull(child.child("date").getValue()).toString();
+                                                            String dateString = convertDate(longV, "dd/MM/yyyy hh:mm:ss");
+                                                            clientLastRideDate = dateString;
+                                                            Log.e("MapsVM", "onDataChange:clientLastRideDate "+clientLastRideDate );
+
+                                                        }
+                                                    } catch (Exception e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                                            }
+                                        });
+
+                                        // Note: Getting total Course Number of client
+                                        FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(clientId).
+                                                addValueEventListener(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                        clientTotalCourse = String.valueOf(dataSnapshot.getChildrenCount());
+                                                        Log.e("MapsVM", "onDataChange:getChildrenCount "+dataSnapshot.getChildrenCount() );
+
+
+
+
+                                                        callback.callbackCourseInfo(courseId,
+                                                                clientId, clientName, clientImageUri,
+                                                                clientPhoneNumber, clientlastCourse, clientSolde, clientCredit,
+                                                                startAddress, destAddress, distanceTraveled, courseState,
+                                                                clientTotalCourse, clientLastRideDate, preWaitTime,
+                                                                driverArraivalLatLong);
+
+
+                                                    }
+
+                                                    @Override
+                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                    }
+                                                });
+
+                                        // Note: Getting last Course date time of client
+//                                        FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(clientId)
+//                                                .limitToLast(1).addValueEventListener(new ValueEventListener() {
+//                                            @Override
+//                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                                if (dataSnapshot.exists()) {
+//                                                    try {
+//                                                        for (DataSnapshot child : dataSnapshot.getChildren()) {
+//
+//                                                        }
+//                                                    } catch (Exception e) {
+//                                                        e.printStackTrace();
+//                                                    }
+//                                                }
+//                                            }
+//
+//                                            @Override
+//                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+//                                                callback.callbackCourseInfo(courseId,
+//                                                        clientId, clientName, clientImageUri,
+//                                                        clientPhoneNumber, clientlastCourse, clientSolde, clientCredit,
+//                                                        startAddress, destAddress, distanceTraveled, courseState,
+//                                                        clientTotalCourse, clientLastRideDate, preWaitTime, driverArraivalLatLong);
+//                                            }
+//                                        });
+
+
+
                                     }
                                 }
 
@@ -274,6 +313,11 @@ public class MapsVM {
             }
         });
 
+
+    }
+
+    public String convertDate(String dateInMilliseconds, String dateFormat) {
+        return DateFormat.format(dateFormat, Long.parseLong(dateInMilliseconds)).toString();
     }
 
     public void gettingPriceValue(final PriceCallBack priceCallBack) {
@@ -324,5 +368,41 @@ public class MapsVM {
 
             }
         });
+    }
+
+    public void rateClient(final int Rate) {
+        FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("rating").child(Integer.toString(Rate)).
+                addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        int rating = Integer.parseInt(dataSnapshot.getValue(String.class)) + 1;
+                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId)
+                                .child("rating").child(Integer.toString(Rate)).setValue("" + rating);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
+    }
+
+    public void checkingOnlineOffline(final OnlineOfflineCallBack onlineOfflineCallBack) {
+        FirebaseDatabase.getInstance().getReference().child("ONLINEDRIVERS").child(driverId).
+                addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists())
+                            onlineOfflineCallBack.isOnline(true);
+                        else onlineOfflineCallBack.isOnline(false);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
     }
 }

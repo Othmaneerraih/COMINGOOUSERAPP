@@ -49,8 +49,8 @@
     <string name="txt_driver_arrive">Appuyez pour arriver</string>
     <string name="txt_tap_to_start">Appuyez pour commancer</string>
     <string name="txt_finish_course">Appuyez pour terminer</string>
-    <string name="txt_highest_10_mad">Vous ne pouvez pas dépasser 10 MAD de recharge pour ce client.</string>
-    <string name="txt_highest_100_mad">Vous ne pouvez pas dépasser 100 MAD de recharge pour ce client.</string>
+    <string name="txt_highest_ten_mad" translatable="false">Vous ne pouvez pas dépasser 10 MAD de recharge pour ce client.</string>
+    <string name="txt_highest_hundrad_mad" translatable="false">Vous ne pouvez pas dépasser 100 MAD de recharge pour ce client.</string>
     <string name="recharger">Recharger</string>
     <string name="mad">MAD</string>
 

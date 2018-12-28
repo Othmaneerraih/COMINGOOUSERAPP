@@ -52,10 +52,36 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="10dp"
-                android:layout_toStartOf="@+id/call_button"
                 android:layout_toEndOf="@+id/user_image"
-                android:text="name" />
+                android:text="name"
+                android:textStyle="bold"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/txt_size_xxlarge"/>
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_toEndOf="@+id/user_name_txt">
+
+                <ImageButton
+                    android:id="@+id/iv_rating"
+                    android:layout_width="51dp"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginLeft="8dp"
+                    android:background="@drawable/rating_box"/>
+
+                <TextView
+                    android:id="@+id/ratings"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="4.6"
+                    android:textSize="10sp"
+                    android:layout_marginStart="35dp"
+                    android:layout_centerVertical="true"/>
+
+            </RelativeLayout>
 
             <TextView
                 android:id="@+id/course_count_txt"

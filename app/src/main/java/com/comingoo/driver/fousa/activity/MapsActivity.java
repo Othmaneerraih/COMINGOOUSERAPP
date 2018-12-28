@@ -1041,7 +1041,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                                     price = dialog.findViewById(R.id.btn_price_show);
 
-                                                    final ImageView imot = dialog.findViewById(R.id.stars_rating);
+                                                    final ImageView imot = dialog.findViewById(R.id.rating_reaction);
 
                                                     final Button gotMoney = dialog.findViewById(R.id.button);
                                                     final Button charge = dialog.findViewById(R.id.btn_recharger);
@@ -1756,7 +1756,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             todayEarnings = "0";
                             todayTrips = "0";
 
-                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(number).child("EARNINGS").child(getDateMonth(GetUnixTime())).child(getDateDay(GetUnixTime())).addListenerForSingleValueEvent(new ValueEventListener() {
+                            FirebaseDatabase.getInstance().getReference("DRIVERUSERS").
+                                    child(number).child("EARNINGS").
+                                    child(getDateMonth(GetUnixTime())).child(getDateDay(GetUnixTime())).addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 

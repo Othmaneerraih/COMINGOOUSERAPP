@@ -10,9 +10,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -25,10 +26,9 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
+import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -46,6 +46,7 @@ import android.widget.Toast;
 import com.comingoo.driver.fousa.R;
 import com.comingoo.driver.fousa.interfaces.CourseCallBack;
 import com.comingoo.driver.fousa.interfaces.DataCallBack;
+import com.comingoo.driver.fousa.interfaces.OnlineOfflineCallBack;
 import com.comingoo.driver.fousa.interfaces.PriceCallBack;
 import com.comingoo.driver.fousa.service.DriverService;
 import com.comingoo.driver.fousa.utility.CustomAnimation;
@@ -86,7 +87,7 @@ import static com.comingoo.driver.fousa.utility.Utilities.getDateDay;
 import static com.comingoo.driver.fousa.utility.Utilities.getDateMonth;
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
-public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCallback, OnlineOfflineCallBack {
     private MapsVM mapsVM;
     private double rating = 0.0;
     private String driverName = "";
@@ -121,6 +122,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
     private Runnable runnable;
     private boolean isFixed;
     private int totalRecharge;
+    private boolean isRatingPopupShowed = false;
 
     private int RATE = 4;
     private double fixedPrice, price1, price2, price3, promoCode;
@@ -177,6 +179,13 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
     private RelativeLayout logoutLayout;
     private TextView logoutTxt;
 
+    private BitmapFactory.Options bOptions;
+    private int imageHeight;
+    private int imageWidth;
+    private int lastImageHeight;
+    private int lastImageWidth;
+    private int inSampleSize;
+
     private GoogleMap mMap;
     private LatLng userLatLng;
     private RelativeLayout.LayoutParams params;
@@ -199,7 +208,8 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
 
         mapsVM.checkLogin(MapsNewActivity.this, new DataCallBack() {
             @Override
-            public void callbackCall(boolean success, String drivrNam, String drivrImg, String drivrNum, String debt, String todystrp, String todysErn, double rat, String drivrId) {
+            public void callbackCall(boolean success, String drivrNam, String drivrImg,
+                                     String drivrNum, String debt, String todystrp, String todysErn, double rat, String drivrId) {
                 if (success) {
                     driverName = drivrNam;
                     driverImage = drivrImg;
@@ -247,6 +257,10 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                 courseHandle();
             }
         });
+
+        if (todayEarnings != null)
+            moneyBtn.setText(todayEarnings + " MAD");
+
 
         // Note: Prewait Time Handler
         handler = new Handler(Looper.getMainLooper());
@@ -338,7 +352,6 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
             @Override
             public void onClick(View v) {
                 switchOnlineUI();
-                startService(new Intent(MapsNewActivity.this, DriverService.class));
             }
         });
 
@@ -346,7 +359,6 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
             @Override
             public void onClick(View v) {
                 switchOfflineUI();
-                stopService(new Intent(MapsNewActivity.this, DriverService.class));
             }
         });
 
@@ -427,6 +439,26 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                 openWaze(destinationLatLong);
             }
         });
+
+//        mapsVM.checkingOnlineOffline(new OnlineOfflineCallBack() {
+//            @Override
+//            public void isOnline(boolean isOnline) {
+//                if (isOnline)
+//                    switchOnlineUI();
+//                else switchOfflineUI();
+//            }
+//        });
+
+
+//        CommandActivity commandActivity = new CommandActivity(new OnlineOfflineCallBack() {
+//            @Override
+//            public void isOnline(boolean isOnline) {
+//                if (isOnline)
+//                    switchOnlineUI();
+//                else switchOfflineUI();
+//            }
+//        });
+
     }
 
     private void permission() {
@@ -525,25 +557,28 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
             handler.postDelayed(runnable, 1000);
         } else if (courseState.equals("2")) {
             handler.removeCallbacks(runnable);
+            isRatingPopupShowed = false;
         } else if (courseState.equals("3")) {
-            switchToCourseUI();
+            courseUIOff();
             // Note: Making driver offline
             FirebaseDatabase.getInstance().getReference().child("ONLINEDRIVERS").child(driverId).removeValue();
             switchOnlineUI();
-            calculatePrice();
+            if (!isRatingPopupShowed)
+                calculatePrice();
         }
     }
 
     private void calculatePrice() {
+        isRatingPopupShowed = true;
         mapsVM.gettingPriceValue(new PriceCallBack() {
             @Override
             public void callbackPrice(Double att, Double base, Double debtCeil, Double km, Double mini,
                                       Double percent, boolean promo, double earn, double voya, double debt, String level) {
 
                 final Dialog dialog = new Dialog(MapsNewActivity.this);
+                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 dialog.setContentView(R.layout.dialog_finished_course);
 
-                Button dialogButton = dialog.findViewById(R.id.button);
                 final Button star1 = dialog.findViewById(R.id.star1);
                 final Button star2 = dialog.findViewById(R.id.star2);
                 final Button star3 = dialog.findViewById(R.id.star3);
@@ -552,7 +587,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
 
                 Button price = dialog.findViewById(R.id.btn_price_show);
 
-                final ImageView imot = dialog.findViewById(R.id.stars_rating);
+                final ImageView ivRateReaction = dialog.findViewById(R.id.rating_reaction);
 
                 final Button gotMoney = dialog.findViewById(R.id.button);
                 final Button charge = dialog.findViewById(R.id.btn_recharger);
@@ -561,21 +596,12 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                 dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                     @Override
                     public void onDismiss(DialogInterface dialog) {
-                        FirebaseDatabase.getInstance().getReference().child("ONLINEDRIVERS").child(driverId).removeValue();
                         switchOnlineUI();
                     }
                 });
 
-
-//                double attribute = att;
-//                double baseValue = base;
-//                double kilometer = km;
                 double minimum = mini;
-//                double comingooPercent = percent;
-//                double earning = earn;
-//                double voyages = voya;
                 double driverDebt = debt;
-//                boolean isPromoCode = promo;
 
                 long timestamp = GetUnixTime() * -1;
 
@@ -663,20 +689,6 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                             e.printStackTrace();
                         }
                     }
-                } else {
-
-                    // if user has  no solde
-                    try {
-                        double commission = currentBil * percent * -1;
-                        double newDebt = (driverDebt + commission);
-                        currentDebt = newDebt;
-                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(driverId).child("PAID").setValue("0");
-                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(driverId).child("debt").setValue(Double.toString(newDebt));
-                        FirebaseDatabase.getInstance().getReference("COURSES").child(courseId).child("price").setValue(df2.format(currentBil));
-                        price.setText(df2.format(currentBil) + " MAD");
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
                 }
 
 //                if (clientLevel != null) {
@@ -687,7 +699,9 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
 //                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("level").setValue("0");
 //                }
 
-                FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("LASTCOURSE").setValue("Derniére course : Captain " + driverName + " / " + df2.format(currentBil) + " MAD");
+                FirebaseDatabase.getInstance().getReference("clientUSERS").
+                        child(clientId).child("LASTCOURSE").
+                        setValue("Captain " + driverName + " / " + df2.format(currentBil) + " MAD");
                 FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("COURSE").setValue(courseId);
                 FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(clientId).child("COURSE").setValue(courseId);
 
@@ -710,7 +724,6 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                 switchOnlineUI();
 
                 // Note: Recharge Functionality Here
-
                 charge.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -732,8 +745,8 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                                 double newSold = currentWallet + userProvidedRecharge;
 
                                 if (Integer.parseInt(clientTotalRide) >= 3) {
-//                                                rideMorethanThree = true;
                                     if (totalRecharge <= 100) {
+                                        mapsVM.rateClient(RATE);
                                         // Enter the value into driver wallet here
                                         Log.e(TAG, "onDataChange: " + newSold);
                                         Toast.makeText(MapsNewActivity.this, getString(R.string.txt_successfully_recharged), Toast.LENGTH_LONG).show();
@@ -745,127 +758,175 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                                         Toast.makeText(MapsNewActivity.this, "Vous ne pouvez pas dépasser 100 MAD de recharge pour ce client.", Toast.LENGTH_LONG).show();
                                     }
                                 } else {
-//                                                rideMorethanThree = false;
                                     if (totalRecharge <= 10) {
                                         // Enter the value into driver wallet here
+                                        mapsVM.rateClient(RATE);
                                         Toast.makeText(MapsNewActivity.this, getString(R.string.txt_successfully_recharged), Toast.LENGTH_LONG).show();
                                         FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(clientId).child("debt").setValue("" + newdebt);
                                         FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("SOLDE").setValue("" + newSold);
                                         FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("USECREDIT").setValue("1");
                                         dialog.dismiss();
                                     } else {
-                                        Toast.makeText(MapsNewActivity.this, getString(R.string.txt_highest_10_mad), Toast.LENGTH_LONG).show();
+                                        Toast.makeText(MapsNewActivity.this, getString(R.string.txt_highest_ten_mad), Toast.LENGTH_LONG).show();
                                     }
                                 }
                             } else
-                                Toast.makeText(MapsNewActivity.this, getString(R.string.txt_highest_100_mad), Toast.LENGTH_LONG).show();
+                                Toast.makeText(MapsNewActivity.this, getString(R.string.txt_highest_hundrad_mad), Toast.LENGTH_LONG).show();
 
                         }
                     }
                 });
 
-//                gotMoney.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//                        if (RATE > 0) {
-//                            dialog.dismiss();
-//                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("rating").child(Integer.toString(RATE)).
-//                                    addListenerForSingleValueEvent(new ValueEventListener() {
-//                                @Override
-//                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                                    int rating = Integer.parseInt(dataSnapshot.getValue(String.class)) + 1;
-//                                    FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("rating").child(Integer.toString(RATE)).setValue("" + rating);
-//                                    dialog.dismiss();
-//                                }
-//
-//                                @Override
-//                                public void onCancelled(@NonNull DatabaseError databaseError) {
-//                                    dialog.dismiss();
-//                                }
-//                            });
-//
-//                            final Handler handler = new Handler();
-//                            handler.postDelayed(new Runnable() {
-//                                @Override
-//                                public void run() {
-//                                    FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(clientId).child("COURSE").removeValue();
-//
-//                                }
-//                            }, 3000);
-//
-//                        }
-//                    }
-//                });
+                gotMoney.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (RATE > 0) {
+                            dialog.dismiss();
+                            mapsVM.rateClient(RATE);
+                        }
+                    }
+                });
 
-//                dialogButton.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View view) {
-//                        try {
-//                            Log.e(TAG, "onClick:client id " + clientId);
-//                            FirebaseDatabase.getInstance().getReference("clientUSERS").
-//                                    child(clientId).child("rating").child(Integer.toString(RATE)).
-//                                    addListenerForSingleValueEvent(new ValueEventListener() {
-//                                @Override
-//                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                                    if (dataSnapshot.exists()) {
-//                                        int Rating = Integer.parseInt(dataSnapshot.getValue(String.class)) + 1;
-//                                        FirebaseDatabase.getInstance().getReference("clientUSERS").
-//                                                child(clientId).child("rating").child(Integer.toString(RATE)).setValue("" + Rating);
-//                                        dialog.dismiss();
-//                                    }
-//                                    dialog.dismiss();
-//                                    isRatingPopupShowed = true;
-//                                }
-//
-//                                @Override
-//                                public void onCancelled(@NonNull DatabaseError databaseError) {
-//                                    dialog.dismiss();
-//                                    isRatingPopupShowed = true;
-//                                }
-//                            });
-//                        } catch (Exception e) {
-//                            e.printStackTrace();
-//                            dialog.dismiss();
-////                            isRatingPopupShowed = true;
-//                        }
-//
-//                    }
-//                });
+                star1.setBackgroundResource(R.drawable.normal_star);
+                star2.setBackgroundResource(R.drawable.normal_star);
+                star3.setBackgroundResource(R.drawable.normal_star);
+                star4.setBackgroundResource(R.drawable.selected_star);
+                ivRateReaction.setImageBitmap(scaleBitmap(150, 150, R.drawable.four_stars));
+
+                star1.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        RATE = 1;
+                        star1.setBackgroundResource(R.drawable.selected_star);
+                        star2.setBackgroundResource(R.drawable.unselected_star);
+                        star3.setBackgroundResource(R.drawable.unselected_star);
+                        star4.setBackgroundResource(R.drawable.unselected_star);
+                        star5.setBackgroundResource(R.drawable.unselected_star);
+
+                        ivRateReaction.setImageBitmap(scaleBitmap(150, 150, R.drawable.one_star));
+                    }
+                });
+                star2.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        RATE = 2;
+
+                        star1.setBackgroundResource(R.drawable.normal_star);
+                        star2.setBackgroundResource(R.drawable.selected_star);
+                        star3.setBackgroundResource(R.drawable.unselected_star);
+                        star4.setBackgroundResource(R.drawable.unselected_star);
+                        star5.setBackgroundResource(R.drawable.unselected_star);
+
+                        ivRateReaction.setImageBitmap(scaleBitmap(150, 150, R.drawable.two_stars));
+                    }
+                });
+                star3.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        RATE = 3;
+
+                        star1.setBackgroundResource(R.drawable.normal_star);
+                        star2.setBackgroundResource(R.drawable.normal_star);
+                        star3.setBackgroundResource(R.drawable.selected_star);
+                        star4.setBackgroundResource(R.drawable.unselected_star);
+                        star5.setBackgroundResource(R.drawable.unselected_star);
+
+                        ivRateReaction.setImageBitmap(scaleBitmap(150, 150, R.drawable.three_stars));
+                    }
+                });
+                star4.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        RATE = 4;
+
+                        star1.setBackgroundResource(R.drawable.normal_star);
+                        star2.setBackgroundResource(R.drawable.normal_star);
+                        star3.setBackgroundResource(R.drawable.normal_star);
+                        star4.setBackgroundResource(R.drawable.selected_star);
+                        star5.setBackgroundResource(R.drawable.unselected_star);
+
+                        ivRateReaction.setImageBitmap(scaleBitmap(150, 150, R.drawable.four_stars));
+                    }
+                });
+                star5.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        RATE = 5;
+
+                        star1.setBackgroundResource(R.drawable.normal_star);
+                        star2.setBackgroundResource(R.drawable.normal_star);
+                        star3.setBackgroundResource(R.drawable.normal_star);
+                        star4.setBackgroundResource(R.drawable.normal_star);
+                        star5.setBackgroundResource(R.drawable.selected_star);
+
+                        ivRateReaction.setImageBitmap(scaleBitmap(150, 150, R.drawable.five_stars));
+                    }
+                });
+
 
                 dialog.setCancelable(false);
-                dialog.setCanceledOnTouchOutside(false);
+                final Window window = dialog.getWindow();
+                if (window != null) {
+                    window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
+                }
+                if (window != null) {
+                    window.setGravity(Gravity.CENTER);
+                }
                 dialog.show();
-
-//                Display display = getWindowManager().getDefaultDisplay();
-//                DisplayMetrics outMetrics = new DisplayMetrics();
-//                display.getMetrics(outMetrics);
-//
-//                float density = getResources().getDisplayMetrics().density;
-//                float dpHeight = outMetrics.heightPixels / density;
-//                float dpWidth = outMetrics.widthPixels / density;
-//                dialog.findViewById(R.id.body).getLayoutParams().width =
-//                        (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (int)
-//                                (dpWidth), MapsNewActivity.this.getResources().getDisplayMetrics());
-
-
-                WindowManager.LayoutParams lp = Objects.requireNonNull(dialog.getWindow()).getAttributes();
-                lp.dimAmount = 0.5f;
-                dialog.getWindow().setAttributes(lp);
-                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-
             }
         });
     }
 
+    public Bitmap scaleBitmap(int reqWidth, int reqHeight, int resId) {
+        // Raw height and width of image
+
+        bOptions = new BitmapFactory.Options();
+        bOptions.inJustDecodeBounds = true;
+        BitmapFactory.decodeResource(getResources(), resId, bOptions);
+        imageHeight = bOptions.outHeight;
+        imageWidth = bOptions.outWidth;
+
+        imageHeight = bOptions.outHeight;
+        imageWidth = bOptions.outWidth;
+        inSampleSize = 1;
+
+        if (imageHeight > reqHeight || imageWidth > reqWidth) {
+
+            lastImageHeight = imageHeight / 2;
+            lastImageWidth = lastImageWidth / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((lastImageHeight / inSampleSize) >= reqHeight
+                    && (lastImageWidth / inSampleSize) >= reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+
+
+        // First decode with inJustDecodeBounds=true to check dimensions
+        bOptions = new BitmapFactory.Options();
+        bOptions.inJustDecodeBounds = true;
+        BitmapFactory.decodeResource(getResources(), resId, bOptions);
+
+        // Calculate inSampleSize
+        bOptions.inSampleSize = inSampleSize;
+
+        // Decode bitmap with inSampleSize set
+        bOptions.inJustDecodeBounds = false;
+        return BitmapFactory.decodeResource(getResources(), resId, bOptions);
+    }
 
     private void showClientInformation() {
         courseActionBtn.setText(getString(R.string.txt_driver_arrive));
         clientInfoLayout.setVisibility(View.VISIBLE);
         clientNameTv.setText(clientName);
         Picasso.get().load(clientImageUri).into(clientImage);
-        totalCourseTv.setText("Courses:" + clientTotalRide);
+        String s = "<b>Courses: </b>";
+        Log.e(TAG, "showClientInformation:clientTotalRide: " + clientTotalRide);
+        totalCourseTv.setText(Html.fromHtml(s) + clientTotalRide);
         driverInfoTv.setText(clientlastCourse);
+        dateTv.setText(clientLastRideDate);
     }
 
     private void switchToCourseUI() {
@@ -1053,6 +1114,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         CustomAnimation.fadeIn(MapsNewActivity.this, onlineBtn, 500, 10);
         SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
         prefs.edit().putString("online", "1").apply();
+        startService(new Intent(MapsNewActivity.this, DriverService.class));
     }
 
     private void switchOfflineUI() {
@@ -1063,6 +1125,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         offlineBtn.setVisibility(View.VISIBLE);
         SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
         prefs.edit().putString("online", "0").apply();
+        stopService(new Intent(MapsNewActivity.this, DriverService.class));
     }
 
     @Override
@@ -1098,6 +1161,11 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         } else {
             getLastLocation();
         }
+    }
+
+    @Override
+    public void isOnline(boolean isOnline) {
+
     }
 
     private class SinchCallClientListener implements CallClientListener {

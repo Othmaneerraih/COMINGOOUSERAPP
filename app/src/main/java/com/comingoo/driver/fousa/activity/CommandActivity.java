@@ -23,6 +23,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.comingoo.driver.fousa.R;
+import com.comingoo.driver.fousa.interfaces.OnlineOfflineCallBack;
 import com.comingoo.driver.fousa.service.DriverService;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -62,12 +63,21 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
     public static CountDownTimer countDownTimer;
     private String clientType = "new";
     private Double driverPosLat, driverPosLong;
+//    private OnlineOfflineCallBack onlineOfflineCallBack;
+
+    public CommandActivity(){
+    }
+
+//    public CommandActivity(OnlineOfflineCallBack callBack){
+//        this.onlineOfflineCallBack = callBack;
+//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_command_new);
         clientR = this;
+
 
         Window window = this.getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
@@ -180,7 +190,6 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
         }
         clientID = intent.getStringExtra("name");
         userId = intent.getStringExtra("userId");
-
 
         try {
             FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID).child("rating")
@@ -540,7 +549,9 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
                 public void onClick(View view) {
                     dialog.dismiss();
                     FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
+//                    onlineOfflineCallBack.isOnline(false);
                     stopService(new Intent(CommandActivity.this, DriverService.class));
+                    finish();
                 }
             });
 
