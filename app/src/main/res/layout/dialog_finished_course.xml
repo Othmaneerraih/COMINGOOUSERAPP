@@ -1,175 +1,171 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent">-->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/body"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/finished_bg"
+    android:minWidth="300dp">
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/body"
+    <Button
+        android:id="@+id/btn_price_show"
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/price_tag"
+        android:text=""
+        android:textAllCaps="false"
+        android:textColor="@color/colorPrimary"
+        android:textSize="17sp" />
+
+    <TextView
+        android:id="@+id/textView13"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btn_price_show"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="8dp"
+        android:text="@string/montant_total_collecter"
+        android:textColor="@android:color/white" />
+
+    <TextView
+        android:id="@+id/textView14"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/rating_reaction"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        android:text="@string/evaluez_votre_xperience"
+        android:textAllCaps="false"
+        android:textColor="@color/colorPrimary"
+        android:textSize="19sp"
+        android:textStyle="bold" />
+
+    <ImageView
+        android:id="@+id/rating_reaction"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="8dp"
+        android:contentDescription="@string/todo" />
+
+    <LinearLayout
+        android:id="@+id/start_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/finished_bg">
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/rating_reaction"
+        android:gravity="center"
+        android:orientation="horizontal">
 
         <Button
-            android:id="@+id/btn_price_show"
-            android:layout_width="120dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="32dp"
-            android:layout_marginEnd="8dp"
-            android:background="@drawable/price_tag"
-            android:text=""
-            android:textAllCaps="false"
-            android:textColor="@color/colorPrimary"
-            android:textSize="17sp" />
-
-        <TextView
-            android:id="@+id/textView13"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/btn_price_show"
-            android:layout_centerHorizontal="true"
+            android:id="@+id/star1"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="4dp"
             android:layout_marginTop="8dp"
-            android:text="@string/montant_total_collecter"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/unselected_star" />
+
+        <Button
+            android:id="@+id/star2"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/unselected_star" />
+
+        <Button
+            android:id="@+id/star3"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/unselected_star" />
+
+        <Button
+            android:id="@+id/star4"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/unselected_star" />
+
+        <Button
+            android:id="@+id/star5"
+            android:layout_width="40dp"
+            android:layout_height="45dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/unselected_star" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/start_layout"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="40dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/add_button"
+        android:text="@string/esp_ces_collect_es"
+        android:textAllCaps="false"
+        android:textColor="@android:color/white"
+        android:textSize="18sp" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_below="@+id/button"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/grad_bg">
+
+        <Button
+            android:id="@+id/btn_recharger"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/white_btn"
+            android:text="@string/recharger"
+            android:textAllCaps="false"
+            android:textColor="@color/colorPrimaryDark" />
+
+        <EditText
+            android:id="@+id/editText"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@+id/tv_mad"
+            android:ems="10"
+            android:hint="100"
+            android:inputType="number|phone"
             android:textColor="@android:color/white" />
 
         <TextView
-            android:id="@+id/textView14"
+            android:id="@+id/tv_mad"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/rating_reaction"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="40dp"
-            android:text="@string/evaluez_votre_xperience"
-            android:textAllCaps="false"
-            android:textColor="@color/colorPrimary"
-            android:textSize="19sp"
-            android:textStyle="bold" />
-
-        <ImageView
-            android:id="@+id/rating_reaction"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_centerInParent="true"
-            android:layout_marginTop="8dp"
-            android:contentDescription="@string/todo" />
-
-        <LinearLayout
-            android:id="@+id/start_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/rating_reaction"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/star1"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="4dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
-                android:background="@drawable/unselected_star" />
-
-            <Button
-                android:id="@+id/star2"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="4dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
-                android:background="@drawable/unselected_star" />
-
-            <Button
-                android:id="@+id/star3"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="4dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
-                android:background="@drawable/unselected_star" />
-
-            <Button
-                android:id="@+id/star4"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="4dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
-                android:background="@drawable/unselected_star" />
-
-            <Button
-                android:id="@+id/star5"
-                android:layout_width="40dp"
-                android:layout_height="45dp"
-                android:layout_marginStart="4dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
-                android:background="@drawable/unselected_star" />
-        </LinearLayout>
-
-        <Button
-            android:id="@+id/button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/start_layout"
-            android:layout_centerHorizontal="true"
-            android:layout_marginStart="40dp"
-            android:layout_marginTop="24dp"
-            android:layout_marginEnd="40dp"
-            android:layout_marginBottom="20dp"
-            android:background="@drawable/add_button"
-            android:text="@string/esp_ces_collect_es"
-            android:textAllCaps="false"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="24dp"
+            android:text="@string/mad"
             android:textColor="@android:color/white"
-            android:textSize="18sp" />
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:layout_below="@+id/button"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginBottom="20dp"
-            android:background="@drawable/grad_bg">
-
-            <Button
-                android:id="@+id/btn_recharger"
-                android:layout_width="100dp"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="24dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
-                android:background="@drawable/white_btn"
-                android:text="@string/recharger"
-                android:textAllCaps="false"
-                android:textColor="@color/colorPrimaryDark" />
-
-            <EditText
-                android:id="@+id/editText"
-                android:layout_width="70dp"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_toStartOf="@+id/tv_mad"
-                android:ems="10"
-                android:hint="100"
-                android:inputType="number|phone"
-                android:textColor="@android:color/white" />
-
-            <TextView
-                android:id="@+id/tv_mad"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:layout_marginEnd="24dp"
-                android:text="@string/mad"
-                android:textColor="@android:color/white"
-                android:textSize="25sp" />
-
-        </RelativeLayout>
+            android:textSize="25sp" />
 
     </RelativeLayout>
-<!--</ScrollView>-->
+
+</RelativeLayout>

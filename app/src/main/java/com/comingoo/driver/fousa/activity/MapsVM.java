@@ -79,7 +79,6 @@ public class MapsVM {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if (dataSnapshot.exists()) {
-                        Log.e(TAG, "onDataChange: driver exists");
                         String isVerified = dataSnapshot.child("isVerified").getValue(String.class);
                         if (isVerified != null && isVerified.equals("0")) {
                             prefs.edit().remove("phoneNumber").apply();
@@ -122,12 +121,15 @@ public class MapsVM {
                         todysErn = "0";
                         todystrp = "0";
 
-                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(driverId).child("EARNINGS").child(getDateMonth(GetUnixTime())).child(getDateDay(GetUnixTime())).addListenerForSingleValueEvent(new ValueEventListener() {
+                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(driverId).
+                                child("EARNINGS").child(getDateMonth(GetUnixTime())).child(getDateDay(GetUnixTime())).
+                                addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                 if (dataSnapshot.exists()) {
                                     todysErn = dataSnapshot.child("earnings").getValue(String.class);
                                     todystrp = dataSnapshot.child("voyages").getValue(String.class);
+                                    Log.e(TAG, "onDataChange: todysErn "+todysErn );
                                     callback.callbackCall(true, drivrNam, drivrImg, drivrNum, debt, todystrp, todysErn, rat, driverId);
                                 }
                             }
@@ -138,7 +140,7 @@ public class MapsVM {
                             }
                         });
 
-                        callback.callbackCall(true, drivrNam, drivrImg, drivrNum, debt, todystrp, todysErn, rat, driverId);
+//                        callback.callbackCall(true, drivrNam, drivrImg, drivrNum, debt, todystrp, todysErn, rat, driverId);
                     } else {
                         Toast.makeText(context, driverId, Toast.LENGTH_SHORT).show();
                         prefs.edit().remove("phoneNumber").apply();
@@ -322,7 +324,7 @@ public class MapsVM {
 
     public void gettingPriceValue(final PriceCallBack priceCallBack) {
         FirebaseDatabase.getInstance().getReference("DRIVERUSERS").
-                child(driverId).addListenerForSingleValueEvent(new ValueEventListener() {
+                child(driverId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {

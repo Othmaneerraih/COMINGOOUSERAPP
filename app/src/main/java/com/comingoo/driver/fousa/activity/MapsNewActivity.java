@@ -216,7 +216,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                     driverNumber = drivrNum;
                     debit = debt;
                     todayTrips = todystrp;
-                    todayEarnings = Double.parseDouble(todysErn);
+                    moneyBtn.setText(todysErn + " MAD");
                     clientRating = rat;
                     driverId = drivrId;
                 } else {
@@ -258,9 +258,6 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
             }
         });
 
-        if (todayEarnings != null)
-            moneyBtn.setText(todayEarnings + " MAD");
-
 
         // Note: Prewait Time Handler
         handler = new Handler(Looper.getMainLooper());
@@ -268,6 +265,8 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
             @Override
             public void run() {
                 int time = preWaitTime + 1;
+                if (courseRef == null)
+                    courseRef = FirebaseDatabase.getInstance().getReference("COURSES").child(courseId);
                 courseRef.child("preWaitTime").setValue(Integer.toString(time));
             }
         };
@@ -714,8 +713,6 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                         child(driverId).child("EARNINGS").child(getDateMonth(GetUnixTime()))
                         .child(getDateDay(GetUnixTime())).setValue(earnings);
 
-                switchOnlineUI();
-
                 final Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     @Override
@@ -876,6 +873,9 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                     window.setGravity(Gravity.CENTER);
                 }
                 dialog.show();
+
+                switchOnlineUI();
+
             }
         });
     }
