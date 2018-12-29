@@ -89,7 +89,7 @@ import static com.google.android.gms.location.LocationServices.getFusedLocationP
 
 public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCallback, OnlineOfflineCallBack {
     private MapsVM mapsVM;
-    private double rating = 0.0;
+    private double clientRating = 0.0;
     private String driverName = "";
     private String driverImage = "";
     private String driverNumber = "";
@@ -165,7 +165,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
     private FlowingDrawer mDrawer;
     private CircleImageView profileImage;
     private TextView nameTxt;
-    private TextView ratingTxt;
+    private TextView ratingTxt, tvClientRate;
     private RelativeLayout homeLayout;
     private TextView homeTxt;
     private RelativeLayout historiqueLayout;
@@ -217,7 +217,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                     debit = debt;
                     todayTrips = todystrp;
                     todayEarnings = Double.parseDouble(todysErn);
-                    rating = rat;
+                    clientRating = rat;
                     driverId = drivrId;
                 } else {
                     Intent intent = new Intent(MapsNewActivity.this, MainActivity.class);
@@ -530,6 +530,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         profileImage = findViewById(R.id.profile_image);
         nameTxt = findViewById(R.id.name_txt);
         ratingTxt = findViewById(R.id.rating_txt);
+        tvClientRate = findViewById(R.id.tv_client_rating);
         homeLayout = findViewById(R.id.home_layout);
         homeTxt = findViewById(R.id.home_txt);
         historiqueLayout = findViewById(R.id.historique_layout);
@@ -548,10 +549,10 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         if (courseState.equalsIgnoreCase("0")) {
             statusLayout.setVisibility(View.GONE);
             courseRef = FirebaseDatabase.getInstance().getReference("COURSES").child(courseId);
-
             // Note: Setting the course into driver's profile
             FirebaseDatabase.getInstance().getReference("DRIVERUSERS")
                     .child(driverId).child("COURSE").setValue(courseId);
+            destinationLayout.setVisibility(View.VISIBLE);
             showClientInformation();
         } else if (courseState.equals("1")) {
             handler.postDelayed(runnable, 1000);
@@ -866,6 +867,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
 
                 dialog.setCancelable(false);
                 final Window window = dialog.getWindow();
+                window.setBackgroundDrawableResource(android.R.color.transparent);
                 if (window != null) {
                     window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
                 }
@@ -922,11 +924,12 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         clientInfoLayout.setVisibility(View.VISIBLE);
         clientNameTv.setText(clientName);
         Picasso.get().load(clientImageUri).into(clientImage);
-        String s = "<b>Courses: </b>";
-        Log.e(TAG, "showClientInformation:clientTotalRide: " + clientTotalRide);
-        totalCourseTv.setText(Html.fromHtml(s) + clientTotalRide);
+        totalCourseTv.setText("Courses: " + clientTotalRide);
         driverInfoTv.setText(clientlastCourse);
         dateTv.setText(clientLastRideDate);
+        addressTxt.setText(destAddress);
+        tvClientRate.setText(String.valueOf(df2.format(clientRating)));
+        switchToCourseUI();
     }
 
     private void switchToCourseUI() {

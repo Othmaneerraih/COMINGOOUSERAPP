@@ -3,8 +3,7 @@
     android:id="@+id/body"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/finished_bg"
-    android:minWidth="300dp">
+    android:background="@drawable/finished_bg">
 
     <Button
         android:id="@+id/btn_price_show"
@@ -149,14 +148,14 @@
             android:layout_width="70dp"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_toStartOf="@+id/textView37"
+            android:layout_toStartOf="@+id/tv_mad"
             android:ems="10"
             android:hint="100"
             android:inputType="number|phone"
             android:textColor="@android:color/white" />
 
         <TextView
-            android:id="@+id/textView37"
+            android:id="@+id/tv_mad"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
