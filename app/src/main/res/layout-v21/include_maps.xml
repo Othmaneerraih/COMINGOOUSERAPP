@@ -63,10 +63,9 @@
         app:civ_border_width="2dp" />
 
     <include
-        android:id="@+id/include_maps_user_info"
         layout="@layout/include_maps_user_info"
         android:layout_width="match_parent"
-        android:layout_height="270dp"
+        android:layout_height="500dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
 
@@ -82,16 +81,6 @@
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp" />
 
-
-    <ImageButton
-        android:id="@+id/my_position_button"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_alignParentEnd="true"
-        android:layout_above="@id/include_maps_user_info"
-        android:layout_marginEnd="16dp"
-        android:background="@drawable/my_location" />
-
     <ImageButton
         android:id="@+id/menu_button"
         android:layout_width="40dp"
@@ -102,15 +91,5 @@
         android:layout_marginTop="16dp"
         android:background="@drawable/menu_icon"
         android:visibility="visible" />
-
-    <ImageButton
-        android:id="@+id/waze_button"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_above="@+id/my_position_button"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="@dimen/margin_normal"
-        android:background="@drawable/waze_icon" />
 
 </RelativeLayout>
