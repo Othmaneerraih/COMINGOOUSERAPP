@@ -704,15 +704,17 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                         child(clientId).child("LASTCOURSE").
                         setValue("Captain " + driverName + " / " + df2.format(currentBil) + " MAD");
                 FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("COURSE").setValue(courseId);
-                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(clientId).child("COURSE").setValue(courseId);
+                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(driverId).child("COURSE").setValue(courseId);
 
                 // Note: inserting driver earnings into Driver profile
                 final Map<String, String> earnings = new HashMap<>();
                 earnings.put("earnings", "" + todayEarnings);
                 earnings.put("voyages", "" + todayVoyages);
                 FirebaseDatabase.getInstance().getReference("DRIVERUSERS").
-                        child(clientId).child("EARNINGS").child(getDateMonth(GetUnixTime()))
+                        child(driverId).child("EARNINGS").child(getDateMonth(GetUnixTime()))
                         .child(getDateDay(GetUnixTime())).setValue(earnings);
+
+                switchOnlineUI();
 
                 final Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
@@ -722,7 +724,6 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                     }
                 }, 3000);
 
-                switchOnlineUI();
 
                 // Note: Recharge Functionality Here
                 charge.setOnClickListener(new View.OnClickListener() {
@@ -751,7 +752,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                                         // Enter the value into driver wallet here
                                         Log.e(TAG, "onDataChange: " + newSold);
                                         Toast.makeText(MapsNewActivity.this, getString(R.string.txt_successfully_recharged), Toast.LENGTH_LONG).show();
-                                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(clientId).child("debt").setValue("" + newdebt);
+                                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(driverId).child("debt").setValue("" + newdebt);
                                         FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("SOLDE").setValue("" + newSold);
                                         FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("USECREDIT").setValue("1");
                                         dialog.dismiss();
@@ -763,7 +764,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                                         // Enter the value into driver wallet here
                                         mapsVM.rateClient(RATE);
                                         Toast.makeText(MapsNewActivity.this, getString(R.string.txt_successfully_recharged), Toast.LENGTH_LONG).show();
-                                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(clientId).child("debt").setValue("" + newdebt);
+                                        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(driverId).child("debt").setValue("" + newdebt);
                                         FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("SOLDE").setValue("" + newSold);
                                         FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("USECREDIT").setValue("1");
                                         dialog.dismiss();
@@ -869,7 +870,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                 final Window window = dialog.getWindow();
                 window.setBackgroundDrawableResource(android.R.color.transparent);
                 if (window != null) {
-                    window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
+                    window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
                 }
                 if (window != null) {
                     window.setGravity(Gravity.CENTER);
