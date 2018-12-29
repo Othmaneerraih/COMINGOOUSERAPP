@@ -577,21 +577,25 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
 
                 final Dialog dialog = new Dialog(MapsNewActivity.this);
                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                dialog.setContentView(R.layout.dialog_finished_course);
+//                dialog.setContentView(R.layout.dialog_finished_course);
+                dialog.show();
+                LayoutInflater inflater = getLayoutInflater();
+                View dialogView = inflater.inflate(R.layout.dialog_finished_course, null);
+                dialog.getWindow().setContentView(dialogView);
 
-                final Button star1 = dialog.findViewById(R.id.star1);
-                final Button star2 = dialog.findViewById(R.id.star2);
-                final Button star3 = dialog.findViewById(R.id.star3);
-                final Button star4 = dialog.findViewById(R.id.star4);
-                final Button star5 = dialog.findViewById(R.id.star5);
+                final Button star1 = dialogView.findViewById(R.id.star1);
+                final Button star2 = dialogView.findViewById(R.id.star2);
+                final Button star3 = dialogView.findViewById(R.id.star3);
+                final Button star4 = dialogView.findViewById(R.id.star4);
+                final Button star5 = dialogView.findViewById(R.id.star5);
 
-                Button price = dialog.findViewById(R.id.btn_price_show);
+                Button price = dialogView.findViewById(R.id.btn_price_show);
 
-                final ImageView ivRateReaction = dialog.findViewById(R.id.rating_reaction);
+                final ImageView ivRateReaction = dialogView.findViewById(R.id.rating_reaction);
 
-                final Button gotMoney = dialog.findViewById(R.id.button);
-                final Button charge = dialog.findViewById(R.id.btn_recharger);
-                final EditText moneyAmount = dialog.findViewById(R.id.editText);
+                final Button gotMoney = dialogView.findViewById(R.id.button);
+                final Button charge = dialogView.findViewById(R.id.btn_recharger);
+                final EditText moneyAmount = dialogView.findViewById(R.id.editText);
 
                 dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                     @Override
@@ -872,10 +876,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                 if (window != null) {
                     window.setGravity(Gravity.CENTER);
                 }
-                dialog.show();
-
                 switchOnlineUI();
-
             }
         });
     }

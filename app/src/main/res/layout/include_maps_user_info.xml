@@ -2,12 +2,12 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="match_parent">
 
     <RelativeLayout
         android:id="@+id/client_info_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
         <RelativeLayout
             android:id="@+id/user_info_layout"
@@ -19,7 +19,6 @@
             android:layout_marginLeft="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
-            android:layout_marginBottom="28dp"
             android:visibility="visible">
 
             <RelativeLayout
@@ -54,9 +53,9 @@
                     android:layout_marginStart="16dp"
                     android:layout_toEndOf="@+id/user_image"
                     android:text="name"
-                    android:textStyle="bold"
                     android:textColor="@android:color/black"
-                    android:textSize="@dimen/txt_size_xxlarge"/>
+                    android:textSize="@dimen/txt_size_xxlarge"
+                    android:textStyle="bold" />
 
                 <RelativeLayout
                     android:layout_width="wrap_content"
@@ -70,16 +69,16 @@
                         android:layout_height="30dp"
                         android:layout_marginStart="8dp"
                         android:layout_marginLeft="8dp"
-                        android:background="@drawable/rating_box"/>
+                        android:background="@drawable/rating_box" />
 
                     <TextView
                         android:id="@+id/tv_client_rating"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="33dp"
                         android:text="4.6"
-                        android:textSize="10sp"
-                        android:layout_marginStart="35dp"
-                        android:layout_centerVertical="true"/>
+                        android:textSize="10sp" />
 
                 </RelativeLayout>
 
@@ -131,23 +130,19 @@
 
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/close_button"
-                    android:layout_width="35dp"
-                    android:layout_height="35dp"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
-                    android:layout_marginTop="40dp"
-                    android:layout_marginEnd="16dp"
                     android:background="@drawable/rectangle_blue"
                     android:src="@drawable/cancel_x" />
 
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/call_button"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
-                    android:layout_marginTop="40dp"
-                    android:layout_marginEnd="16dp"
                     android:src="@drawable/contact" />
 
             </RelativeLayout>
@@ -165,6 +160,24 @@
                 android:background="@drawable/online_button"
                 android:gravity="center">
 
+                <ImageView
+                    android:id="@+id/cancen_btn"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="5dp"
+                    android:background="@drawable/cancel_x" />
+
+                <ImageView
+                    android:layout_width="1dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@+id/cancen_btn"
+                    android:layout_alignBottom="@+id/cancen_btn"
+                    android:layout_alignParentTop="true"
+                    android:layout_centerVertical="true"
+                    android:layout_toEndOf="@+id/cancen_btn"
+                    android:background="@android:color/white" />
+
                 <Button
                     android:id="@+id/course_action_button"
                     android:layout_width="match_parent"
@@ -173,6 +186,7 @@
                     android:layout_marginEnd="8dp"
                     android:background="@color/transp"
                     android:clickable="false"
+                    android:elevation="10dp"
                     android:gravity="center"
                     android:text="@string/appuyez_pour_arriver"
                     android:textAllCaps="false"
@@ -220,6 +234,27 @@
 
         </LinearLayout>
 
+        <ImageButton
+            android:id="@+id/my_position_button"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_above="@id/user_info_layout"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/my_location"
+            android:contentDescription="@string/todo" />
+
+        <ImageButton
+            android:id="@+id/waze_button"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_above="@+id/my_position_button"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="@dimen/margin_normal"
+            android:background="@drawable/waze_icon"
+            android:contentDescription="@string/todo" />
     </RelativeLayout>
 
 </RelativeLayout>

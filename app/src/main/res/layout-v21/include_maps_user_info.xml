@@ -2,226 +2,261 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="500dp">
 
     <RelativeLayout
         android:id="@+id/client_info_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-    <RelativeLayout
-        android:id="@+id/user_info_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_height="500dp"
         android:layout_centerHorizontal="true"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginBottom="28dp"
-        android:visibility="visible">
+        android:layout_alignParentBottom="true">
 
         <RelativeLayout
-            android:id="@+id/info_layout"
+            android:id="@+id/user_info_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
-            android:background="@android:color/white"
-            android:elevation="10dp"
-            android:padding="10dp">
-
-            <com.mikhaellopez.circularimageview.CircularImageView
-                android:id="@+id/user_image"
-                android:layout_width="90dp"
-                android:layout_height="90dp"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
-                android:background="@drawable/rectangle_blue"
-                android:src="@color/colorPrimary"
-                app:civ_border_width="1dp"
-                app:civ_shadow="true"
-                app:civ_shadow_radius="2" />
-
-            <TextView
-                android:id="@+id/user_name_txt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_marginStart="16dp"
-                android:layout_toEndOf="@+id/user_image"
-                android:text="name"
-                android:textStyle="bold"
-                android:textColor="@android:color/black"
-                android:textSize="@dimen/txt_size_xxlarge"/>
+            android:visibility="visible">
 
             <RelativeLayout
-                android:layout_width="wrap_content"
+                android:id="@+id/info_layout"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:layout_toEndOf="@+id/user_name_txt">
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginRight="8dp"
+                android:background="@android:color/white"
+                android:elevation="10dp"
+                android:padding="10dp">
 
-                <ImageButton
-                    android:id="@+id/iv_rating"
-                    android:layout_width="51dp"
-                    android:layout_height="30dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:background="@drawable/rating_box"/>
+                <com.mikhaellopez.circularimageview.CircularImageView
+                    android:id="@+id/user_image"
+                    android:layout_width="90dp"
+                    android:layout_height="90dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    app:civ_border_width="1dp"
+                    app:civ_shadow="true"
+                    app:civ_shadow_radius="2" />
 
                 <TextView
-                    android:id="@+id/tv_client_rating"
+                    android:id="@+id/user_name_txt"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="4.6"
-                    android:textSize="10sp"
-                    android:layout_marginStart="33dp"
-                    android:layout_centerVertical="true"/>
+                    android:layout_alignParentTop="true"
+                    android:layout_marginStart="16dp"
+                    android:layout_toEndOf="@+id/user_image"
+                    android:text="name"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/txt_size_xxlarge"
+                    android:textStyle="bold" />
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:layout_toEndOf="@+id/user_name_txt">
+
+                    <ImageButton
+                        android:id="@+id/iv_rating"
+                        android:layout_width="51dp"
+                        android:layout_height="30dp"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginLeft="8dp"
+                        android:background="@drawable/rating_box" />
+
+                    <TextView
+                        android:id="@+id/tv_client_rating"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="33dp"
+                        android:text="4.6"
+                        android:textSize="10sp" />
+
+                </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/course_count_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/user_name_txt"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_toStartOf="@+id/call_button"
+                    android:layout_toEndOf="@+id/user_image"
+                    android:text="Courses : 6" />
+
+                <TextView
+                    android:id="@+id/course_details_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/course_count_txt"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_toStartOf="@+id/call_button"
+                    android:layout_toEndOf="@+id/user_image"
+                    android:text="Derniére course :"
+                    android:textStyle="bold" />
+
+
+                <TextView
+                    android:id="@+id/driver_details_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/course_details_txt"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="@dimen/margin_normal"
+                    android:layout_toStartOf="@+id/call_button"
+                    android:layout_toEndOf="@+id/user_image"
+                    android:maxLines="5"
+                    android:text="Captain Ahmed / 39 MAD" />
+
+                <TextView
+                    android:id="@+id/date_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/driver_details_txt"
+                    android:layout_marginStart="16dp"
+                    android:layout_toStartOf="@+id/call_button"
+                    android:layout_toEndOf="@+id/user_image"
+                    android:text="date" />
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/close_button"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/rectangle_blue"
+                    android:src="@drawable/cancel_x" />
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/call_button"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/contact" />
 
             </RelativeLayout>
 
-            <TextView
-                android:id="@+id/course_count_txt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/user_name_txt"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="4dp"
-                android:layout_toStartOf="@+id/call_button"
-                android:layout_toEndOf="@+id/user_image"
-                android:text="Courses : 6" />
-
-            <TextView
-                android:id="@+id/course_details_txt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/course_count_txt"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="4dp"
-                android:layout_toStartOf="@+id/call_button"
-                android:layout_toEndOf="@+id/user_image"
-                android:text="Derniére course :"
-                android:textStyle="bold" />
-
-
-            <TextView
-                android:id="@+id/driver_details_txt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/course_details_txt"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="@dimen/margin_normal"
-                android:layout_toStartOf="@+id/call_button"
-                android:layout_toEndOf="@+id/user_image"
-                android:maxLines="5"
-                android:text="Captain Ahmed / 39 MAD" />
-
-            <TextView
-                android:id="@+id/date_txt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/driver_details_txt"
-                android:layout_marginStart="16dp"
-                android:layout_toStartOf="@+id/call_button"
-                android:layout_toEndOf="@+id/user_image"
-                android:text="date" />
-
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/close_button"
-                android:layout_width="35dp"
-                android:layout_height="35dp"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:layout_marginTop="40dp"
-                android:layout_marginEnd="16dp"
-                android:background="@drawable/rectangle_blue"
-                android:src="@drawable/cancel_x" />
-
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/call_button"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:layout_marginTop="40dp"
-                android:layout_marginEnd="16dp"
-                android:src="@drawable/contact" />
-
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/rl_cancel_course"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/info_layout"
-            android:layout_centerHorizontal="true"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginBottom="8dp"
-            android:background="@drawable/online_button"
-            android:gravity="center">
-
-            <Button
-                android:id="@+id/course_action_button"
+            <RelativeLayout
+                android:id="@+id/rl_cancel_course"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:layout_marginEnd="8dp"
-                android:background="@color/transp"
-                android:clickable="false"
-                android:elevation="10dp"
-                android:gravity="center"
-                android:text="@string/appuyez_pour_arriver"
-                android:textAllCaps="false"
-                android:textColor="@android:color/white" />
+                android:layout_below="@+id/info_layout"
+                android:layout_centerHorizontal="true"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/online_button"
+                android:gravity="center">
+
+                <ImageView
+                    android:id="@+id/cancen_btn"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="5dp"
+                    android:background="@drawable/cancel_x" />
+
+                <ImageView
+                    android:layout_width="1dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@+id/cancen_btn"
+                    android:layout_alignBottom="@+id/cancen_btn"
+                    android:layout_alignParentTop="true"
+                    android:layout_centerVertical="true"
+                    android:layout_toEndOf="@+id/cancen_btn"
+                    android:background="@android:color/white" />
+
+                <Button
+                    android:id="@+id/course_action_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:layout_marginEnd="8dp"
+                    android:background="@color/transp"
+                    android:clickable="false"
+                    android:elevation="10dp"
+                    android:gravity="center"
+                    android:text="@string/appuyez_pour_arriver"
+                    android:textAllCaps="false"
+                    android:textColor="@android:color/white" />
+            </RelativeLayout>
+
         </RelativeLayout>
 
-    </RelativeLayout>
-
-    <LinearLayout
-        android:id="@+id/ll_voip_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/user_info_layout"
-        android:layout_marginStart="70dp"
-        android:layout_marginLeft="70dp"
-        android:layout_marginEnd="70dp"
-        android:layout_marginRight="70dp"
-        android:layout_marginBottom="-25dp"
-        android:background="@drawable/layout_background_rounded_corner"
-        android:gravity="center"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/tv_telephone"
+        <LinearLayout
+            android:id="@+id/ll_voip_view"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_marginBottom="5dp"
+            android:layout_height="100dp"
+            android:layout_above="@+id/user_info_layout"
+            android:layout_marginStart="70dp"
+            android:layout_marginLeft="70dp"
+            android:layout_marginEnd="70dp"
+            android:layout_marginRight="70dp"
+            android:layout_marginBottom="-25dp"
+            android:background="@drawable/layout_background_rounded_corner"
             android:gravity="center"
-            android:text="@string/appelle_telephonique"
-            android:textSize="14sp" />
+            android:orientation="vertical">
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@android:color/black" />
+            <TextView
+                android:id="@+id/tv_telephone"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginBottom="5dp"
+                android:gravity="center"
+                android:text="@string/appelle_telephonique"
+                android:textSize="14sp" />
 
-        <TextView
-            android:id="@+id/tv_voip"
-            android:layout_width="match_parent"
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/black" />
+
+            <TextView
+                android:id="@+id/tv_voip"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="5dp"
+                android:gravity="center"
+                android:text="@string/appelle_voip"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/my_position_button"
+            android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_marginTop="5dp"
-            android:gravity="center"
-            android:text="@string/appelle_voip"
-            android:textSize="14sp" />
+            android:layout_above="@id/user_info_layout"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/my_location"
+            android:contentDescription="@string/todo" />
 
-    </LinearLayout>
+        <ImageButton
+            android:id="@+id/waze_button"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_above="@+id/my_position_button"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="@dimen/margin_normal"
+            android:background="@drawable/waze_icon"
+            android:contentDescription="@string/todo" />
     </RelativeLayout>
 
 </RelativeLayout>
