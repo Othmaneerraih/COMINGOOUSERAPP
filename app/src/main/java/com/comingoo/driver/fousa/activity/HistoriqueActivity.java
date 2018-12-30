@@ -50,7 +50,7 @@ public class HistoriqueActivity extends AppCompatActivity {
         mLocationView.setHasFixedSize(true);
         mLocationView.setLayoutManager(new LinearLayoutManager(this));
 
-        cAdapter = new HistoryAdapter(getApplicationContext(), CoursesData);
+        cAdapter = new HistoryAdapter(HistoriqueActivity.this, CoursesData);
         mLocationView.setAdapter(cAdapter);
         new CheckUserHistoriqueTask(mLocation, cAdapter, CoursesData).execute();
 

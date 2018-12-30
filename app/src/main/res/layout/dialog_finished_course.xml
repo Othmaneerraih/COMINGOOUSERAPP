@@ -2,9 +2,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/body"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:background="@drawable/finished_bg"
-    android:minWidth="300dp">
+    android:minHeight="300dp">
 
     <Button
         android:id="@+id/btn_price_show"
@@ -13,7 +13,6 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="32dp"
-        android:layout_marginEnd="8dp"
         android:background="@drawable/price_tag"
         android:text=""
         android:textAllCaps="false"
@@ -34,9 +33,9 @@
         android:id="@+id/textView14"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/rating_reaction"
+        android:layout_below="@+id/textView13"
+        android:layout_marginTop="60dp"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="40dp"
         android:text="@string/evaluez_votre_xperience"
         android:textAllCaps="false"
         android:textColor="@color/colorPrimary"
@@ -47,15 +46,14 @@
         android:id="@+id/rating_reaction"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:layout_centerInParent="true"
-        android:layout_marginTop="8dp"
-        android:contentDescription="@string/todo" />
+        android:layout_centerInParent="true" />
 
     <LinearLayout
         android:id="@+id/start_layout"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/rating_reaction"
+        android:layout_above="@+id/button"
+        android:layout_centerHorizontal="true"
         android:gravity="center"
         android:orientation="horizontal">
 
@@ -109,12 +107,10 @@
         android:id="@+id/button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/start_layout"
+        android:layout_above="@+id/recharge_layout"
         android:layout_centerHorizontal="true"
         android:layout_marginStart="40dp"
-        android:layout_marginTop="24dp"
         android:layout_marginEnd="40dp"
-        android:layout_marginBottom="20dp"
         android:background="@drawable/add_button"
         android:text="@string/esp_ces_collect_es"
         android:textAllCaps="false"
@@ -122,10 +118,12 @@
         android:textSize="18sp" />
 
     <RelativeLayout
+        android:id="@+id/recharge_layout"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:layout_below="@+id/button"
+        android:layout_height="80dp"
+        android:layout_alignParentBottom="true"
         android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="20dp"
         android:background="@drawable/grad_bg">
@@ -137,8 +135,6 @@
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
             android:layout_marginStart="24dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
             android:background="@drawable/white_btn"
             android:text="@string/recharger"
             android:textAllCaps="false"

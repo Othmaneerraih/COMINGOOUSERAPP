@@ -7,7 +7,9 @@
     <RelativeLayout
         android:id="@+id/client_info_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true">
 
         <RelativeLayout
             android:id="@+id/user_info_layout"
@@ -130,8 +132,8 @@
 
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/close_button"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
+                    android:layout_width="45dp"
+                    android:layout_height="45dp"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
                     android:background="@drawable/rectangle_blue"
@@ -139,8 +141,8 @@
 
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/call_button"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
                     android:src="@drawable/contact" />
@@ -166,7 +168,9 @@
                     android:layout_height="35dp"
                     android:layout_centerVertical="true"
                     android:layout_marginStart="5dp"
-                    android:background="@drawable/cancel_x" />
+                    android:background="@drawable/cancel_x"
+                    android:contentDescription="@string/hide_it_for_now_because_requirment_is_chage"
+                    android:visibility="gone" />
 
                 <ImageView
                     android:layout_width="1dp"
@@ -176,7 +180,9 @@
                     android:layout_alignParentTop="true"
                     android:layout_centerVertical="true"
                     android:layout_toEndOf="@+id/cancen_btn"
-                    android:background="@android:color/white" />
+                    android:background="@android:color/white"
+                    android:contentDescription="@string/hide_it_for_now_because_requirment_is_chage"
+                    android:visibility="gone" />
 
                 <Button
                     android:id="@+id/course_action_button"
@@ -198,7 +204,7 @@
         <LinearLayout
             android:id="@+id/ll_voip_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="100dp"
             android:layout_above="@+id/user_info_layout"
             android:layout_marginStart="70dp"
             android:layout_marginLeft="70dp"

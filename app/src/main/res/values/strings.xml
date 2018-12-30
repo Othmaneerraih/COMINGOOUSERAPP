@@ -53,5 +53,9 @@
     <string name="txt_highest_hundrad_mad" translatable="false">Vous ne pouvez pas dépasser 100 MAD de recharge pour ce client.</string>
     <string name="recharger">Recharger</string>
     <string name="mad">MAD</string>
+    <string name="hide_it_for_now_because_requirment_is_chage">Hide it for now because requirment is chage</string>
+    <string name="kilomiter">Kilomiter</string>
+    <string name="chauffeur">Chauffeur</string>
+    <string name="temps_d_attam">Temps d`attam</string>
 
 </resources>

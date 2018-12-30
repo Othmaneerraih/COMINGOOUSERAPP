@@ -2,7 +2,10 @@ package com.comingoo.driver.fousa.adapters;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +15,14 @@ import android.widget.TextView;
 
 import com.comingoo.driver.fousa.model.Course;
 import com.comingoo.driver.fousa.R;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
@@ -23,21 +34,25 @@ import java.util.List;
 
 import static android.content.Context.MODE_PRIVATE;
 
-public class HistoryAdapter  extends RecyclerView.Adapter<HistoryAdapter.ViewHolder> {
+public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHolder> {
     private List<Course> mDataset;
     private Context mContext;
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements OnMapReadyCallback {
         // each data item is just a string in this case
 
         public View h;
         public TextView driverName, dateText, startText, startText2, endText2, endText, priceText, priceText3, km, kmVal, waitTime, waitTime2, km2, waitTimeVal, lateVal, basePriceVal, date2;
         public Button priceText2;
         public FoldingCell fc;
+        private SupportMapFragment map;
 
         public ViewHolder(View v) {
             super(v);
             h = v;
+            map = ((SupportMapFragment) ((AppCompatActivity) mContext).getSupportFragmentManager()
+                    .findFragmentById(R.id.map_history));
+            map.getMapAsync(this);
             dateText = v.findViewById(R.id.date);
             startText = v.findViewById(R.id.depart);
             endText = v.findViewById(R.id.destination);
@@ -60,7 +75,28 @@ public class HistoryAdapter  extends RecyclerView.Adapter<HistoryAdapter.ViewHol
 
             driverName = v.findViewById(R.id.textView27);
 
-            fc = (FoldingCell) v.findViewById(R.id.folding_cell);
+            fc = v.findViewById(R.id.folding_cell);
+        }
+
+        @Override
+        public void onMapReady(GoogleMap googleMap) {
+            LatLng latLng = new LatLng(Double.parseDouble("37.34"), Double.parseDouble("7.09"));
+//        BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.person_green);
+            int height = 150;
+            int width = 80;
+            BitmapDrawable bitmapdraw = (BitmapDrawable) mContext.getResources().getDrawable(R.drawable.person_green);
+            Bitmap b = bitmapdraw.getBitmap();
+            Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
+
+            MarkerOptions markerOptions = new MarkerOptions().position(latLng)
+                    .icon(BitmapDescriptorFactory.fromBitmap(smallMarker));
+            CameraPosition cameraPosition = new CameraPosition.Builder()
+                    .target(latLng)      // Sets the center of the map to Mountain View
+                    .zoom(17)                   // Sets the zoom
+                    .build();
+            googleMap.addMarker(markerOptions);
+            // Creates a CameraPosition from the builder
+            googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         }
     }
 
@@ -72,10 +108,10 @@ public class HistoryAdapter  extends RecyclerView.Adapter<HistoryAdapter.ViewHol
     // Create new views (invoked by the layout manager)
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent,
-                                                   int viewType) {
+                                         int viewType) {
         // create a new view
         View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.rows_courses, parent, false);
+                .inflate(R.layout.rows_history, parent, false);
         ViewHolder vh = new ViewHolder(v);
         return vh;
     }
@@ -104,10 +140,10 @@ public class HistoryAdapter  extends RecyclerView.Adapter<HistoryAdapter.ViewHol
         holder.priceText2.setText(newCourse.getPrice());
         holder.priceText3.setText(newCourse.getPrice());
 
-        holder.km.setText(newCourse.getDistance()+"km");
+        holder.km.setText(newCourse.getDistance() + "km");
         holder.waitTime.setText(newCourse.getWaitTime() + "min");
 
-        holder.km2.setText(newCourse.getDistance()+"km");
+        holder.km2.setText(newCourse.getDistance() + "km");
         holder.waitTime2.setText(newCourse.getWaitTime() + "min");
 
         final SharedPreferences prefs = mContext.getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
@@ -124,7 +160,7 @@ public class HistoryAdapter  extends RecyclerView.Adapter<HistoryAdapter.ViewHol
             }
         });
 
-        if ( Integer.parseInt(newCourse.getPreWaitTime()) > 180) {
+        if (Integer.parseInt(newCourse.getPreWaitTime()) > 180) {
             holder.lateVal.setText("3 MAD");
         } else {
             holder.lateVal.setText("0 MAD");
@@ -135,7 +171,7 @@ public class HistoryAdapter  extends RecyclerView.Adapter<HistoryAdapter.ViewHol
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 holder.kmVal.setText((new DecimalFormat("##.##").format(Double.parseDouble(newCourse.getDistance()) * Double.parseDouble(dataSnapshot.child("km").getValue(String.class)))) + " MAD");
                 holder.waitTimeVal.setText((new DecimalFormat("##.##").format(Double.parseDouble(newCourse.getWaitTime()) * Double.parseDouble(dataSnapshot.child("att").getValue(String.class)))) + " MAD");
-                holder.basePriceVal.setText(dataSnapshot.child("base").getValue(String.class)+ " MAD");
+                holder.basePriceVal.setText(dataSnapshot.child("base").getValue(String.class) + " MAD");
             }
 
             @Override
@@ -143,8 +179,6 @@ public class HistoryAdapter  extends RecyclerView.Adapter<HistoryAdapter.ViewHol
 
             }
         });
-
-
 
 
     }
