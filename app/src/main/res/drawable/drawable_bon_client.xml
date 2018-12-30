@@ -7,7 +7,7 @@
             android:thicknessRatio="99.0"
             android:useLevel="true">
             <solid
-                android:color="@color/color_new_client"/>
+                android:color="@color/color_bon_client"/>
         </shape>
     </item>
 </layer-list>

@@ -23,7 +23,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.comingoo.driver.fousa.R;
-import com.comingoo.driver.fousa.interfaces.OnlineOfflineCallBack;
 import com.comingoo.driver.fousa.service.DriverService;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -60,17 +59,14 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
     private String lat, lng, destinatinLat, destinationLong;
     private String clientID, userId;
     private ProgressBar barTimer;
+    private TextView tvClientType;
+    private String clientType;
     public static CountDownTimer countDownTimer;
-    private String clientType = "new";
     private Double driverPosLat, driverPosLong;
-//    private OnlineOfflineCallBack onlineOfflineCallBack;
+    private boolean isProfilePicValid;
 
-    public CommandActivity(){
+    public CommandActivity() {
     }
-
-//    public CommandActivity(OnlineOfflineCallBack callBack){
-//        this.onlineOfflineCallBack = callBack;
-//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,6 +139,7 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
         decline = findViewById(R.id.decline);
         accept = findViewById(R.id.accept);
         barTimer = findViewById(R.id.barTimer);
+        tvClientType = findViewById(R.id.client_type_txt);
 
         final Intent intent = getIntent();
         int dist = 0;
@@ -157,7 +154,6 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
 
         driverPosLat = intent.getDoubleExtra("driverPosLat", 0.0);
         driverPosLong = intent.getDoubleExtra("driverPosLong", 0.0);
-
 
         try {
             String gatedDistance = "";
@@ -178,16 +174,15 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
                 distance.setText(intent.getStringExtra("distance") + "Km,  " + time + " min");
 
             }
-            Log.e("Commandac", "onCreate: distance " + intent.getStringExtra("distance"));
         } catch (NumberFormatException e) {
             e.printStackTrace();
-            Log.e("Commandac", "onCreate: " + e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("Commandac", "onCreate:1111111 " + e.getMessage());
             dist = 0;
             time = 0;
         }
+
+//        clientType = intent.getStringExtra("client_type");
         clientID = intent.getStringExtra("name");
         userId = intent.getStringExtra("userId");
 
@@ -243,36 +238,6 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
                     });
 
 
-            FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").
-                    addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            if (dataSnapshot.hasChild(clientID)) {
-                                FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(clientID)
-                                        .addListenerForSingleValueEvent(new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                if (dataSnapshot.exists()) {
-                                                    int size = (int) dataSnapshot.getChildrenCount();
-                                                    if (size > 0) {
-                                                        clientType = "bon";
-                                                    } else clientType = "new";
-                                                }
-                                            }
-
-                                            @Override
-                                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                            }
-                                        });
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                        }
-                    });
         } catch (ArithmeticException e) {
             e.printStackTrace();
         } catch (NullPointerException e) {
@@ -281,11 +246,95 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
             e.printStackTrace();
         }
 
-        if (clientType.equalsIgnoreCase("bon")) {
-            barTimer.setProgressDrawable(getResources().getDrawable(R.drawable.drawable_new_client));
-        } else {
-            barTimer.setProgressDrawable(getResources().getDrawable(R.drawable.green_circular));
-        }
+
+        // client type calculation
+        Log.e("CommandActivity", "onCreate:clientID "+clientID );
+        FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").
+                addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.hasChild(clientID)) {
+                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientID)
+                                    .addValueEventListener(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                            if (dataSnapshot.hasChild("isProfilePicValid")){
+                                                isProfilePicValid = dataSnapshot.child("isProfilePicValid").getValue(Boolean.class);
+                                            } else isProfilePicValid = false;
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                        }
+                                    });
+
+                            FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(clientID)
+                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                            if (dataSnapshot.exists()) {
+                                                int size = (int) dataSnapshot.getChildrenCount();
+                                                if (!isProfilePicValid && size == 0){
+                                                    clientType = "new";
+                                                    tvClientType.setTextColor(getColor(R.color.color_new_client));
+                                                    tvClientType.setText(getResources().getString(R.string.txt_new_client));
+                                                    barTimer.setProgressDrawable(getResources().getDrawable(R.drawable.drawable_new_client));
+                                                } else if (isProfilePicValid && size ==0){
+                                                    tvClientType.setTextColor(getColor(R.color.color_potential_client));
+                                                    tvClientType.setText(getResources().getString(R.string.txt_potential_client));
+                                                    barTimer.setProgressDrawable(getResources().getDrawable(R.drawable.drawable_potential_client));
+                                                    clientType = "potential";
+                                                } else if (!isProfilePicValid && size < 3){
+                                                    tvClientType.setTextColor(getColor(R.color.color_potential_client));
+                                                    tvClientType.setText(getResources().getString(R.string.txt_potential_client));
+                                                    barTimer.setProgressDrawable(getResources().getDrawable(R.drawable.drawable_potential_client));
+                                                    clientType = "potential";
+                                                } else if (!isProfilePicValid && size >= 3){
+                                                    clientType = "bon";
+                                                    tvClientType.setTextColor(getColor(R.color.color_bon_client));
+                                                    tvClientType.setText(getResources().getString(R.string.txt_bon_client));
+                                                    barTimer.setProgressDrawable(getResources().getDrawable(R.drawable.drawable_bon_client));
+                                                } else if (isProfilePicValid && size >0){
+                                                    clientType = "bon";
+                                                    tvClientType.setTextColor(getColor(R.color.color_bon_client));
+                                                    tvClientType.setText(getResources().getString(R.string.txt_bon_client));
+                                                    barTimer.setProgressDrawable(getResources().getDrawable(R.drawable.drawable_bon_client));
+                                                }
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                        }
+                                    });
+                        } //else clientType = "new";
+
+                        Log.e("CommandActivity", "onCreate:clientType "+clientType );
+//                        if (clientType.equalsIgnoreCase("new")) {
+//                            tvClientType.setTextColor(getColor(R.color.color_new_client));
+//                            tvClientType.setText(getResources().getString(R.string.txt_new_client));
+//                            barTimer.setProgressDrawable(getResources().getDrawable(R.drawable.drawable_new_client));
+//                        } else  if (clientType.equalsIgnoreCase("potential")) {
+//                            tvClientType.setTextColor(getColor(R.color.color_potential_client));
+//                            tvClientType.setText(getResources().getString(R.string.txt_potential_client));
+//                            barTimer.setProgressDrawable(getResources().getDrawable(R.drawable.drawable_potential_client));
+//                        } else  if (clientType.equalsIgnoreCase("bon")) {
+//                            tvClientType.setTextColor(getColor(R.color.color_bon_client));
+//                            tvClientType.setText(getResources().getString(R.string.txt_bon_client));
+//                            barTimer.setProgressDrawable(getResources().getDrawable(R.drawable.drawable_bon_client));
+//                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
+
 
 
         map = ((SupportMapFragment) getSupportFragmentManager()
@@ -538,7 +587,7 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
 
 
     public void showCustomDialog(final Context context) {
-        try{
+        try {
             final Dialog dialog = new Dialog(context);
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -567,9 +616,9 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
             dialog.setCancelable(false);
             dialog.setContentView(dialogView);
             dialog.show();
-        }catch (WindowManager.BadTokenException e){
+        } catch (WindowManager.BadTokenException e) {
             e.printStackTrace();
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

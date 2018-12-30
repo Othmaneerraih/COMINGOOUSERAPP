@@ -206,7 +206,6 @@ public class MapsVM {
                                         }
 
 
-                                        Log.e("MapsVM", "clientId: "+clientId );
                                         FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").child(clientId)/*.child(userId)
                 .orderByKey()*/.limitToLast(1).addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override

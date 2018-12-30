@@ -31,7 +31,6 @@
     <string name="se_connecter">To log in</string>
     <string name="num_ro_de_t_l_phone">Phone number</string>
     <string name="mot_de_passe">Password</string>
-    <string name="bon_client">Good Customer</string>
     <string name="refuser">Refuse</string>
     <string name="accepter">Accept</string>
     <string name="vous_tes_hors_ligne">You are offline</string>
@@ -57,4 +56,7 @@
     <string name="kilomiter">Kilomiter</string>
     <string name="chauffeur">Chauffeur</string>
     <string name="temps_d_attam">Temps d`attam</string>
+    <string name="txt_new_client">Nouveau Client</string>
+    <string name="txt_potential_client">Client Potential</string>
+    <string name="txt_bon_client">Bon Client</string>
 </resources>

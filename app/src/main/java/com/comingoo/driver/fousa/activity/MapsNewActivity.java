@@ -27,7 +27,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.Html;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -53,7 +52,6 @@ import com.comingoo.driver.fousa.interfaces.OnlineOfflineCallBack;
 import com.comingoo.driver.fousa.interfaces.PriceCallBack;
 import com.comingoo.driver.fousa.service.DriverService;
 import com.comingoo.driver.fousa.utility.CustomAnimation;
-import com.comingoo.driver.fousa.utility.KeyboardUtils;
 import com.comingoo.driver.fousa.utility.Utilities;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -127,6 +125,8 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
     private boolean isFixed;
     private int totalRecharge = 0;
     private boolean isRatingPopupShowed = false;
+    private SharedPreferences prefs;
+    private SharedPreferences.Editor editor;
 
     private int RATE = 4;
     private double fixedPrice, price1, price2, price3, promoCode;
@@ -276,7 +276,15 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
             }
         };
 
-        SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
+        prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
+        editor = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE).edit();
+
+        boolean isPopupDismissedBefore = getSharedPreferences("COMINGOODRIVERDATA",
+                MODE_PRIVATE).getBoolean("isRatingPopupDismissedBefore", false);
+
+        if (isPopupDismissedBefore)
+            calculatePrice();
+
         if (Objects.equals(prefs.getString("online", "0"), "1")) {
             switchOnlineUI();
         }
@@ -416,8 +424,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         });
 
         // Note: initially driver will be offline
-        switchOfflineUI();
-
+//        switchOfflineUI();
 
         rlRideFlow.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -500,7 +507,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         callBtn = findViewById(R.id.call_button);
         rlRideFlow = findViewById(R.id.rl_cancel_course);
         voipView = findViewById(R.id.ll_voip_view);
-        dateTv = findViewById(R.id.date_txt);
+        dateTv = findViewById(R.id.client_type_txt);
         courseActionBtn = findViewById(R.id.course_action_button);
         telephoneTv = findViewById(R.id.tv_telephone);
         voipTv = findViewById(R.id.tv_voip);
@@ -557,9 +564,13 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
     }
 
     private void courseHandle() {
+        courseRef = FirebaseDatabase.getInstance().getReference("COURSES").child(courseId);
+        editor.putBoolean("isRatingPopupShowed", false);
+        editor.apply();
+
         if (courseState.equalsIgnoreCase("0")) {
             statusLayout.setVisibility(View.GONE);
-            courseRef = FirebaseDatabase.getInstance().getReference("COURSES").child(courseId);
+
             // Note: Setting the course into driver's profile
             FirebaseDatabase.getInstance().getReference("DRIVERUSERS")
                     .child(driverId).child("COURSE").setValue(courseId);
@@ -567,15 +578,28 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
             showClientInformation();
         } else if (courseState.equals("1")) {
             handler.postDelayed(runnable, 1000);
+            showClientInformation();
+            courseActionBtn.setText(getString(R.string.txt_tap_to_start));
         } else if (courseState.equals("2")) {
+            showClientInformation();
             handler.removeCallbacks(runnable);
             isRatingPopupShowed = false;
+            showClientInformation();
+            courseActionBtn.setText(getString(R.string.txt_finish_course));
         } else if (courseState.equals("3")) {
             courseUIOff();
             // Note: Making driver offline
             FirebaseDatabase.getInstance().getReference().child("ONLINEDRIVERS").child(driverId).removeValue();
             switchOnlineUI();
+
+//            boolean isPopupDismissedBefore = getSharedPreferences("COMINGOODRIVERDATA",
+//                    MODE_PRIVATE).getBoolean("isRatingPopupDismissedBefore", false);
+//
+//            Log.e(TAG, "courseHandle:isPopupDismissedBefore "+isPopupDismissedBefore );
+//            Log.e(TAG, "courseHandle:isRatingPopupShowed "+isPopupDismissedBefore );
+
             if (!isRatingPopupShowed)
+//                if (!isPopupDismissedBefore)
                 calculatePrice();
         }
     }
@@ -612,10 +636,15 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         final Button charge = view.findViewById(R.id.btn_recharger);
         final EditText moneyAmount = view.findViewById(R.id.editText);
 
+        editor.putBoolean("isRatingPopupDismissedBefore", true);
+        editor.apply();
+
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
                 switchOnlineUI();
+                editor.putBoolean("isRatingPopupDismissedBefore", false);
+                editor.apply();
             }
         });
 
@@ -1092,7 +1121,6 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
     }
 
     private void logout() {
-        final SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
         prefs.edit().remove("userId").apply();
     }
 
@@ -1133,7 +1161,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         CustomAnimation.fadeOut(MapsNewActivity.this, offlineBtn, 0, 10);
         CustomAnimation.fadeOut(MapsNewActivity.this, switchOnlineBtn, 0, 10);
         CustomAnimation.fadeIn(MapsNewActivity.this, onlineBtn, 500, 10);
-        SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
+        prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
         prefs.edit().putString("online", "1").apply();
         startService(new Intent(MapsNewActivity.this, DriverService.class));
     }
@@ -1144,7 +1172,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         CustomAnimation.fadeOut(MapsNewActivity.this, onlineBtn, 0, 10);
         switchOnlineBtn.setVisibility(View.VISIBLE);
         offlineBtn.setVisibility(View.VISIBLE);
-        SharedPreferences prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
+        prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
         prefs.edit().putString("online", "0").apply();
         stopService(new Intent(MapsNewActivity.this, DriverService.class));
     }

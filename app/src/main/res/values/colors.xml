@@ -7,4 +7,7 @@
     <color name="transp">#00000000</color>
     <color name="gradiantEnd2">#0C57B1</color>
     <color name="back_part">#fbe3e0ea</color>
+    <color name="color_new_client">#d77b45</color>
+    <color name="color_potential_client">#2175c9</color>
+    <color name="color_bon_client">#5fd278</color>
 </resources>

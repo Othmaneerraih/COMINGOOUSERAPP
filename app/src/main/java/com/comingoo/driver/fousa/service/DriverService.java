@@ -18,6 +18,8 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.comingoo.driver.fousa.activity.CommandActivity;
+import com.comingoo.driver.fousa.activity.MapsVM;
+import com.comingoo.driver.fousa.interfaces.DataCallBack;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -44,6 +46,8 @@ public class DriverService extends Service {
     private DatabaseReference driverPickupRequests;
 
     private String userId;
+    private String clientID;
+    private String clientType;
 
     private List<String> requestUsersID;
     private List<String> requestUsersLocation;
@@ -253,11 +257,13 @@ public class DriverService extends Service {
                     }
 
                     if (!isIntentCalled) {
-                        Log.e(TAG, "run: ");
                         isIntentCalled = true;
+
+
                         final Intent intent = new Intent(DriverService.this, CommandActivity.class);
                         intent.putExtra("userId", userId);
                         intent.putExtra("name", requestUsersID.get(counter));
+//                        intent.putExtra("client_type", clientType);
                         intent.putExtra("start", "" + startingText.get(counter));
                         intent.putExtra("arrival", "" + arrivalText.get(counter));
                         intent.putExtra("distance", "" + requestUsersLocation.get(counter));

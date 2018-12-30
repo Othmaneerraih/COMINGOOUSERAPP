@@ -334,7 +334,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             close_button = findViewById(R.id.close_button);
             call_button = findViewById(R.id.call_button);
             voip_view = findViewById(R.id.ll_voip_view);
-            date = findViewById(R.id.date_txt);
+            date = findViewById(R.id.client_type_txt);
             df2.setRoundingMode(RoundingMode.UP);
             SinchClient sinchClient = Sinch.getSinchClientBuilder()
                     .context(this)
