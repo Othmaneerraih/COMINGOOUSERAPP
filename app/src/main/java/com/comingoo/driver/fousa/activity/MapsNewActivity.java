@@ -282,6 +282,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         boolean isPopupNotDismissedBefore = getSharedPreferences("COMINGOODRIVERDATA",
                 MODE_PRIVATE).getBoolean("isRatingPopupDismissedBefore", false);
 
+        Log.e(TAG, "isPopupNotDismissedBefore : " + isPopupNotDismissedBefore);
         if (isPopupNotDismissedBefore)
             calculatePrice();
 
@@ -636,14 +637,14 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         final Button charge = view.findViewById(R.id.btn_recharger);
         final EditText moneyAmount = view.findViewById(R.id.editText);
 
-        editor.putBoolean("isRatingPopupDismissedBefore", false);
+        editor.putBoolean("isRatingPopupDismissedBefore", true);
         editor.apply();
 
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
                 switchOnlineUI();
-                editor.putBoolean("isRatingPopupDismissedBefore", true);
+                editor.putBoolean("isRatingPopupDismissedBefore", false);
                 editor.apply();
             }
         });
@@ -718,8 +719,6 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                         price.setText(df2.format(userDue) + " MAD");
                         FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(driverId).child("debt").setValue(Double.toString(newDebt));
                     }
-                } catch (NumberFormatException e) {
-                    e.printStackTrace();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -907,11 +906,9 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
 
         dialog.setCancelable(false);
         final Window window = dialog.getWindow();
-        window.setBackgroundDrawableResource(android.R.color.transparent);
         if (window != null) {
+            window.setBackgroundDrawableResource(android.R.color.transparent);
             window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
-        }
-        if (window != null) {
             window.setGravity(Gravity.CENTER);
         }
         switchOnlineUI();
@@ -1274,19 +1271,15 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                     dialog.findViewById(R.id.incoming_call_view).setVisibility(View.GONE);
                     setVolumeControlStream(AudioManager.USE_DEFAULT_STREAM_TYPE);
                     try {
-                        if (mp != null) {
-                            if (mp.isPlaying()) {
-                                mp.stop();
-                                mp.release();
-                            }
+                        if (mp.isPlaying()) {
+                            mp.stop();
+                            mp.release();
                         }
                         iv_mute.setVisibility(View.GONE);
                         iv_loud.setVisibility(View.GONE);
                         caller_name.setVisibility(View.GONE);
                         callState.setText("");
                         dialog.dismiss();
-                    } catch (IllegalStateException e) {
-                        e.printStackTrace();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -1298,11 +1291,9 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                     dialog.findViewById(R.id.incoming_call_view).setVisibility(View.VISIBLE);
                     setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
                     try {
-                        if (mp != null) {
-                            if (mp.isPlaying()) {
-                                mp.stop();
-                                mp.release();
-                            }
+                        if (mp.isPlaying()) {
+                            mp.stop();
+                            mp.release();
                         }
                         callState.setText("connected");
                         iv_mute.setVisibility(View.VISIBLE);
@@ -1414,15 +1405,11 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                 public void onClick(View v) {
                     call.hangup();
                     try {
-                        if (mp != null) {
-                            if (mp.isPlaying()) {
-                                mp.stop();
-                                mp.release();
-                            }
+                        if (mp.isPlaying()) {
+                            mp.stop();
+                            mp.release();
                         }
                         dialog.dismiss();
-                    } catch (IllegalStateException e) {
-                        e.printStackTrace();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -1439,16 +1426,12 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                 @Override
                 public void onClick(View v) {
                     try {
-                        if (mp != null) {
-                            if (mp.isPlaying()) {
-                                mp.stop();
-                                mp.release();
-                            }
+                        if (mp.isPlaying()) {
+                            mp.stop();
+                            mp.release();
                         }
                         call.answer();
                         iv_recv_call_voip_one.setClickable(false);
-                    } catch (IllegalStateException e) {
-                        e.printStackTrace();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

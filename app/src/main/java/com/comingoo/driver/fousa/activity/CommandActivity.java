@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Vibrator;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -74,13 +75,11 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
         setContentView(R.layout.activity_command_new);
         clientR = this;
 
-
         Window window = this.getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
         window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
 
         vibrator = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
 
@@ -158,7 +157,7 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
         try {
             String gatedDistance = "";
             gatedDistance = intent.getStringExtra("distance");
-            if (gatedDistance != "") {
+            if (!gatedDistance.equals("")) {
                 Dist = Double.parseDouble(intent.getStringExtra("distance"));
                 dist = (int) Math.round(Dist);
                 time = (int) (Dist * 1.5);
@@ -191,7 +190,7 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
                     .addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            if (!dataSnapshot.getKey().isEmpty()) {
+                            if (!Objects.requireNonNull(dataSnapshot.getKey()).isEmpty()) {
 
                                 if (dataSnapshot.getValue() == null) {
                                     ratingShow.setText("0");
@@ -218,8 +217,6 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
                                             String avg = String.format("%.2f", avgRating);
                                             String newString = avg.replace(",", ".");
                                             ratingShow.setText(newString);
-                                        } catch (ArithmeticException e) {
-                                            e.printStackTrace();
                                         } catch (Exception e) {
                                             e.printStackTrace();
                                         }
@@ -236,19 +233,13 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
                             ratingShow.setText(4.5 + "");
                         }
                     });
-
-
-        } catch (ArithmeticException e) {
-            e.printStackTrace();
-        } catch (NullPointerException e) {
-            e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
 
 
         // client type calculation
-        Log.e("CommandActivity", "onCreate:clientID "+clientID );
+        Log.e("CommandActivity", "onCreate:clientID " + clientID);
         FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").
                 addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -258,14 +249,13 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
                                     .addValueEventListener(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                            if (dataSnapshot.hasChild("isProfilePicValid")){
+                                            if (dataSnapshot.hasChild("isProfilePicValid")) {
                                                 isProfilePicValid = dataSnapshot.child("isProfilePicValid").getValue(Boolean.class);
                                             } else isProfilePicValid = false;
                                         }
 
                                         @Override
                                         public void onCancelled(@NonNull DatabaseError databaseError) {
-
                                         }
                                     });
 
@@ -275,29 +265,29 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                             if (dataSnapshot.exists()) {
                                                 int size = (int) dataSnapshot.getChildrenCount();
-                                                if (!isProfilePicValid && size == 0){
+                                                if (!isProfilePicValid && size == 0) {
                                                     clientType = "new";
-                                                    tvClientType.setTextColor(getColor(R.color.color_new_client));
+                                                    tvClientType.setTextColor(ContextCompat.getColor(CommandActivity.this, R.color.color_new_client));
                                                     tvClientType.setText(getResources().getString(R.string.txt_new_client));
                                                     barTimer.setProgressDrawable(getResources().getDrawable(R.drawable.drawable_new_client));
-                                                } else if (isProfilePicValid && size ==0){
-                                                    tvClientType.setTextColor(getColor(R.color.color_potential_client));
+                                                } else if (isProfilePicValid && size == 0) {
+                                                    tvClientType.setTextColor(ContextCompat.getColor(CommandActivity.this, R.color.color_potential_client));
                                                     tvClientType.setText(getResources().getString(R.string.txt_potential_client));
                                                     barTimer.setProgressDrawable(getResources().getDrawable(R.drawable.drawable_potential_client));
                                                     clientType = "potential";
-                                                } else if (!isProfilePicValid && size < 3){
-                                                    tvClientType.setTextColor(getColor(R.color.color_potential_client));
+                                                } else if (!isProfilePicValid && size < 3) {
+                                                    tvClientType.setTextColor(ContextCompat.getColor(CommandActivity.this, R.color.color_potential_client));
                                                     tvClientType.setText(getResources().getString(R.string.txt_potential_client));
                                                     barTimer.setProgressDrawable(getResources().getDrawable(R.drawable.drawable_potential_client));
                                                     clientType = "potential";
-                                                } else if (!isProfilePicValid && size >= 3){
+                                                } else if (!isProfilePicValid && size >= 3) {
                                                     clientType = "bon";
-                                                    tvClientType.setTextColor(getColor(R.color.color_bon_client));
+                                                    tvClientType.setTextColor(ContextCompat.getColor(CommandActivity.this, R.color.color_bon_client));
                                                     tvClientType.setText(getResources().getString(R.string.txt_bon_client));
                                                     barTimer.setProgressDrawable(getResources().getDrawable(R.drawable.drawable_bon_client));
-                                                } else if (isProfilePicValid && size >0){
+                                                } else if (isProfilePicValid && size > 0) {
                                                     clientType = "bon";
-                                                    tvClientType.setTextColor(getColor(R.color.color_bon_client));
+                                                    tvClientType.setTextColor(ContextCompat.getColor(CommandActivity.this, R.color.color_bon_client));
                                                     tvClientType.setText(getResources().getString(R.string.txt_bon_client));
                                                     barTimer.setProgressDrawable(getResources().getDrawable(R.drawable.drawable_bon_client));
                                                 }
@@ -311,7 +301,7 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
                                     });
                         } //else clientType = "new";
 
-                        Log.e("CommandActivity", "onCreate:clientType "+clientType );
+                        Log.e("CommandActivity", "onCreate:clientType " + clientType);
 //                        if (clientType.equalsIgnoreCase("new")) {
 //                            tvClientType.setTextColor(getColor(R.color.color_new_client));
 //                            tvClientType.setText(getResources().getString(R.string.txt_new_client));
@@ -333,8 +323,6 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
 
                     }
                 });
-
-
 
 
         map = ((SupportMapFragment) getSupportFragmentManager()
@@ -446,7 +434,7 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
                         } else {
 
                             for (DataSnapshot dataS : dataSnapshot.getChildren()) {
-                                if (dataS.child("state").getValue(String.class).equals("3")) {
+                                if (Objects.requireNonNull(dataS.child("state").getValue(String.class)).equals("3")) {
 
                                     DatabaseReference courseDatabase = FirebaseDatabase.getInstance().getReference("COURSES").push();
                                     Map<String, String> data = new HashMap<>();
@@ -549,8 +537,6 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
 
                         vibrator.cancel();
                         showCustomDialog(CommandActivity.this);
-                    } catch (IllegalStateException e) {
-                        e.printStackTrace();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -616,8 +602,6 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
             dialog.setCancelable(false);
             dialog.setContentView(dialogView);
             dialog.show();
-        } catch (WindowManager.BadTokenException e) {
-            e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
