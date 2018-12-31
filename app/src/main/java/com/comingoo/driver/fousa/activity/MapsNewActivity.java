@@ -279,10 +279,10 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
         editor = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE).edit();
 
-        boolean isPopupDismissedBefore = getSharedPreferences("COMINGOODRIVERDATA",
+        boolean isPopupNotDismissedBefore = getSharedPreferences("COMINGOODRIVERDATA",
                 MODE_PRIVATE).getBoolean("isRatingPopupDismissedBefore", false);
 
-        if (isPopupDismissedBefore)
+        if (isPopupNotDismissedBefore)
             calculatePrice();
 
         if (Objects.equals(prefs.getString("online", "0"), "1")) {
@@ -576,6 +576,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                     .child(driverId).child("COURSE").setValue(courseId);
             destinationLayout.setVisibility(View.VISIBLE);
             showClientInformation();
+
         } else if (courseState.equals("1")) {
             handler.postDelayed(runnable, 1000);
             showClientInformation();
@@ -599,7 +600,6 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
 //            Log.e(TAG, "courseHandle:isRatingPopupShowed "+isPopupDismissedBefore );
 
             if (!isRatingPopupShowed)
-//                if (!isPopupDismissedBefore)
                 calculatePrice();
         }
     }
@@ -636,14 +636,14 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         final Button charge = view.findViewById(R.id.btn_recharger);
         final EditText moneyAmount = view.findViewById(R.id.editText);
 
-        editor.putBoolean("isRatingPopupDismissedBefore", true);
+        editor.putBoolean("isRatingPopupDismissedBefore", false);
         editor.apply();
 
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
                 switchOnlineUI();
-                editor.putBoolean("isRatingPopupDismissedBefore", false);
+                editor.putBoolean("isRatingPopupDismissedBefore", true);
                 editor.apply();
             }
         });

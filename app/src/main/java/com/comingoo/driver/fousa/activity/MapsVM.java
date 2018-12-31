@@ -376,9 +376,11 @@ public class MapsVM {
                 addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        int rating = Integer.parseInt(dataSnapshot.getValue(String.class)) + 1;
-                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId)
-                                .child("rating").child(Integer.toString(Rate)).setValue("" + rating);
+                        if (dataSnapshot.exists()) {
+                            int rating = Integer.parseInt(dataSnapshot.getValue(String.class)) + 1;
+                            FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId)
+                                    .child("rating").child(Integer.toString(Rate)).setValue("" + rating);
+                        }
                     }
 
                     @Override
