@@ -491,7 +491,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
 
         // NOTE : Banner init
         moneyBtn = findViewById(R.id.money_btn);
-        destinationLayout = findViewById(R.id.destination_include);
+        destinationLayout = findViewById(R.id.destination_layout);
         destTimeTxt = findViewById(R.id.dest_time_txt);
         addressTxt = findViewById(R.id.address_txt);
 
