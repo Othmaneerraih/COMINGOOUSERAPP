@@ -45,6 +45,8 @@ import java.util.Map;
 import java.util.Objects;
 
 public class CommandActivity extends AppCompatActivity implements OnMapReadyCallback {
+
+    private String TAG = "CommandActivity";
     public static Activity clientR;
     private TextView tvUserRating;
     private TextView ratingShow;
@@ -65,6 +67,7 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
     public static CountDownTimer countDownTimer;
     private Double driverPosLat, driverPosLong;
     private boolean isProfilePicValid;
+    private Dialog dialog;
 
     public CommandActivity() {
     }
@@ -520,31 +523,39 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
         active = true;
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(dialog!=null){
+            dialog.dismiss();
+        }
+
+    }
+
     private void startTimer() {
         countDownTimer = new CountDownTimer(15000, 1000) {
             @Override
             public void onTick(long leftTimeInMilliseconds) {
                 long seconds = leftTimeInMilliseconds / 1000;
                 barTimer.setProgress((int) seconds);
-                if (seconds == 0) {
-                    try {
-                        if (mp != null) {
-                            if (mp.isPlaying()) {
-                                mp.stop();
-                                mp.release();
-                            }
-                        }
-
-                        vibrator.cancel();
-                        showCustomDialog(CommandActivity.this);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
             }
 
             @Override
             public void onFinish() {
+                Log.e(TAG, "finished");
+                try {
+                    if (mp != null) {
+                        if (mp.isPlaying()) {
+                            mp.stop();
+                            mp.release();
+                        }
+                    }
+
+                    vibrator.cancel();
+                    showCustomDialog(CommandActivity.this);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }.start();
 
@@ -574,7 +585,7 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
 
     public void showCustomDialog(final Context context) {
         try {
-            final Dialog dialog = new Dialog(context);
+            dialog = new Dialog(context);
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View dialogView = inflater.inflate(R.layout.dialog_misses_ride_request, null, false);

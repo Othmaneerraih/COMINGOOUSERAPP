@@ -89,7 +89,7 @@ import static com.comingoo.driver.fousa.utility.Utilities.getDateDay;
 import static com.comingoo.driver.fousa.utility.Utilities.getDateMonth;
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
-public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCallback, OnlineOfflineCallBack {
+public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCallback {
     private MapsVM mapsVM;
     private double clientRating = 0.0;
     private String driverName = "";
@@ -195,6 +195,8 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
     private LatLng userLatLng;
     private RelativeLayout.LayoutParams params;
     private boolean isLoud = false;
+    private int mHour, mMinute; // variables holding the hour and minuteZ
+    private Handler mHandler = new Handler();
 
     protected static final int REQUEST_CHECK_SETTINGS = 0x1;
 
@@ -208,8 +210,6 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
     }
 
     private void action() {
-        df2.setRoundingMode(RoundingMode.UP);
-        mapsVM = new MapsVM();
 
         mapsVM.checkLogin(MapsNewActivity.this, new DataCallBack() {
             @Override
@@ -221,6 +221,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                     driverNumber = drivrNum;
                     debit = debt;
                     todayTrips = todystrp;
+
                     moneyBtn.setText(todysErn + " MAD");
                     clientRating = rat;
                     driverId = drivrId;
@@ -489,6 +490,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
             mapFragment.getMapAsync(this);
         }
 
+        mapsVM = new MapsVM();
         // NOTE : Banner init
         moneyBtn = findViewById(R.id.money_btn);
         destinationLayout = findViewById(R.id.destination_layout);
@@ -514,6 +516,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         voipTv = findViewById(R.id.tv_voip);
         clientInfoLayout = findViewById(R.id.client_info_layout);
         // NOTE : Those are initially Hide
+        clientInfoLayout.setBackgroundColor(Color.WHITE);
         clientInfoLayout.setVisibility(View.GONE);
         closeBtn.setVisibility(View.GONE);
         voipView.setVisibility(View.GONE);
@@ -562,6 +565,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         float density = getResources().getDisplayMetrics().density;
         float dpHeight = outMetrics.heightPixels / density;
         dpWidth = outMetrics.widthPixels / density;
+        df2.setRoundingMode(RoundingMode.UP);
     }
 
     private void courseHandle() {
@@ -593,12 +597,6 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
             // Note: Making driver offline
             FirebaseDatabase.getInstance().getReference().child("ONLINEDRIVERS").child(driverId).removeValue();
             switchOnlineUI();
-
-//            boolean isPopupDismissedBefore = getSharedPreferences("COMINGOODRIVERDATA",
-//                    MODE_PRIVATE).getBoolean("isRatingPopupDismissedBefore", false);
-//
-//            Log.e(TAG, "courseHandle:isPopupDismissedBefore "+isPopupDismissedBefore );
-//            Log.e(TAG, "courseHandle:isRatingPopupShowed "+isPopupDismissedBefore );
 
             if (!isRatingPopupShowed)
                 calculatePrice();
@@ -1209,11 +1207,6 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         }
     }
 
-    @Override
-    public void isOnline(boolean isOnline) {
-
-    }
-
     private class SinchCallClientListener implements CallClientListener {
         @Override
         public void onIncomingCall(CallClient callClient, Call incomingCall) {
@@ -1236,6 +1229,15 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         } else {
             getLastLocation();
         }
+
+//        mapsVM.checkingOnlineOffline(new OnlineOfflineCallBack() {
+//            @Override
+//            public void isOnline(boolean isOnline) {
+//                if(!isOnline){
+//                    switchOfflineUI();
+//                }
+//            }
+//        });
     }
 
     public void showDialog(final Context context, final Call call) {
@@ -1256,6 +1258,25 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
             final CircleImageView iv_mute = dialog.findViewById(R.id.iv_mute);
             final CircleImageView iv_loud = dialog.findViewById(R.id.iv_loud);
             TextView tv_name_voip_one = dialog.findViewById(R.id.tv_name_voip_one);
+
+            final Runnable mUpdate = new Runnable() {
+
+                @Override
+                public void run() {
+                    mMinute += 1;
+                    // just some checks to keep everything in order
+                    if (mMinute >= 60) {
+                        mMinute = 0;
+                        mHour += 1;
+                    }
+                    if (mHour >= 24) {
+                        mHour = 0;
+                    }
+                    // or call your method
+                    caller_name.setText(mHour + ":" + mMinute);
+                    mHandler.postDelayed(this, 1000);
+                }
+            };
 
             iv_recv_call_voip_one.setClickable(true);
             iv_mute.setVisibility(View.GONE);
@@ -1306,6 +1327,11 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                         }
                         params.addRule(RelativeLayout.CENTER_HORIZONTAL);
                         iv_cancel_call_voip_one.setLayoutParams(params);
+
+                        mHour = 0;//c.get(Calendar.HOUR_OF_DAY);
+                        mMinute = 0;//c.get(Calendar.MINUTE);
+                        caller_name.setText(mHour + ":" + mMinute);
+                        mHandler.postDelayed(mUpdate, 1000); // 60000 a minute
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -1392,13 +1418,13 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
             caller_name.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
             caller_name.setTypeface(null, Typeface.NORMAL);      // for Normal Text
 
-//            caller_name.setText(clientName + " vous appelle");
-//            tv_name_voip_one.setText(clientName);
-//            if (clientImageUri != null) {
-//                if (!clientImageUri.isEmpty()) {
-//                    Picasso.get().load(clientImageUri).into(iv_user_image_voip_one);
-//                }
-//            }
+            caller_name.setText(clientName + " vous appelle");
+            tv_name_voip_one.setText(clientName);
+            if (clientImageUri != null) {
+                if (!clientImageUri.isEmpty()) {
+                    Picasso.get().load(clientImageUri).into(iv_user_image_voip_one);
+                }
+            }
 
             iv_cancel_call_voip_one.setOnClickListener(new View.OnClickListener() {
                 @Override
