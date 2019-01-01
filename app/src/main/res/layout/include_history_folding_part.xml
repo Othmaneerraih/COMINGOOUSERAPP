@@ -13,16 +13,10 @@
             android:id="@+id/map_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             android:layout_alignParentTop="true">
 
-            <fragment
-                android:id="@+id/map_history"
-                android:name="com.google.android.gms.maps.SupportMapFragment"
-                android:layout_width="match_parent"
-                android:layout_height="150dp"
-                android:layout_centerInParent="true"
-                android:layout_margin="3dp"
-                android:background="@drawable/drawable_circle_dark_blue" />
+
         </RelativeLayout>
 
         <RelativeLayout

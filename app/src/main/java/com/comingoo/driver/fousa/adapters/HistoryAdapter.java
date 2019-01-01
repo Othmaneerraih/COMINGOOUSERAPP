@@ -38,21 +38,17 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
     private List<Course> mDataset;
     private Context mContext;
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements OnMapReadyCallback {
+    public class ViewHolder extends RecyclerView.ViewHolder {
         // each data item is just a string in this case
 
         public View h;
         public TextView driverName, dateText, startText, startText2, endText2, endText, priceText, priceText3, km, kmVal, waitTime, waitTime2, km2, waitTimeVal, lateVal, basePriceVal, date2;
         public Button priceText2;
         public FoldingCell fc;
-        private SupportMapFragment map;
 
         public ViewHolder(View v) {
             super(v);
             h = v;
-            map = ((SupportMapFragment) ((AppCompatActivity) mContext).getSupportFragmentManager()
-                    .findFragmentById(R.id.map_history));
-            map.getMapAsync(this);
             dateText = v.findViewById(R.id.date);
             startText = v.findViewById(R.id.depart);
             endText = v.findViewById(R.id.destination);
@@ -76,27 +72,6 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
             driverName = v.findViewById(R.id.textView27);
 
             fc = v.findViewById(R.id.folding_cell);
-        }
-
-        @Override
-        public void onMapReady(GoogleMap googleMap) {
-            LatLng latLng = new LatLng(Double.parseDouble("37.34"), Double.parseDouble("7.09"));
-//        BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.person_green);
-            int height = 150;
-            int width = 80;
-            BitmapDrawable bitmapdraw = (BitmapDrawable) mContext.getResources().getDrawable(R.drawable.person_green);
-            Bitmap b = bitmapdraw.getBitmap();
-            Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
-
-            MarkerOptions markerOptions = new MarkerOptions().position(latLng)
-                    .icon(BitmapDescriptorFactory.fromBitmap(smallMarker));
-            CameraPosition cameraPosition = new CameraPosition.Builder()
-                    .target(latLng)      // Sets the center of the map to Mountain View
-                    .zoom(17)                   // Sets the zoom
-                    .build();
-            googleMap.addMarker(markerOptions);
-            // Creates a CameraPosition from the builder
-            googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         }
     }
 
