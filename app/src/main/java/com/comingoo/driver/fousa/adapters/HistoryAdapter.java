@@ -64,7 +64,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
             waitTime = v.findViewById(R.id.waitTime);
             waitTimeVal = v.findViewById(R.id.waitTimeValue);
             lateVal = v.findViewById(R.id.preWaitV);
-            basePriceVal = v.findViewById(R.id.basePrice);
+//            basePriceVal = v.findViewById(R.id.basePrice);
 
             waitTime2 = v.findViewById(R.id.waitTime2);
             km2 = v.findViewById(R.id.km2);
@@ -146,7 +146,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 holder.kmVal.setText((new DecimalFormat("##.##").format(Double.parseDouble(newCourse.getDistance()) * Double.parseDouble(dataSnapshot.child("km").getValue(String.class)))) + " MAD");
                 holder.waitTimeVal.setText((new DecimalFormat("##.##").format(Double.parseDouble(newCourse.getWaitTime()) * Double.parseDouble(dataSnapshot.child("att").getValue(String.class)))) + " MAD");
-                holder.basePriceVal.setText(dataSnapshot.child("base").getValue(String.class) + " MAD");
+//                holder.basePriceVal.setText(dataSnapshot.child("base").getValue(String.class) + " MAD");
             }
 
             @Override

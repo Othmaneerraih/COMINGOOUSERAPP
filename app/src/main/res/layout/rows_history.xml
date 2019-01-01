@@ -7,19 +7,20 @@
     <com.ramotion.foldingcell.FoldingCell xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/folding_cell"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         folding-cell:backSideColor="@color/back_part">
 
         <include
             layout="@layout/include_history_first_part"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+           />
 
         <include
             layout="@layout/include_history_folding_part"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone" />
+            android:visibility="gone"/>
 
     </com.ramotion.foldingcell.FoldingCell>
 
