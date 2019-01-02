@@ -200,44 +200,55 @@
 
         </RelativeLayout>
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/ll_voip_view"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="140dp"
             android:layout_above="@+id/user_info_layout"
-            android:layout_marginStart="70dp"
-            android:layout_marginLeft="70dp"
-            android:layout_marginEnd="70dp"
-            android:layout_marginRight="70dp"
-            android:layout_marginBottom="-25dp"
-            android:background="@drawable/layout_background_rounded_corner"
-            android:gravity="center"
-            android:orientation="vertical">
+            android:layout_marginStart="60dp"
+            android:layout_marginLeft="60dp"
+            android:layout_marginEnd="60dp"
+            android:layout_marginRight="60dp"
+            android:layout_marginBottom="-35dp">
 
-            <TextView
-                android:id="@+id/tv_telephone"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_marginBottom="5dp"
+                android:layout_height="100dp"
+                android:layout_alignParentBottom="true"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/layout_background_rounded_corner"
                 android:gravity="center"
-                android:text="@string/appelle_telephonique"
-                android:textSize="14sp" />
+                android:orientation="vertical">
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@android:color/black" />
+                <TextView
+                    android:id="@+id/tv_telephone"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginBottom="5dp"
+                    android:gravity="center"
+                    android:text="@string/appelle_telephonique"
+                    android:textSize="14sp" />
 
-            <TextView
-                android:id="@+id/tv_voip"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_marginTop="5dp"
-                android:gravity="center"
-                android:text="@string/appelle_voip"
-                android:textSize="14sp" />
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@android:color/black" />
 
-        </LinearLayout>
+                <TextView
+                    android:id="@+id/tv_voip"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="5dp"
+                    android:gravity="center"
+                    android:text="@string/appelle_voip"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
 
         <ImageButton
             android:id="@+id/my_position_button"

@@ -146,7 +146,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
     private RelativeLayout rlRideFlow;
     private Button courseActionBtn;
     private RelativeLayout clientInfoLayout;
-    private LinearLayout voipView;
+    private RelativeLayout voipView;
     private TextView telephoneTv;
     private TextView voipTv;
 
@@ -577,7 +577,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         voipTv = findViewById(R.id.tv_voip);
         clientInfoLayout = findViewById(R.id.client_info_layout);
         // NOTE : Those are initially Hide
-        clientInfoLayout.setBackgroundColor(Color.WHITE);
+        voipView.setBackgroundColor(Color.TRANSPARENT);
         clientInfoLayout.setVisibility(View.GONE);
         closeBtn.setVisibility(View.GONE);
         voipView.setVisibility(View.GONE);
