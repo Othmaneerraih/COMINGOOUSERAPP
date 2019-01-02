@@ -57,4 +57,5 @@
     <string name="txt_new_client">Nouveau Client</string>
     <string name="txt_potential_client">Client Potential</string>
     <string name="txt_bon_client">Bon Client</string>
+    <string name="txt_incoming_call">Incoming call</string>
 </resources>

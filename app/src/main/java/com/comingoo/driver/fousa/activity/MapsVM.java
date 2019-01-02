@@ -126,7 +126,6 @@ public class MapsVM {
                                             todysErn = dataSnapshot.child("earnings").getValue(String.class);
                                             todystrp = dataSnapshot.child("voyages").getValue(String.class);
                                             Log.e(TAG, "onDataChange: todysErn " + todysErn);
-                                            callback.callbackCall(true, drivrNam, drivrImg, drivrNum, debt, todystrp, todysErn, rat, driverId);
                                         }
                                     }
 
@@ -135,8 +134,8 @@ public class MapsVM {
                                         callback.callbackCall(false, "", "", "", "", "", "", 0.0, "");
                                     }
                                 });
+                        callback.callbackCall(true, drivrNam, drivrImg, drivrNum, debt, todystrp, todysErn, rat, driverId);
 
-//                        callback.callbackCall(true, drivrNam, drivrImg, drivrNum, debt, todystrp, todysErn, rat, driverId);
                     } else {
                         Toast.makeText(context, driverId, Toast.LENGTH_SHORT).show();
                         prefs.edit().remove("phoneNumber").apply();

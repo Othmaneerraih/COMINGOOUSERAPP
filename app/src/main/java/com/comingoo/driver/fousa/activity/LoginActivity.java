@@ -150,7 +150,7 @@ public class LoginActivity extends AppCompatActivity {
         String number = prefs.getString("userId", null);
         if(number != null){
             //User Is Logged In
-            Intent intent = new Intent(LoginActivity.this, MapsActivity.class);
+            Intent intent = new Intent(LoginActivity.this, MapsNewActivity.class);
             startActivity(intent);
             finish();
         }

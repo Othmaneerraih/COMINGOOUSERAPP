@@ -426,6 +426,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     finish();
                 }
             });
+
             BitmapDrawable bitmapdraw = (BitmapDrawable) getResources().getDrawable(R.drawable.driver_pin);
             int height = 250;
             int width = 120;

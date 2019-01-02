@@ -30,8 +30,8 @@
 
     <ImageButton
         android:id="@+id/rating_image"
-        android:layout_width="51dp"
-        android:layout_height="30dp"
+        android:layout_width="57dp"
+        android:layout_height="35dp"
         android:layout_below="@+id/name_txt"
         android:layout_alignStart="@+id/name_txt"
         android:layout_marginStart="8dp"
@@ -46,10 +46,11 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/name_txt"
         android:layout_alignTop="@+id/rating_image"
-        android:layout_marginStart="-35dp"
-        android:layout_marginTop="6dp"
+        android:layout_marginStart="-37dp"
+        android:layout_marginTop="10dp"
         android:layout_toEndOf="@+id/rating_image"
         android:text="4"
+        android:maxLength="3"
         android:textSize="12sp" />
 
     <RelativeLayout
