@@ -2,7 +2,6 @@
 <resources>
     <string name="app_name">Fousa</string>
     <string name="title_activity_maps">Fousa</string>
-    <string name="txt_not_enough_money">Not enough money to recharge</string>
     <string name="txt_successfully_recharged">Successfully Recharged</string>
 
     <string name="Q1">How can I get an estimate of the price of a race?</string>
@@ -43,7 +42,6 @@
     <string name="appelle_telephonique">Phone call</string>
     <string name="appelle_voip">VOIP call</string>
     <string name="appuyez_pour_arriver">Press to arrive</string>
-    <string name="_0_0_mad">0.0 MAD</string>
     <string name="todo">TODO</string>
     <string name="txt_driver_arrive">Appuyez pour arriver</string>
     <string name="txt_tap_to_start">Appuyez pour commancer</string>

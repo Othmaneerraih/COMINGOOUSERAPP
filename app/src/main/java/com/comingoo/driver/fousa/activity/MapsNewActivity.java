@@ -89,7 +89,9 @@ import static com.comingoo.driver.fousa.utility.Utilities.getDateDay;
 import static com.comingoo.driver.fousa.utility.Utilities.getDateMonth;
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
-public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCallback, OnlineOfflineCallBack {
+public class MapsNewActivity extends AppCompatActivity
+        implements OnMapReadyCallback, OnlineOfflineCallBack {
+
     private MapsVM mapsVM;
     private double clientRating = 0.0;
     private String driverName = "";
@@ -195,8 +197,38 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
     private LatLng userLatLng;
     private RelativeLayout.LayoutParams params;
     private boolean isLoud = false;
+    private MediaPlayer mp;
+    private TextView caller_name;
+    private TextView callState;
+    private Handler mHandler = new Handler();
+    private CircleImageView iv_cancel_call_voip_one;
+    private CircleImageView iv_mute;
+    private CircleImageView iv_loud;
+    private CircleImageView iv_recv_call_voip_one;
+    private int count = 0;
 
     protected static final int REQUEST_CHECK_SETTINGS = 0x1;
+
+    private int mHour, mMinute; // variables holding the hour and minute
+    private Runnable mUpdate = new Runnable() {
+
+        @Override
+        public void run() {
+            mMinute += 1;
+            // just some checks to keep everything in order
+            if (mMinute >= 60) {
+                mMinute = 0;
+                mHour += 1;
+            }
+            if (mHour >= 24) {
+                mHour = 0;
+            }
+            // or call your method
+            caller_name.setText(mHour + ":" + mMinute);
+            mHandler.postDelayed(this, 1000);
+        }
+    };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -208,6 +240,8 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
     }
 
     private void action() {
+
+
         df2.setRoundingMode(RoundingMode.UP);
         mapsVM = new MapsVM();
 
@@ -264,7 +298,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         });
 
 
-        // Note: Prewait Time Handler
+        // Note: Pre wait Time Handler
         handler = new Handler(Looper.getMainLooper());
         runnable = new Runnable() {
             @Override
@@ -1144,7 +1178,295 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         }
     }
 
-    private void mute(AudioManager audioManager, CircleImageView iv_mute) {
+    public void showDialog(final Context context, final Call call) {
+        try {
+            final Dialog dialog = new Dialog(context);
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View view = inflater.inflate(R.layout.dialog_incomming_call, null, false);
+            dialog.setContentView(view);
+
+            CircleImageView iv_user_image_voip_one = dialog.findViewById(R.id.iv_user_image_voip_one);
+            iv_cancel_call_voip_one = dialog.findViewById(R.id.iv_cancel_call_voip_one);
+            iv_recv_call_voip_one = dialog.findViewById(R.id.iv_recv_call_voip_one);
+            caller_name = dialog.findViewById(R.id.callerName);
+            callState = dialog.findViewById(R.id.callState);
+
+            iv_mute = dialog.findViewById(R.id.iv_mute);
+            iv_loud = dialog.findViewById(R.id.iv_loud);
+            TextView tv_name_voip_one = dialog.findViewById(R.id.tv_name_voip_one);
+
+            iv_recv_call_voip_one.setClickable(true);
+            iv_mute.setVisibility(View.GONE);
+            iv_loud.setVisibility(View.GONE);
+
+            mp = MediaPlayer.create(this, R.raw.ring);
+            mp.start();
+
+            call.addCallListener(new CallListener() {
+                @Override
+                public void onCallEnded(Call endedCall) {
+                    //call ended by either party
+                    dialog.findViewById(R.id.incoming_call_view).setVisibility(View.GONE);
+                    setVolumeControlStream(AudioManager.USE_DEFAULT_STREAM_TYPE);
+                    try {
+                        if (mp != null) {
+                            if (mp.isPlaying()) {
+                                mp.stop();
+                                mp.release();
+                            }
+                        }
+                        iv_mute.setVisibility(View.GONE);
+                        iv_loud.setVisibility(View.GONE);
+                        caller_name.setVisibility(View.GONE);
+                        callState.setText("");
+                        mHandler.removeCallbacks(mUpdate);// we need to remove our updates if the activity isn't focused(or even destroyed) or we could get in trouble
+                        dialog.dismiss();
+                    } catch (IllegalStateException e) {
+                        e.printStackTrace();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onCallEstablished(final Call establishedCall) {
+                    //incoming call was picked up
+                    dialog.findViewById(R.id.incoming_call_view).setVisibility(View.VISIBLE);
+                    setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
+                    try {
+                        if (mp != null) {
+                            if (mp.isPlaying()) {
+                                mp.stop();
+                                mp.release();
+                            }
+                        }
+                        callState.setText("connected");
+                        iv_mute.setVisibility(View.VISIBLE);
+                        iv_loud.setVisibility(View.VISIBLE);
+
+                        iv_recv_call_voip_one.setVisibility(View.GONE);
+
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                            params.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                        }
+                        params.addRule(RelativeLayout.CENTER_HORIZONTAL);
+                        iv_cancel_call_voip_one.setLayoutParams(params);
+
+                        mHour = 00;//c.get(Calendar.HOUR_OF_DAY);
+                        mMinute = 00;//c.get(Calendar.MINUTE);
+                        caller_name.setText(mHour + ":" + mMinute);
+                        mHandler.postDelayed(mUpdate, 1000); // 60000 a minute
+                    } catch (IllegalStateException e) {
+                        e.printStackTrace();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onCallProgressing(Call progressingCall) {
+                    //call is ringing
+                    try {
+                        if (mp != null) {
+                            if (mp.isPlaying()) {
+                                mp.stop();
+                                mp.release();
+                            }
+                        }
+                        dialog.findViewById(R.id.incoming_call_view).setVisibility(View.VISIBLE);
+                        caller_name.setText(progressingCall.getDetails().getDuration() + "");
+                        caller_name.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+                        iv_mute.setVisibility(View.VISIBLE);
+                        iv_loud.setVisibility(View.VISIBLE);
+                        caller_name.setTypeface(null, Typeface.BOLD);
+                        callState.setText("ringing");
+                        iv_recv_call_voip_one.setVisibility(View.GONE);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                            params.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                        }
+                        params.addRule(RelativeLayout.CENTER_HORIZONTAL);
+                        iv_cancel_call_voip_one.setLayoutParams(params);
+                    } catch (IllegalStateException e) {
+                        e.printStackTrace();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onShouldSendPushNotification(Call call, List<PushPair> pushPairs) {
+                    //don't worry about this right now
+                }
+            });
+
+            final AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+
+            final int origionalVolume = am != null ? am.getStreamVolume(AudioManager.STREAM_MUSIC) : 0;
+            if (am != null) {
+                am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
+            }
+
+            if (am != null) {
+                switch (am.getRingerMode()) {
+                    case 0:
+                        mp.start();
+                        break;
+                    case 1:
+                        mp.start();
+                        break;
+                    case 2:
+                        mp.start();
+                        break;
+                }
+            }
+
+            mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mediaPlayer) {
+                    try {
+                        if (mp != null) {
+                            if (mp.isPlaying()) {
+                                mp.stop();
+                                mp.release();
+                            }
+                        }
+                        if (am != null) {
+                            am.setStreamVolume(AudioManager.STREAM_MUSIC, origionalVolume, 0);
+                        }
+                    } catch (IllegalStateException e) {
+                        e.printStackTrace();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            });
+
+            if (ContextCompat.checkSelfPermission(MapsNewActivity.this, android.Manifest.permission.RECORD_AUDIO)
+                    != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(MapsNewActivity.this, android.Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(MapsNewActivity.this,
+                        new String[]{android.Manifest.permission.RECORD_AUDIO, android.Manifest.permission.READ_PHONE_STATE},
+                        1);
+            }
+
+            caller_name.setVisibility(View.VISIBLE);
+            caller_name.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+            caller_name.setTypeface(null, Typeface.NORMAL);      // for Normal Text
+
+            caller_name.setText(clientName + " vous appelle");
+            tv_name_voip_one.setText(clientName);
+            if (clientImageUri != null) {
+                if (!clientImageUri.isEmpty()) {
+                    Picasso.get().load(clientImageUri).into(iv_user_image_voip_one);
+                }
+            }
+
+            iv_cancel_call_voip_one.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    call.hangup();
+                    try {
+                        if (mp != null) {
+                            if (mp.isPlaying()) {
+                                mp.stop();
+                                mp.release();
+                            }
+                        }
+                        dialog.dismiss();
+                    } catch (IllegalStateException e) {
+                        e.printStackTrace();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            });
+            params = (RelativeLayout.LayoutParams) iv_cancel_call_voip_one.getLayoutParams();
+            params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+            iv_cancel_call_voip_one.setLayoutParams(params);
+
+
+            iv_recv_call_voip_one.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    try {
+                        if (mp != null) {
+                            if (mp.isPlaying()) {
+                                mp.stop();
+                                mp.release();
+                            }
+                        }
+                        call.answer();
+                        iv_recv_call_voip_one.setClickable(false);
+                    } catch (IllegalStateException e) {
+                        e.printStackTrace();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+
+            iv_loud.setBackgroundColor(Color.WHITE);
+            iv_loud.setCircleBackgroundColor(Color.WHITE);
+            iv_mute.setBackgroundColor(Color.WHITE);
+            iv_mute.setCircleBackgroundColor(Color.WHITE);
+
+            final AudioManager audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+            if (audioManager != null) {
+                audioManager.setMode(AudioManager.MODE_IN_CALL);
+            }
+            if (audioManager != null) {
+                audioManager.setSpeakerphoneOn(false);
+            }
+            if (audioManager != null) {
+                audioManager.setMicrophoneMute(false);
+            }
+
+            iv_loud.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (!isLoud) {
+                        if (audioManager != null) {
+                            audioManager.setSpeakerphoneOn(true);
+                        }
+                        iv_loud.setImageResource(R.drawable.clicked_speaker_bt);
+                        isLoud = true;
+                    } else {
+                        iv_loud.setImageResource(R.drawable.speaker_bt);
+                        if (audioManager != null) {
+                            audioManager.setSpeakerphoneOn(false);
+                        }
+                        isLoud = false;
+                    }
+                }
+            });
+
+
+            iv_mute.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mute(audioManager);
+                }
+            });
+
+            final Window window = dialog.getWindow();
+            if (window != null) {
+                window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
+            }
+            if (window != null) {
+                window.setGravity(Gravity.CENTER);
+            }
+            dialog.show();
+        } catch (WindowManager.BadTokenException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void mute(AudioManager audioManager) {
         if (!audioManager.isMicrophoneMute()) {
             audioManager.setMicrophoneMute(true);
             iv_mute.setImageResource(R.drawable.clicked_mute);
@@ -1238,261 +1560,261 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         }
     }
 
-    public void showDialog(final Context context, final Call call) {
-        try {
-            final Dialog dialog = new Dialog(context);
-            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View view = inflater.inflate(R.layout.dialog_incomming_call, null, false);
-            dialog.setContentView(view);
-
-
-            CircleImageView iv_user_image_voip_one = dialog.findViewById(R.id.iv_user_image_voip_one);
-            final CircleImageView iv_cancel_call_voip_one = dialog.findViewById(R.id.iv_cancel_call_voip_one);
-            final CircleImageView iv_recv_call_voip_one = dialog.findViewById(R.id.iv_recv_call_voip_one);
-            final TextView caller_name = dialog.findViewById(R.id.callerName);
-            final TextView callState = dialog.findViewById(R.id.callState);
-
-            final CircleImageView iv_mute = dialog.findViewById(R.id.iv_mute);
-            final CircleImageView iv_loud = dialog.findViewById(R.id.iv_loud);
-            TextView tv_name_voip_one = dialog.findViewById(R.id.tv_name_voip_one);
-
-            iv_recv_call_voip_one.setClickable(true);
-            iv_mute.setVisibility(View.GONE);
-            iv_loud.setVisibility(View.GONE);
-
-            final MediaPlayer mp = MediaPlayer.create(this, R.raw.ring);
-            mp.start();
-
-            call.addCallListener(new CallListener() {
-                @Override
-                public void onCallEnded(Call endedCall) {
-                    //call ended by either party
-                    dialog.findViewById(R.id.incoming_call_view).setVisibility(View.GONE);
-                    setVolumeControlStream(AudioManager.USE_DEFAULT_STREAM_TYPE);
-                    try {
-                        if (mp.isPlaying()) {
-                            mp.stop();
-                            mp.release();
-                        }
-                        iv_mute.setVisibility(View.GONE);
-                        iv_loud.setVisibility(View.GONE);
-                        caller_name.setVisibility(View.GONE);
-                        callState.setText("");
-                        dialog.dismiss();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                @Override
-                public void onCallEstablished(final Call establishedCall) {
-                    //incoming call was picked up
-                    dialog.findViewById(R.id.incoming_call_view).setVisibility(View.VISIBLE);
-                    setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
-                    try {
-                        if (mp.isPlaying()) {
-                            mp.stop();
-                            mp.release();
-                        }
-                        callState.setText("connected");
-                        iv_mute.setVisibility(View.VISIBLE);
-                        iv_loud.setVisibility(View.VISIBLE);
-
-                        iv_recv_call_voip_one.setVisibility(View.GONE);
-
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                            params.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-                        }
-                        params.addRule(RelativeLayout.CENTER_HORIZONTAL);
-                        iv_cancel_call_voip_one.setLayoutParams(params);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                @Override
-                public void onCallProgressing(Call progressingCall) {
-                    //call is ringing
-                    try {
-                        if (mp.isPlaying()) {
-                            mp.stop();
-                            mp.release();
-                        }
-                        dialog.findViewById(R.id.incoming_call_view).setVisibility(View.VISIBLE);
-                        caller_name.setText(progressingCall.getDetails().getDuration() + "");
-                        caller_name.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
-                        iv_mute.setVisibility(View.VISIBLE);
-                        iv_loud.setVisibility(View.VISIBLE);
-                        caller_name.setTypeface(null, Typeface.BOLD);
-                        callState.setText("ringing");
-                        iv_recv_call_voip_one.setVisibility(View.GONE);
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                            params.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-                        }
-                        params.addRule(RelativeLayout.CENTER_HORIZONTAL);
-                        iv_cancel_call_voip_one.setLayoutParams(params);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                @Override
-                public void onShouldSendPushNotification(Call call, List<PushPair> pushPairs) {
-                    //don't worry about this right now
-                }
-            });
-
-            final AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-
-            final int origionalVolume = am != null ? am.getStreamVolume(AudioManager.STREAM_MUSIC) : 0;
-            if (am != null) {
-                am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
-            }
-
-            if (am != null) {
-                switch (am.getRingerMode()) {
-                    case 0:
-                        mp.start();
-                        break;
-                    case 1:
-                        mp.start();
-                        break;
-                    case 2:
-                        mp.start();
-                        break;
-                }
-            }
-
-            mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mediaPlayer) {
-                    try {
-                        if (mp.isPlaying()) {
-                            mp.stop();
-                            mp.release();
-                        }
-                        if (am != null) {
-                            am.setStreamVolume(AudioManager.STREAM_MUSIC, origionalVolume, 0);
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-                }
-            });
-
-            if (ContextCompat.checkSelfPermission(MapsNewActivity.this, android.Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(MapsNewActivity.this, android.Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(MapsNewActivity.this,
-                        new String[]{android.Manifest.permission.RECORD_AUDIO, android.Manifest.permission.READ_PHONE_STATE},
-                        1);
-            }
-
-            caller_name.setVisibility(View.VISIBLE);
-            caller_name.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-            caller_name.setTypeface(null, Typeface.NORMAL);      // for Normal Text
-
-//            caller_name.setText(clientName + " vous appelle");
-//            tv_name_voip_one.setText(clientName);
-//            if (clientImageUri != null) {
-//                if (!clientImageUri.isEmpty()) {
-//                    Picasso.get().load(clientImageUri).into(iv_user_image_voip_one);
+//    public void showDialog(final Context context, final Call call) {
+//        try {
+//            final Dialog dialog = new Dialog(context);
+//            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+//            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//            View view = inflater.inflate(R.layout.dialog_incomming_call, null, false);
+//            dialog.setContentView(view);
+//
+//
+//            CircleImageView iv_user_image_voip_one = dialog.findViewById(R.id.iv_user_image_voip_one);
+//            final CircleImageView iv_cancel_call_voip_one = dialog.findViewById(R.id.iv_cancel_call_voip_one);
+//            final CircleImageView iv_recv_call_voip_one = dialog.findViewById(R.id.iv_recv_call_voip_one);
+//            final TextView caller_name = dialog.findViewById(R.id.callerName);
+//            final TextView callState = dialog.findViewById(R.id.callState);
+//
+//            final CircleImageView iv_mute = dialog.findViewById(R.id.iv_mute);
+//            final CircleImageView iv_loud = dialog.findViewById(R.id.iv_loud);
+//            TextView tv_name_voip_one = dialog.findViewById(R.id.tv_name_voip_one);
+//
+//            iv_recv_call_voip_one.setClickable(true);
+//            iv_mute.setVisibility(View.GONE);
+//            iv_loud.setVisibility(View.GONE);
+//
+//            final MediaPlayer mp = MediaPlayer.create(this, R.raw.ring);
+//            mp.start();
+//
+//            call.addCallListener(new CallListener() {
+//                @Override
+//                public void onCallEnded(Call endedCall) {
+//                    //call ended by either party
+//                    dialog.findViewById(R.id.incoming_call_view).setVisibility(View.GONE);
+//                    setVolumeControlStream(AudioManager.USE_DEFAULT_STREAM_TYPE);
+//                    try {
+//                        if (mp.isPlaying()) {
+//                            mp.stop();
+//                            mp.release();
+//                        }
+//                        iv_mute.setVisibility(View.GONE);
+//                        iv_loud.setVisibility(View.GONE);
+//                        caller_name.setVisibility(View.GONE);
+//                        callState.setText("");
+//                        dialog.dismiss();
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//
+//                @Override
+//                public void onCallEstablished(final Call establishedCall) {
+//                    //incoming call was picked up
+//                    dialog.findViewById(R.id.incoming_call_view).setVisibility(View.VISIBLE);
+//                    setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
+//                    try {
+//                        if (mp.isPlaying()) {
+//                            mp.stop();
+//                            mp.release();
+//                        }
+//                        callState.setText("connected");
+//                        iv_mute.setVisibility(View.VISIBLE);
+//                        iv_loud.setVisibility(View.VISIBLE);
+//
+//                        iv_recv_call_voip_one.setVisibility(View.GONE);
+//
+//                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+//                            params.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+//                        }
+//                        params.addRule(RelativeLayout.CENTER_HORIZONTAL);
+//                        iv_cancel_call_voip_one.setLayoutParams(params);
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//
+//                @Override
+//                public void onCallProgressing(Call progressingCall) {
+//                    //call is ringing
+//                    try {
+//                        if (mp.isPlaying()) {
+//                            mp.stop();
+//                            mp.release();
+//                        }
+//                        dialog.findViewById(R.id.incoming_call_view).setVisibility(View.VISIBLE);
+//                        caller_name.setText(progressingCall.getDetails().getDuration() + "");
+//                        caller_name.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+//                        iv_mute.setVisibility(View.VISIBLE);
+//                        iv_loud.setVisibility(View.VISIBLE);
+//                        caller_name.setTypeface(null, Typeface.BOLD);
+//                        callState.setText("ringing");
+//                        iv_recv_call_voip_one.setVisibility(View.GONE);
+//                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+//                            params.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+//                        }
+//                        params.addRule(RelativeLayout.CENTER_HORIZONTAL);
+//                        iv_cancel_call_voip_one.setLayoutParams(params);
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//
+//                @Override
+//                public void onShouldSendPushNotification(Call call, List<PushPair> pushPairs) {
+//                    //don't worry about this right now
+//                }
+//            });
+//
+//            final AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+//
+//            final int origionalVolume = am != null ? am.getStreamVolume(AudioManager.STREAM_MUSIC) : 0;
+//            if (am != null) {
+//                am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
+//            }
+//
+//            if (am != null) {
+//                switch (am.getRingerMode()) {
+//                    case 0:
+//                        mp.start();
+//                        break;
+//                    case 1:
+//                        mp.start();
+//                        break;
+//                    case 2:
+//                        mp.start();
+//                        break;
 //                }
 //            }
-
-            iv_cancel_call_voip_one.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    call.hangup();
-                    try {
-                        if (mp.isPlaying()) {
-                            mp.stop();
-                            mp.release();
-                        }
-                        dialog.dismiss();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-                }
-            });
-            params = (RelativeLayout.LayoutParams) iv_cancel_call_voip_one.getLayoutParams();
-            params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-            iv_cancel_call_voip_one.setLayoutParams(params);
-
-
-            iv_recv_call_voip_one.setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-                    try {
-                        if (mp.isPlaying()) {
-                            mp.stop();
-                            mp.release();
-                        }
-                        call.answer();
-                        iv_recv_call_voip_one.setClickable(false);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-
-            iv_loud.setBackgroundColor(Color.WHITE);
-            iv_loud.setCircleBackgroundColor(Color.WHITE);
-            iv_mute.setBackgroundColor(Color.WHITE);
-            iv_mute.setCircleBackgroundColor(Color.WHITE);
-
-            final AudioManager audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
-            if (audioManager != null) {
-                audioManager.setMode(AudioManager.MODE_IN_CALL);
-            }
-            if (audioManager != null) {
-                audioManager.setSpeakerphoneOn(false);
-            }
-            if (audioManager != null) {
-                audioManager.setMicrophoneMute(false);
-            }
-
-            iv_loud.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (!isLoud) {
-                        if (audioManager != null) {
-                            audioManager.setSpeakerphoneOn(true);
-                        }
-                        iv_loud.setImageResource(R.drawable.clicked_speaker_bt);
-                        isLoud = true;
-                    } else {
-                        iv_loud.setImageResource(R.drawable.speaker_bt);
-                        if (audioManager != null) {
-                            audioManager.setSpeakerphoneOn(false);
-                        }
-                        isLoud = false;
-                    }
-                }
-            });
-
-
-            iv_mute.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (audioManager != null) {
-                        mute(audioManager, iv_mute);
-                    }
-                }
-            });
-
-            final Window window = dialog.getWindow();
-            if (window != null) {
-                window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
-            }
-            if (window != null) {
-                window.setGravity(Gravity.CENTER);
-            }
-            dialog.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+//
+//            mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+//                @Override
+//                public void onCompletion(MediaPlayer mediaPlayer) {
+//                    try {
+//                        if (mp.isPlaying()) {
+//                            mp.stop();
+//                            mp.release();
+//                        }
+//                        if (am != null) {
+//                            am.setStreamVolume(AudioManager.STREAM_MUSIC, origionalVolume, 0);
+//                        }
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//
+//                }
+//            });
+//
+//            if (ContextCompat.checkSelfPermission(MapsNewActivity.this, android.Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(MapsNewActivity.this, android.Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+//                ActivityCompat.requestPermissions(MapsNewActivity.this,
+//                        new String[]{android.Manifest.permission.RECORD_AUDIO, android.Manifest.permission.READ_PHONE_STATE},
+//                        1);
+//            }
+//
+//            caller_name.setVisibility(View.VISIBLE);
+//            caller_name.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+//            caller_name.setTypeface(null, Typeface.NORMAL);      // for Normal Text
+//
+////            caller_name.setText(clientName + " vous appelle");
+////            tv_name_voip_one.setText(clientName);
+////            if (clientImageUri != null) {
+////                if (!clientImageUri.isEmpty()) {
+////                    Picasso.get().load(clientImageUri).into(iv_user_image_voip_one);
+////                }
+////            }
+//
+//            iv_cancel_call_voip_one.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    call.hangup();
+//                    try {
+//                        if (mp.isPlaying()) {
+//                            mp.stop();
+//                            mp.release();
+//                        }
+//                        dialog.dismiss();
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//
+//                }
+//            });
+//            params = (RelativeLayout.LayoutParams) iv_cancel_call_voip_one.getLayoutParams();
+//            params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+//            iv_cancel_call_voip_one.setLayoutParams(params);
+//
+//
+//            iv_recv_call_voip_one.setOnClickListener(new View.OnClickListener() {
+//
+//                @Override
+//                public void onClick(View v) {
+//                    try {
+//                        if (mp.isPlaying()) {
+//                            mp.stop();
+//                            mp.release();
+//                        }
+//                        call.answer();
+//                        iv_recv_call_voip_one.setClickable(false);
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            });
+//
+//            iv_loud.setBackgroundColor(Color.WHITE);
+//            iv_loud.setCircleBackgroundColor(Color.WHITE);
+//            iv_mute.setBackgroundColor(Color.WHITE);
+//            iv_mute.setCircleBackgroundColor(Color.WHITE);
+//
+//            final AudioManager audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+//            if (audioManager != null) {
+//                audioManager.setMode(AudioManager.MODE_IN_CALL);
+//            }
+//            if (audioManager != null) {
+//                audioManager.setSpeakerphoneOn(false);
+//            }
+//            if (audioManager != null) {
+//                audioManager.setMicrophoneMute(false);
+//            }
+//
+//            iv_loud.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    if (!isLoud) {
+//                        if (audioManager != null) {
+//                            audioManager.setSpeakerphoneOn(true);
+//                        }
+//                        iv_loud.setImageResource(R.drawable.clicked_speaker_bt);
+//                        isLoud = true;
+//                    } else {
+//                        iv_loud.setImageResource(R.drawable.speaker_bt);
+//                        if (audioManager != null) {
+//                            audioManager.setSpeakerphoneOn(false);
+//                        }
+//                        isLoud = false;
+//                    }
+//                }
+//            });
+//
+//
+//            iv_mute.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    if (audioManager != null) {
+//                        mute(audioManager, iv_mute);
+//                    }
+//                }
+//            });
+//
+//            final Window window = dialog.getWindow();
+//            if (window != null) {
+//                window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
+//            }
+//            if (window != null) {
+//                window.setGravity(Gravity.CENTER);
+//            }
+//            dialog.show();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 }

@@ -2,7 +2,6 @@
     ources>
     <string name="app_name">Fousa</string>
     <string name="title_activity_maps">Fousa</string>
-    <string name="txt_not_enough_money">Pas assez d\'argent pour recharger</string>
     <string name="txt_successfully_recharged">Rechargé avec succès</string>
 
     <string name="Q1">Comment puis-je obtenir l\'estimation du prix d\'une course?</string>
@@ -31,7 +30,6 @@
     <string name="se_connecter">Se connecter</string>
     <string name="num_ro_de_t_l_phone">Numéro de téléphone</string>
     <string name="mot_de_passe">Mot de passe</string>
-    <string name="bon_client">Bon Client</string>
     <string name="refuser">Refuser</string>
     <string name="accepter">Accepter</string>
     <string name="vous_tes_hors_ligne">Vous étes hors ligne</string>
@@ -44,7 +42,6 @@
     <string name="appelle_telephonique">Appelle telephonique</string>
     <string name="appelle_voip">Appelle VOIP</string>
     <string name="appuyez_pour_arriver">Appuyez pour arriver</string>
-    <string name="_0_0_mad">0.0 MAD</string>
     <string name="todo">TODO</string>
     <string name="txt_driver_arrive">Appuyez pour arriver</string>
     <string name="txt_tap_to_start">Appuyez pour commancer</string>
