@@ -1709,8 +1709,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Looper.myLooper();
                 }
 
-
-                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(number).addValueEventListener(new ValueEventListener() {
+                Log.e(TAG, "doInBackground: "+driverId );
+                FirebaseDatabase.getInstance().getReference("DRIVERUSERS").child(driverId).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (dataSnapshot.exists()) {
@@ -1743,7 +1743,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 int t = r1 + (r2 * 2) + (r3 * 3) + (r4 * 4) + (r5 * 5);
                                 int total = r1 + r2 + r3 + r4 + r5;
 
-                                Rating = 0;
+                                Rating = 4.0;
                                 if (total != 0)
                                     Rating = (double) (t / total);
                             }
@@ -1837,9 +1837,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         } else {
             driverI.setImageResource(R.drawable.driver_profil_picture);
         }
-        fullName.setText(driverName);
-        ratingR.setText(Rating + "");
 
+        fullName.setText(driverName);
+        Log.e(TAG, "setUserUi: "+Rating );
+        if (Rating != 0) {
+            ratingR.setText(Rating + "");
+        }
         money.setText(df2.format(Double.parseDouble(todayEarnings)) + " MAD");
 
 

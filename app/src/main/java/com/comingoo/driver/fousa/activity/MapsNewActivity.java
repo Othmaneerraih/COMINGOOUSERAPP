@@ -530,8 +530,12 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         }
 
         nameTxt.setText(driverName);
-        ratingTxt.setText( df2.format(driverRating)+ "");
         moneyBtn.setText(df2.format(todayEarnings) + " MAD");
+
+
+        if (driverRating != 0.0) {
+            ratingTxt.setText(df2.format(driverRating)+ "");
+        }else ratingTxt.setText("4.0");
     }
 
     private void permission() {
