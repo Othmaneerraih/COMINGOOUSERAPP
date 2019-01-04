@@ -54,7 +54,7 @@ public class VoipCallingActivity extends AppCompatActivity {
 
     private static final String APP_KEY = "185d9822-a953-4af6-a780-b0af1fd31bf7";
     private static final String APP_SECRET = "ZiJ6FqH5UEWYbkMZd1rWbw==";
-    private static final String ENVIRONMENT = "sandbox.sinch.com";
+    private static final String ENVIRONMENT = "clientapi.sinch.com";
 
     boolean isLoud = false;
 

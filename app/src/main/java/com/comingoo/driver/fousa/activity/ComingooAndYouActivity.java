@@ -54,7 +54,7 @@ public class ComingooAndYouActivity extends AppCompatActivity {
     private Button addCarButton;
 
     private ImageButton backAddCar;
-
+    private Double earnings = 0.0;
     private TextView tvTarrif, todayEarnings, debt, courses, userName, phoneNumber;
 
     private Button changePassBtn;
@@ -72,7 +72,7 @@ public class ComingooAndYouActivity extends AppCompatActivity {
 
     private ConstraintLayout tarifs;
     private ConstraintLayout tarifsLayout;
-    private DecimalFormat df2 = new DecimalFormat("0.##");
+    private DecimalFormat df2 = new DecimalFormat(".##");
 
 
     @Override
@@ -84,8 +84,11 @@ public class ComingooAndYouActivity extends AppCompatActivity {
 
         df2.setRoundingMode(RoundingMode.UP);
 
+        earnings = getIntent().getDoubleExtra("earnings", 0.0);
 
-        todayEarnings.setText(getIntent().getStringExtra("earnings") + " MAD");
+        if (earnings == null) {
+            todayEarnings.setText("0.0 MAD");
+        } else todayEarnings.setText(earnings + " MAD");
 
         todayEarnings.setTextColor(Color.GREEN);
         double debtPrice = Double.parseDouble(getIntent().getStringExtra("debt"));
@@ -144,10 +147,10 @@ public class ComingooAndYouActivity extends AppCompatActivity {
         mLocationView.setHasFixedSize(true);
         mLocationView.setLayoutManager(new LinearLayoutManager(this));
 
-        cAdapter = new ComingooUAdapter(carsData,mLocation);
+        cAdapter = new ComingooUAdapter(carsData, mLocation);
         mLocationView.setAdapter(cAdapter);
 
-        new CheckUserComingoUTask(mLocation,cAdapter,carsData).execute();
+        new CheckUserComingoUTask(mLocation, cAdapter, carsData).execute();
 
 
         String Month;

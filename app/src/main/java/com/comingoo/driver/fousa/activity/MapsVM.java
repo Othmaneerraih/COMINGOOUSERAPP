@@ -126,6 +126,7 @@ public class MapsVM {
                                             todysErn = dataSnapshot.child("earnings").getValue(String.class);
                                             todystrp = dataSnapshot.child("voyages").getValue(String.class);
                                             Log.e(TAG, "onDataChange: todysErn " + todysErn);
+                                            callback.callbackCall(true, drivrNam, drivrImg, drivrNum, debt, todystrp, todysErn, rat, driverId);
                                         }
                                     }
 

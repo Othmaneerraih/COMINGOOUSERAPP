@@ -251,6 +251,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                     driverName = drivrNam;
                     driverImage = drivrImg;
                     driverNumber = drivrNum;
+                    todayEarnings = Double.parseDouble(todysErn);
                     debit = debt;
                     todayTrips = todystrp;
                     driverRating = rat;
@@ -426,19 +427,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
             }
         });
 
-        comingoonyouLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MapsNewActivity.this, ComingooAndYouActivity.class);
-                intent.putExtra("image", driverImage);
-                intent.putExtra("name", driverName);
-                intent.putExtra("phone", driverNumber);
-                intent.putExtra("courses", todayTrips);
-                intent.putExtra("earnings", todayEarnings);
-                intent.putExtra("debt", debit);
-                startActivity(intent);
-            }
-        });
+
 
         inboxLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -530,12 +519,26 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         }
 
         nameTxt.setText(driverName);
+        Log.e(TAG, "setUserUi: "+todayEarnings );
         moneyBtn.setText(df2.format(todayEarnings) + " MAD");
-
 
         if (driverRating != 0.0) {
             ratingTxt.setText(df2.format(driverRating)+ "");
         }else ratingTxt.setText("4.0");
+
+        comingoonyouLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MapsNewActivity.this, ComingooAndYouActivity.class);
+                intent.putExtra("image", driverImage);
+                intent.putExtra("name", driverName);
+                intent.putExtra("phone", driverNumber);
+                intent.putExtra("courses", todayTrips);
+                intent.putExtra("earnings", todayEarnings);
+                intent.putExtra("debt", debit);
+                startActivity(intent);
+            }
+        });
     }
 
     private void permission() {
@@ -662,7 +665,6 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
             // Note: Making driver offline
             FirebaseDatabase.getInstance().getReference().child("ONLINEDRIVERS").child(driverId).removeValue();
             switchOnlineUI();
-
             if (!isRatingPopupShowed)
                 calculatePrice();
         }
@@ -800,14 +802,6 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                 }
             }
         }
-
-//                if (clientLevel != null) {
-//                    if (clientLevel.equals("2"))
-//                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("level").setValue("1");
-//
-//                    if (clientLevel.equals("1"))
-//                        FirebaseDatabase.getInstance().getReference("clientUSERS").child(clientId).child("level").setValue("0");
-//                }
 
         FirebaseDatabase.getInstance().getReference("clientUSERS").
                 child(clientId).child("LASTCOURSE").
