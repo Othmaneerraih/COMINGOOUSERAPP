@@ -477,7 +477,6 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
             }
         });
 
-        wazeBtn.setVisibility(View.VISIBLE);
         wazeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

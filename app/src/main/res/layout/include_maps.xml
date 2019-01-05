@@ -62,6 +62,27 @@
         app:civ_border_color="@android:color/black"
         app:civ_border_width="2dp" />
 
+    <ImageButton
+        android:id="@+id/my_position_button"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/my_location"
+        android:contentDescription="@string/todo" />
+
+    <ImageButton
+        android:id="@+id/waze_button"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_above="@+id/my_position_button"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="@dimen/margin_normal"
+        android:background="@drawable/waze_icon"
+        android:contentDescription="@string/todo" />
+
     <include
         layout="@layout/include_maps_user_info"
         android:layout_width="match_parent"
