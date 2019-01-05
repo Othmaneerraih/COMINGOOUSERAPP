@@ -674,6 +674,8 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
             switchOnlineUI();
             if (!isRatingPopupShowed)
                 calculatePrice();
+        } else if (courseState.equals("5")){
+            courseUIOff();
         }
     }
 
@@ -1185,7 +1187,6 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
             if (diff >= FIVE_MINUTES_DURATION) {
                 // Note: checking client type
                 clientType = prefs.getString("Client_Type", "default");
-                Log.e(TAG, "onClick: clientType " + clientType);
                 if (clientType.equals("bon")) {
                     FirebaseDatabase.getInstance().getReference("COURSES").child(courseId).child("state").setValue("5");
                     double punishmentValue = Double.parseDouble(debit) - PANISHMENT_VALUE;
@@ -1194,7 +1195,6 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                 }
             }
         }
-
     }
 
     private void logout() {
