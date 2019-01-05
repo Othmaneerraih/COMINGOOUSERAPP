@@ -76,6 +76,8 @@ import com.squareup.picasso.Picasso;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,6 +89,8 @@ import static com.comingoo.driver.fousa.utility.Utilities.GetUnixTime;
 import static com.comingoo.driver.fousa.utility.Utilities.getDateDay;
 import static com.comingoo.driver.fousa.utility.Utilities.getDateMonth;
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.MINUTES;
 
 public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCallback {
     private MapsVM mapsVM;
@@ -205,6 +209,9 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
     private CircleImageView iv_loud;
     private CircleImageView iv_recv_call_voip_one;
     private int count = 0;
+    private Date startTime;
+    private long FIVE_MINUTES_DURATION = MILLISECONDS.convert(5, MINUTES);
+    private int PANISHMENT_VALUE = 5;
 
     private int mHour, mMinute; // variables holding the hour and minuteZ
 
@@ -642,6 +649,8 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         if (courseState.equalsIgnoreCase("0")) {
             statusLayout.setVisibility(View.GONE);
 
+            startTime = Calendar.getInstance().getTime();
+
             // Note: Setting the course into driver's profile
             FirebaseDatabase.getInstance().getReference("DRIVERUSERS")
                     .child(driverId).child("COURSE").setValue(courseId);
@@ -1063,15 +1072,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                 btnNoDontCancelRide.setBackgroundColor(Color.TRANSPARENT);
                 btnNoDontCancelRide.setTextColor(Color.WHITE);
 
-                // Note: checking client type
-                clientType = prefs.getString("Client_Type", "default");
-                Log.e(TAG, "onClick: clientType " + clientType);
-                if (clientType.equals("bon")) {
-                    FirebaseDatabase.getInstance().getReference("COURSES").child(courseId).child("state").setValue("5");
-                    double punishmentValue = Double.parseDouble(debit) - 5;
-                    FirebaseDatabase.getInstance().getReference("DRIVERUSERS").
-                            child(driverId).child("debt").setValue(Double.toString(punishmentValue));
-                }
+                punishmentCharge();
 
                 final Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
@@ -1175,6 +1176,25 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                 .zoom(17)                   // Sets the zoom
                 .build();                   // Creates a CameraPosition from the builder
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+    }
+
+    private void punishmentCharge() {
+        Date currentTcurrentTimeime = Calendar.getInstance().getTime();
+        if (startTime != null) {
+            long diff = startTime.getTime() - currentTcurrentTimeime.getTime();
+            if (diff >= FIVE_MINUTES_DURATION) {
+                // Note: checking client type
+                clientType = prefs.getString("Client_Type", "default");
+                Log.e(TAG, "onClick: clientType " + clientType);
+                if (clientType.equals("bon")) {
+                    FirebaseDatabase.getInstance().getReference("COURSES").child(courseId).child("state").setValue("5");
+                    double punishmentValue = Double.parseDouble(debit) - PANISHMENT_VALUE;
+                    FirebaseDatabase.getInstance().getReference("DRIVERUSERS").
+                            child(driverId).child("debt").setValue(Double.toString(punishmentValue));
+                }
+            }
+        }
+
     }
 
     private void logout() {
