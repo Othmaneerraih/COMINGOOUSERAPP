@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.AudioManager;
@@ -68,6 +69,7 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
     private Double driverPosLat, driverPosLong;
     private boolean isProfilePicValid;
     private Dialog dialog;
+    private SharedPreferences prefs;
 
     public CommandActivity() {
     }
@@ -76,6 +78,8 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_command_new);
+        prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
+
         clientR = this;
 
         Window window = this.getWindow();
@@ -240,9 +244,7 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
             e.printStackTrace();
         }
 
-
         // client type calculation
-        Log.e("CommandActivity", "onCreate:clientID " + clientID);
         FirebaseDatabase.getInstance().getReference("CLIENTFINISHEDCOURSES").
                 addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -270,6 +272,7 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
                                                 int size = (int) dataSnapshot.getChildrenCount();
                                                 if (!isProfilePicValid && size == 0) {
                                                     clientType = "new";
+                                                    prefs.edit().putString("Client_Type", "new").apply();
                                                     tvClientType.setTextColor(ContextCompat.getColor(CommandActivity.this, R.color.color_new_client));
                                                     tvClientType.setText(getResources().getString(R.string.txt_new_client));
                                                     barTimer.setProgressDrawable(getResources().getDrawable(R.drawable.drawable_new_client));
@@ -278,22 +281,28 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
                                                     tvClientType.setText(getResources().getString(R.string.txt_potential_client));
                                                     barTimer.setProgressDrawable(getResources().getDrawable(R.drawable.drawable_potential_client));
                                                     clientType = "potential";
+                                                    prefs.edit().putString("Client_Type", "potential").apply();
                                                 } else if (!isProfilePicValid && size < 3) {
                                                     tvClientType.setTextColor(ContextCompat.getColor(CommandActivity.this, R.color.color_potential_client));
                                                     tvClientType.setText(getResources().getString(R.string.txt_potential_client));
                                                     barTimer.setProgressDrawable(getResources().getDrawable(R.drawable.drawable_potential_client));
                                                     clientType = "potential";
+                                                    prefs.edit().putString("Client_Type", "potential").apply();
                                                 } else if (!isProfilePicValid && size >= 3) {
                                                     clientType = "bon";
                                                     tvClientType.setTextColor(ContextCompat.getColor(CommandActivity.this, R.color.color_bon_client));
                                                     tvClientType.setText(getResources().getString(R.string.txt_bon_client));
+                                                    prefs.edit().putString("Client_Type", "bon").apply();
                                                     barTimer.setProgressDrawable(getResources().getDrawable(R.drawable.drawable_bon_client));
                                                 } else if (isProfilePicValid && size > 0) {
                                                     clientType = "bon";
+                                                    prefs.edit().putString("Client_Type", "bon").apply();
                                                     tvClientType.setTextColor(ContextCompat.getColor(CommandActivity.this, R.color.color_bon_client));
                                                     tvClientType.setText(getResources().getString(R.string.txt_bon_client));
                                                     barTimer.setProgressDrawable(getResources().getDrawable(R.drawable.drawable_bon_client));
                                                 }
+
+                                                Log.e(TAG, "onDataChange: clientType "+clientType );
                                             }
                                         }
 
@@ -302,23 +311,7 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
 
                                         }
                                     });
-                        } //else clientType = "new";
-
-                        Log.e("CommandActivity", "onCreate:clientType " + clientType);
-//                        if (clientType.equalsIgnoreCase("new")) {
-//                            tvClientType.setTextColor(getColor(R.color.color_new_client));
-//                            tvClientType.setText(getResources().getString(R.string.txt_new_client));
-//                            barTimer.setProgressDrawable(getResources().getDrawable(R.drawable.drawable_new_client));
-//                        } else  if (clientType.equalsIgnoreCase("potential")) {
-//                            tvClientType.setTextColor(getColor(R.color.color_potential_client));
-//                            tvClientType.setText(getResources().getString(R.string.txt_potential_client));
-//                            barTimer.setProgressDrawable(getResources().getDrawable(R.drawable.drawable_potential_client));
-//                        } else  if (clientType.equalsIgnoreCase("bon")) {
-//                            tvClientType.setTextColor(getColor(R.color.color_bon_client));
-//                            tvClientType.setText(getResources().getString(R.string.txt_bon_client));
-//                            barTimer.setProgressDrawable(getResources().getDrawable(R.drawable.drawable_bon_client));
-//                        }
-
+                        }
                     }
 
                     @Override

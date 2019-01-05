@@ -126,6 +126,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
     private boolean isRatingPopupShowed = false;
     private SharedPreferences prefs;
     private SharedPreferences.Editor editor;
+    private String clientType;
 
     private int RATE = 4;
     private double fixedPrice, price1, price2, price3, promoCode;
@@ -315,7 +316,6 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         boolean isPopupNotDismissedBefore = getSharedPreferences("COMINGOODRIVERDATA",
                 MODE_PRIVATE).getBoolean("isRatingPopupDismissedBefore", false);
 
-        Log.e(TAG, "isPopupNotDismissedBefore : " + isPopupNotDismissedBefore);
         if (isPopupNotDismissedBefore)
             calculatePrice();
 
@@ -428,7 +428,6 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         });
 
 
-
         inboxLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -519,12 +518,12 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         }
 
         nameTxt.setText(driverName);
-        Log.e(TAG, "setUserUi: "+todayEarnings );
+        Log.e(TAG, "setUserUi: " + todayEarnings);
         moneyBtn.setText(df2.format(todayEarnings) + " MAD");
 
         if (driverRating != 0.0) {
-            ratingTxt.setText(df2.format(driverRating)+ "");
-        }else ratingTxt.setText("4.0");
+            ratingTxt.setText(df2.format(driverRating) + "");
+        } else ratingTxt.setText("4.0");
 
         comingoonyouLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -658,8 +657,8 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
             showClientInformation();
             handler.removeCallbacks(runnable);
             isRatingPopupShowed = false;
-            showClientInformation();
             courseActionBtn.setText(getString(R.string.txt_finish_course));
+            cancelRideIv.setVisibility(View.GONE);
         } else if (courseState.equals("3")) {
             courseUIOff();
             // Note: Making driver offline
@@ -975,7 +974,6 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
 
         dialog.findViewById(R.id.body).getLayoutParams().width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (int) (dpWidth), MapsNewActivity.this.getResources().getDisplayMetrics());
 
-
         WindowManager.LayoutParams lp = Objects.requireNonNull(dialog.getWindow()).getAttributes();
         lp.dimAmount = 0.5f;
         dialog.getWindow().setAttributes(lp);
@@ -1006,7 +1004,6 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                 inSampleSize *= 2;
             }
         }
-
 
         // First decode with inJustDecodeBounds=true to check dimensions
         bOptions = new BitmapFactory.Options();
@@ -1067,8 +1064,15 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                 btnNoDontCancelRide.setBackgroundColor(Color.TRANSPARENT);
                 btnNoDontCancelRide.setTextColor(Color.WHITE);
 
-
-                FirebaseDatabase.getInstance().getReference("COURSES").child(courseId).child("state").setValue("5");
+                // Note: checking client type
+                clientType = prefs.getString("Client_Type", "default");
+                Log.e(TAG, "onClick: clientType " + clientType);
+                if (clientType.equals("bon")) {
+                    FirebaseDatabase.getInstance().getReference("COURSES").child(courseId).child("state").setValue("5");
+                    double punishmentValue = Double.parseDouble(debit) - 5;
+                    FirebaseDatabase.getInstance().getReference("DRIVERUSERS").
+                            child(driverId).child("debt").setValue(Double.toString(punishmentValue));
+                }
 
                 final Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
@@ -1080,7 +1084,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                 }, 3000);
 
                 switchOnlineUI();
-
+                courseUIOff();
                 alertDialog.dismiss();
             }
         });
