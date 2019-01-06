@@ -48,6 +48,7 @@ import android.widget.Toast;
 import com.comingoo.driver.fousa.R;
 import com.comingoo.driver.fousa.interfaces.CourseCallBack;
 import com.comingoo.driver.fousa.interfaces.DataCallBack;
+import com.comingoo.driver.fousa.interfaces.OnlineOfflineCallBack;
 import com.comingoo.driver.fousa.interfaces.PriceCallBack;
 import com.comingoo.driver.fousa.service.DriverService;
 import com.comingoo.driver.fousa.utility.CustomAnimation;
@@ -491,14 +492,26 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
             }
         });
 
-//        mapsVM.checkingOnlineOffline(new OnlineOfflineCallBack() {
-//            @Override
-//            public void isOnline(boolean isOnline) {
-//                if (isOnline)
-//                    switchOnlineUI();
-//                else switchOfflineUI();
-//            }
-//        });
+        mapsVM.checkingOnlineOffline(new OnlineOfflineCallBack() {
+            @Override
+            public void isOnline(boolean isOnline) {
+                if (isOnline) {
+                    CustomAnimation.fadeOut(MapsNewActivity.this, offlineBtn, 0, 10);
+                    CustomAnimation.fadeOut(MapsNewActivity.this, switchOnlineBtn, 0, 10);
+                    CustomAnimation.fadeIn(MapsNewActivity.this, onlineBtn, 500, 10);
+                    prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
+                    prefs.edit().putString("online", "1").apply();
+                } else {
+                    CustomAnimation.fadeIn(MapsNewActivity.this, offlineBtn, 500, 10);
+                    CustomAnimation.fadeIn(MapsNewActivity.this, switchOnlineBtn, 500, 10);
+                    CustomAnimation.fadeOut(MapsNewActivity.this, onlineBtn, 0, 10);
+                    switchOnlineBtn.setVisibility(View.VISIBLE);
+                    offlineBtn.setVisibility(View.VISIBLE);
+                    prefs = getSharedPreferences("COMINGOODRIVERDATA", MODE_PRIVATE);
+                    prefs.edit().putString("online", "0").apply();
+                }
+            }
+        });
 
 
 //        CommandActivity commandActivity = new CommandActivity(new OnlineOfflineCallBack() {
@@ -674,7 +687,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
             switchOnlineUI();
             if (!isRatingPopupShowed)
                 calculatePrice();
-        } else if (courseState.equals("5")){
+        } else if (courseState.equals("5")) {
             courseUIOff();
         }
     }

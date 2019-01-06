@@ -67,7 +67,7 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
     private String clientType;
     public static CountDownTimer countDownTimer;
     private Double driverPosLat, driverPosLong;
-    private boolean isProfilePicValid;
+    private boolean isProfilePicValid = true;
     private Dialog dialog;
     private SharedPreferences prefs;
 
@@ -256,7 +256,7 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                             if (dataSnapshot.hasChild("isProfilePicValid")) {
                                                 isProfilePicValid = dataSnapshot.child("isProfilePicValid").getValue(Boolean.class);
-                                            } else isProfilePicValid = false;
+                                            } else isProfilePicValid = true;
                                         }
 
                                         @Override
@@ -270,31 +270,31 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                             if (dataSnapshot.exists()) {
                                                 int size = (int) dataSnapshot.getChildrenCount();
-                                                if (!isProfilePicValid && size == 0) {
+                                                if (isProfilePicValid && size == 0) {
                                                     clientType = "new";
                                                     prefs.edit().putString("Client_Type", "new").apply();
                                                     tvClientType.setTextColor(ContextCompat.getColor(CommandActivity.this, R.color.color_new_client));
                                                     tvClientType.setText(getResources().getString(R.string.txt_new_client));
                                                     barTimer.setProgressDrawable(getResources().getDrawable(R.drawable.drawable_new_client));
-                                                } else if (isProfilePicValid && size == 0) {
+                                                } else if (!isProfilePicValid && size == 0) {
                                                     tvClientType.setTextColor(ContextCompat.getColor(CommandActivity.this, R.color.color_potential_client));
                                                     tvClientType.setText(getResources().getString(R.string.txt_potential_client));
                                                     barTimer.setProgressDrawable(getResources().getDrawable(R.drawable.drawable_potential_client));
                                                     clientType = "potential";
                                                     prefs.edit().putString("Client_Type", "potential").apply();
-                                                } else if (!isProfilePicValid && size < 3) {
+                                                } else if (isProfilePicValid && size < 3) {
                                                     tvClientType.setTextColor(ContextCompat.getColor(CommandActivity.this, R.color.color_potential_client));
                                                     tvClientType.setText(getResources().getString(R.string.txt_potential_client));
                                                     barTimer.setProgressDrawable(getResources().getDrawable(R.drawable.drawable_potential_client));
                                                     clientType = "potential";
                                                     prefs.edit().putString("Client_Type", "potential").apply();
-                                                } else if (!isProfilePicValid && size >= 3) {
+                                                } else if (isProfilePicValid && size >= 3) {
                                                     clientType = "bon";
                                                     tvClientType.setTextColor(ContextCompat.getColor(CommandActivity.this, R.color.color_bon_client));
                                                     tvClientType.setText(getResources().getString(R.string.txt_bon_client));
                                                     prefs.edit().putString("Client_Type", "bon").apply();
                                                     barTimer.setProgressDrawable(getResources().getDrawable(R.drawable.drawable_bon_client));
-                                                } else if (isProfilePicValid && size > 0) {
+                                                } else if (!isProfilePicValid && size > 0) {
                                                     clientType = "bon";
                                                     prefs.edit().putString("Client_Type", "bon").apply();
                                                     tvClientType.setTextColor(ContextCompat.getColor(CommandActivity.this, R.color.color_bon_client));
