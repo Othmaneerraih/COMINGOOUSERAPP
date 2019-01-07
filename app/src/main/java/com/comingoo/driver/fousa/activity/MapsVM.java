@@ -377,20 +377,21 @@ public class MapsVM {
     }
 
     public void checkingOnlineOffline(final OnlineOfflineCallBack onlineOfflineCallBack) {
-        FirebaseDatabase.getInstance().getReference().child("ONLINEDRIVERS").child(driverId).
-                addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.exists())
-                            onlineOfflineCallBack.isOnline(true);
-                        else onlineOfflineCallBack.isOnline(false);
-                    }
+        if (driverId != null) {
+            FirebaseDatabase.getInstance().getReference().child("ONLINEDRIVERS").child(driverId).
+                    addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.exists())
+                                onlineOfflineCallBack.isOnline(true);
+                            else onlineOfflineCallBack.isOnline(false);
+                        }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                    }
-                });
-
+                        }
+                    });
+        }
     }
 }

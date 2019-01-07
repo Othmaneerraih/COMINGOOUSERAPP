@@ -512,17 +512,6 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                 }
             }
         });
-
-
-//        CommandActivity commandActivity = new CommandActivity(new OnlineOfflineCallBack() {
-//            @Override
-//            public void isOnline(boolean isOnline) {
-//                if (isOnline)
-//                    switchOnlineUI();
-//                else switchOfflineUI();
-//            }
-//        });
-
     }
 
     private void setUserUi() {
@@ -689,6 +678,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                 calculatePrice();
         } else if (courseState.equals("5")) {
             courseUIOff();
+            switchOnlineUI();
         }
     }
 
@@ -1045,6 +1035,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         courseActionBtn.setText(getString(R.string.txt_driver_arrive));
         clientInfoLayout.setVisibility(View.VISIBLE);
         clientNameTv.setText(clientName);
+        wazeBtn.setVisibility(View.VISIBLE);
         Picasso.get().load(clientImageUri).into(clientImage);
         totalCourseTv.setText("Courses: " + clientTotalRide);
         driverInfoTv.setText(clientlastCourse);

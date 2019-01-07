@@ -86,7 +86,6 @@
             android:layout_marginStart="150dp"
             android:orientation="vertical">
 
-
             <TextView
                 android:id="@+id/client_type_txt"
                 android:layout_width="wrap_content"

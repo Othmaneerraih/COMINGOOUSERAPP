@@ -58,7 +58,7 @@
                     android:layout_toEndOf="@+id/user_image"
                     android:text="name"
                     android:textColor="@android:color/black"
-                    android:textSize="@dimen/txt_size_xxlarge"
+                    android:textSize="@dimen/txt_size_large"
                     android:textStyle="bold" />
 
                 <RelativeLayout

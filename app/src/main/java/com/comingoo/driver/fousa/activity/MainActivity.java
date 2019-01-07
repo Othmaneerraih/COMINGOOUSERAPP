@@ -69,7 +69,6 @@ public class MainActivity extends AppCompatActivity implements SubscribeDialog.S
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                throw new RuntimeException("This is a crash");
                 startActivity(new Intent(MainActivity.this, LoginActivity.class));
                 finish();
             }
@@ -185,7 +184,8 @@ public class MainActivity extends AppCompatActivity implements SubscribeDialog.S
         name = n;
         password = p;
         tele = t;//"+212"+t;
-        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").orderByChild("phoneNumber").equalTo(tele).addListenerForSingleValueEvent(new ValueEventListener() {
+        FirebaseDatabase.getInstance().getReference("DRIVERUSERS").orderByChild("phoneNumber").
+                equalTo(tele).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {

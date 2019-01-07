@@ -270,6 +270,8 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                             if (dataSnapshot.exists()) {
                                                 int size = (int) dataSnapshot.getChildrenCount();
+                                                Log.e(TAG, "onDataChange:isProfilePicValid: "+isProfilePicValid );
+                                                Log.e(TAG, "onDataChange:numOfRide: "+ size);
                                                 if (isProfilePicValid && size == 0) {
                                                     clientType = "new";
                                                     prefs.edit().putString("Client_Type", "new").apply();
@@ -588,7 +590,6 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
                 public void onClick(View view) {
                     dialog.dismiss();
                     FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
-//                    onlineOfflineCallBack.isOnline(false);
                     stopService(new Intent(CommandActivity.this, DriverService.class));
                     finish();
                 }
@@ -599,6 +600,7 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
                 @Override
                 public void onClick(View view) {
                     FirebaseDatabase.getInstance().getReference("PICKUPREQUEST").child(userId).child(clientID).removeValue();
+                    startService(new Intent(CommandActivity.this, DriverService.class));
                     dialog.dismiss();
                     finish();
                 }
