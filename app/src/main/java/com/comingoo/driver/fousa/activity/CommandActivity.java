@@ -200,8 +200,8 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             if (!Objects.requireNonNull(dataSnapshot.getKey()).isEmpty()) {
 
-                                if (dataSnapshot.getValue() == null) {
-                                    ratingShow.setText("0");
+                                if (dataSnapshot.getValue() == null || dataSnapshot.getValue().equals("NaN")) {
+                                    ratingShow.setText("4");
                                 } else {
                                     int oneStarPerson = 0;
                                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {

@@ -24,6 +24,7 @@
 
 
     <application
+        android:name=".activity.MyApplication"
         android:allowBackup="true"
         android:fullBackupContent="true"
         android:hardwareAccelerated="false"
@@ -52,7 +53,9 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <uses-library android:name="org.apache.http.legacy" android:required="false"/>
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
 
         <!-- <meta-data -->
         <!-- android:name="io.fabric.ApiKey" -->
@@ -63,9 +66,9 @@
             android:name=".activity.MapsActivity"
             android:label="@string/title_activity_maps">
             <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
+            <!--<action android:name="android.intent.action.MAIN" />-->
 
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--<category android:name="android.intent.category.LAUNCHER" />-->
             <!--</intent-filter>-->
         </activity>
         <activity
@@ -102,11 +105,12 @@
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
 
-        <activity android:name=".activity.MapsNewActivity"
+        <activity
+            android:name=".activity.MapsNewActivity"
             android:configChanges="orientation"
+            android:label="@string/title_activity_maps"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize"
-            android:label="@string/title_activity_maps">
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
