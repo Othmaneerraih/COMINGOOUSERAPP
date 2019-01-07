@@ -42,23 +42,16 @@ public class LoginActivity extends AppCompatActivity {
         password = findViewById(R.id.password);
         ImageButton loginBtn = findViewById(R.id.loginBtn);
 
-
-
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 if(phoneNumber.getText().toString().isEmpty() && password.getText().toString().isEmpty()){
                     Toast.makeText(LoginActivity.this, "Fill all the fields", Toast.LENGTH_SHORT).show();
                 }else{
-
                     login(phoneNumber.getText().toString(), password.getText().toString());
                 }
-
             }
         });
-
-
     }
 
     public void checkNetworkConnection(){
