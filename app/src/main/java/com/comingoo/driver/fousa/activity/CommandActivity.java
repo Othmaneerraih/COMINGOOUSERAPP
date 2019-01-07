@@ -41,6 +41,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -406,6 +407,7 @@ public class CommandActivity extends AppCompatActivity implements OnMapReadyCall
                             data.put("startLong", intent.getStringExtra("startLong"));
                             data.put("endLat", intent.getStringExtra("endLat"));
                             data.put("endLong", intent.getStringExtra("endLong"));
+                            data.put("startTime", Calendar.getInstance().getTime().toString());
 
                             data.put("driverPosLat", intent.getStringExtra("driverPosLat"));
                             data.put("driverPosLong", intent.getStringExtra("driverPosLong"));

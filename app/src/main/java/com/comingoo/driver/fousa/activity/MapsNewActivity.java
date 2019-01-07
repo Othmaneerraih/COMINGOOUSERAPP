@@ -77,6 +77,8 @@ import com.squareup.picasso.Picasso;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -210,10 +212,9 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
     private CircleImageView iv_loud;
     private CircleImageView iv_recv_call_voip_one;
     private int count = 0;
-    private Date startTime;
     private long FIVE_MINUTES_DURATION = MILLISECONDS.convert(5, MINUTES);
     private int PANISHMENT_VALUE = 5;
-
+    private Date courseStartTime;
     private int mHour, mMinute; // variables holding the hour and minuteZ
 
     protected static final int REQUEST_CHECK_SETTINGS = 0x1;
@@ -245,6 +246,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
         permission();
         initialize();
         action();
+
     }
 
     private void action() {
@@ -281,7 +283,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                                            String clintImageUri, String clintPhoneNumber,
                                            String clintlastCourse, String clintSold, String clintCre, String strtAddress,
                                            String destAddr, String distanceTravele, String courseSta, String clintTotalRide,
-                                           String clintLastRideDate, String preWTime, LatLng clientDestLatLng) {
+                                           String clintLastRideDate, String preWTime, LatLng clientDestLatLng, String startTime) {
                 courseState = courseSta;
                 courseId = coursId;
                 clientId = clintId;
@@ -296,6 +298,14 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
                 clientTotalRide = clintTotalRide;
                 distanceTraveled = distanceTravele;
                 clientLastRideDate = clintLastRideDate;
+
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                try {
+                    courseStartTime = format.parse(startTime);
+                    System.out.println(courseStartTime);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
                 if (!preWTime.equals(""))
                     preWaitTime = Integer.parseInt(preWTime);
                 else preWaitTime = 0;
@@ -661,9 +671,6 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
 
         if (courseState.equalsIgnoreCase("0")) {
             statusLayout.setVisibility(View.GONE);
-
-            startTime = Calendar.getInstance().getTime();
-
             // Note: Setting the course into driver's profile
             FirebaseDatabase.getInstance().getReference("DRIVERUSERS")
                     .child(driverId).child("COURSE").setValue(courseId);
@@ -1195,8 +1202,8 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
 
     private void punishmentCharge() {
         Date currentTcurrentTimeime = Calendar.getInstance().getTime();
-        if (startTime != null) {
-            long diff = currentTcurrentTimeime.getTime() - startTime.getTime();
+        if (courseStartTime != null) {
+            long diff = currentTcurrentTimeime.getTime() - courseStartTime.getTime();
             if (diff >= FIVE_MINUTES_DURATION) {
                 // Note: checking client type
                 clientType = prefs.getString("Client_Type", "default");

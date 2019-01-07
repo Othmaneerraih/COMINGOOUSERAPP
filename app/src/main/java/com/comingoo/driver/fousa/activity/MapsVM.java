@@ -57,6 +57,7 @@ public class MapsVM {
     private String preWaitTime = "";
     private String distanceTraveled = "";
     private LatLng driverArraivalLatLong;
+    private String startTime = "";
 
     void checkLogin(final Context context, final DataCallBack callback) {
         final String TAG = "checkLoginVM";
@@ -170,6 +171,7 @@ public class MapsVM {
                         distanceTraveled = data.child("distanceTraveled").getValue(String.class);
                         preWaitTime = data.child("preWaitTime").getValue(String.class);
                         clientId = data.child("client").getValue(String.class);
+                        startTime = data.child("startTime").getValue(String.class);
 
                         if (data.child("endLat").getValue(String.class) != null) {
                             if (Objects.equals(data.child("endLat").getValue(String.class), "")) {
@@ -235,7 +237,7 @@ public class MapsVM {
                                                                 clientPhoneNumber, clientlastCourse, clientSolde, clientCredit,
                                                                 startAddress, destAddress, distanceTraveled, courseState,
                                                                 clientTotalCourse, clientLastRideDate, preWaitTime,
-                                                                driverArraivalLatLong);
+                                                                driverArraivalLatLong,startTime);
 
 
                                                     }
@@ -281,7 +283,7 @@ public class MapsVM {
                                             clientId, clientName, clientImageUri,
                                             clientPhoneNumber, clientlastCourse, clientSolde, clientCredit,
                                             startAddress, destAddress, distanceTraveled, courseState,
-                                            clientTotalCourse, clientLastRideDate, preWaitTime, driverArraivalLatLong);
+                                            clientTotalCourse, clientLastRideDate, preWaitTime, driverArraivalLatLong,startTime);
                                 }
                             });
                         }
@@ -291,7 +293,7 @@ public class MapsVM {
                     callback.callbackCourseInfo(courseId, clientId, clientName,
                             clientImageUri, clientPhoneNumber, clientlastCourse, clientSolde, clientCredit,
                             startAddress, destAddress, distanceTraveled, courseState,
-                            clientTotalCourse, clientLastRideDate, preWaitTime, driverArraivalLatLong);
+                            clientTotalCourse, clientLastRideDate, preWaitTime, driverArraivalLatLong,startTime);
                 }
             }
 
