@@ -1196,7 +1196,7 @@ public class MapsNewActivity extends AppCompatActivity implements OnMapReadyCall
     private void punishmentCharge() {
         Date currentTcurrentTimeime = Calendar.getInstance().getTime();
         if (startTime != null) {
-            long diff = startTime.getTime() - currentTcurrentTimeime.getTime();
+            long diff = currentTcurrentTimeime.getTime() - startTime.getTime();
             if (diff >= FIVE_MINUTES_DURATION) {
                 // Note: checking client type
                 clientType = prefs.getString("Client_Type", "default");
